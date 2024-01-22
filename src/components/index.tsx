@@ -19,7 +19,7 @@ const initialNodes: Node[] = [
 ];
 const initialEdges: any[] = [];
 
-export default function App() {
+export default function Sketcher() {
 
   const nodeTypes = useMemo(() => ({ switch: Switch }), []);
 

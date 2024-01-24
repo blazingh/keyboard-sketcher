@@ -10,6 +10,7 @@ import ReactFlow, {
   NodeProps,
   useReactFlow,
   ReactFlowProvider,
+  NodeChange,
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
@@ -19,8 +20,9 @@ import { PlusIcon } from 'lucide-react';
 const initialNodes: Node[] = [
   { id: "1", type: 'switch', position: { x: 0, y: 0 }, data: { label: 'Switch' }, },
   { id: "2", type: 'switch', position: { x: 140, y: 140 }, data: { label: 'Switch' } },
+  { id: "3", type: 'switch', position: { x: 280, y: 280 }, data: { label: 'Switch' } },
+  { id: "4", type: 'switch', position: { x: 420, y: 420 }, data: { label: 'Switch' } },
 ];
-const initialEdges: any[] = [];
 
 export default function Sketcher() {
   return (
@@ -37,25 +39,31 @@ function BasicFlow() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const { getIntersectingNodes } = useReactFlow();
 
-  const [intesectionError, setIntesectionError] = React.useState<boolean>(false);
+  const handleNodesChange = (nodes: NodeChange[]) => {
+    checkIntersections(nodes.filter((n) => n.type === "position").map((n: any) => n.id as Node["id"]))
+    onNodesChange(nodes);
+  }
 
-  const onNodeDrag = useCallback((_: any, node: Node) => {
-    const intersections = getIntersectingNodes(node).map((n) => n.id);
-    let intersect_error = false
+  const checkIntersections = (nodeIds: Node["id"][]) => {
+    let intersections: Node["id"][] = []
+    for (let i = 0; i < nodes.length; i++)
+      getIntersectingNodes({ id: nodes[i].id })
+        .filter((n: any) => n.id !== nodeIds[i])
+        .length > 0 && intersections.push(nodes[i].id)
 
-    setNodes((ns) =>
-      ns.map((n) => {
-        if (intersections.includes(n.id)) intersect_error = true
-        return { ...n, data: { ...n, overlaped: intersections.includes(n.id) } }
-      }
-      )
-    );
-    setIntesectionError(intersect_error)
-  }, []);
+    setNodes((ns) => (
+      ns.map((n) => (
+        {
+          ...n, data: { ...n.data, overlaped: intersections.includes(n.id) }
+        }
+      ))
+    ))
+  }
 
   return (
     <div className='w-full h-[700px]'>
       <div className=' hidden' />
+      <div className='absolute top-0 right-0'>{}</div>
       <ReactFlow
         selectionOnDrag
         panOnDrag={[1, 2, 3, 4]}
@@ -67,10 +75,7 @@ function BasicFlow() {
         fitView
         translateExtent={[[-5000, -5000], [5000, 5000]]}
         nodes={nodes}
-        onNodesChange={(nodes) => {
-          onNodesChange(nodes);
-          onNodeDrag("", nodes[0] as Node);
-        }}
+        onNodesChange={handleNodesChange}
       >
         <Controls />
         <Background
@@ -86,9 +91,10 @@ function BasicFlow() {
 function Switch(props: NodeProps) {
   return (
     <div className={cn(
-      'w-[140px] h-[140px] border-2 rounded-md bg-secondary relative',
-      props.selected && 'border-primary',
-      props.data.overlaped && 'bg-destructive border-destructive',
+      'w-[140px] h-[140px] border border-foreground rounded-md bg-secondary relative',
+      props.selected && 'border-2 border-primary',
+      props.data.overlaped && 'bg-destructive',
+      props.data.overlaped && props.selected && 'border-destructive-foreground',
     )}
       {...props} >
       {props.selected &&

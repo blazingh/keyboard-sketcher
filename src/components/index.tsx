@@ -44,7 +44,7 @@ function BasicFlow() {
     onNodesChange(nodes);
   }
 
-  const checkIntersections = (nodeIds: Node["id"][]) => {
+  const checkIntersections = useCallback((nodeIds: Node["id"][]) => {
     let intersections: Node["id"][] = []
     for (let i = 0; i < nodes.length; i++)
       getIntersectingNodes({ id: nodes[i].id })
@@ -58,7 +58,7 @@ function BasicFlow() {
         }
       ))
     ))
-  }
+  }, [getIntersectingNodes, nodes, setNodes])
 
   return (
     <div className='w-full h-[700px]'>

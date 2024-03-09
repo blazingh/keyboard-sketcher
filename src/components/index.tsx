@@ -1,6 +1,6 @@
 "use client";
 import { cn } from '@/lib/utils';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import ReactFlow, {
   Controls,
   Background,
@@ -8,20 +8,21 @@ import ReactFlow, {
   BackgroundVariant,
   Node,
   NodeProps,
-  useReactFlow,
   ReactFlowProvider,
+  NodeToolbar,
+  Position,
   NodeChange,
+  MiniMap,
 } from 'reactflow';
 
 import 'reactflow/dist/style.css';
 import { Button } from './ui/button';
 import { PlusIcon } from 'lucide-react';
+import { useHotkeys } from 'react-hotkeys-hook'
+import { Key } from 'ts-key-enum'
 
 const initialNodes: Node[] = [
-  { id: "1", type: 'switch', position: { x: 0, y: 0 }, data: { label: 'Switch' }, },
-  { id: "2", type: 'switch', position: { x: 140, y: 140 }, data: { label: 'Switch' } },
-  { id: "3", type: 'switch', position: { x: 280, y: 280 }, data: { label: 'Switch' } },
-  { id: "4", type: 'switch', position: { x: 420, y: 420 }, data: { label: 'Switch' } },
+  { id: "1", type: 'switch', position: { x: 0, y: 0 }, data: { label: 'Switch' }, }
 ];
 
 export default function Sketcher() {
@@ -34,55 +35,110 @@ export default function Sketcher() {
 
 function BasicFlow() {
 
-  const nodeTypes = useMemo(() => ({ switch: Switch }), []);
+  const nodeTypes = useMemo(() => ({ switch: Switch, addButton: AddButton }), []);
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const { getIntersectingNodes } = useReactFlow();
+  const [nodes, _, onNodesChange] = useNodesState(initialNodes);
 
-  const handleNodesChange = (nodes: NodeChange[]) => {
-    checkIntersections(nodes.filter((n) => n.type === "position").map((n: any) => n.id as Node["id"]))
-    onNodesChange(nodes);
+  const selectedNodes = useMemo(() => {
+    return nodes.filter((node) => node.selected).map((node) => node.id)
+  }, [nodes])
+
+  function handleAddNode(side: 'left' | 'right' | 'top' | 'bottom') {
+    const changes: NodeChange[] = []
+    let deltas = [0, 0]
+    if (side === 'top') deltas = [0, -190]
+    if (side === 'bottom') deltas = [0, 190]
+    if (side === 'left') deltas = [-190, 0]
+    if (side === 'right') deltas = [190, 0]
+    nodes.map((node) => {
+      if (!selectedNodes.includes(node.id)) return
+      changes.push({ type: 'select', id: node.id, selected: false })
+      changes.push({ type: 'add', item: { ...node, id: `${Math.random()}`, position: { x: node.position.x + deltas[0], y: node.position.y + deltas[1] }, selected: true } })
+    })
+    onNodesChange(changes)
   }
 
-  const checkIntersections = useCallback((nodeIds: Node["id"][]) => {
-    let intersections: Node["id"][] = []
-    for (let i = 0; i < nodes.length; i++)
-      getIntersectingNodes({ id: nodes[i].id })
-        .filter((n: any) => n.id !== nodeIds[i])
-        .length > 0 && intersections.push(nodes[i].id)
+  function handleMoveNode(key: 'ArrowLeft' | 'ArrowRight' | 'ArrowUp' | 'ArrowDown') {
+    const changes: NodeChange[] = []
+    let deltas = [0, 0]
+    if (key === 'ArrowLeft') deltas = [-10, 0]
+    if (key === 'ArrowRight') deltas = [10, 0]
+    if (key === 'ArrowUp') deltas = [0, -10]
+    if (key === 'ArrowDown') deltas = [0, 10]
+    nodes.map((node) => {
+      if (!selectedNodes.includes(node.id)) return
+      changes.push({ type: 'position', id: node.id, position: { x: node.position.x + deltas[0], y: node.position.y + deltas[1] } })
+    })
+    onNodesChange(changes)
+  }
 
-    setNodes((ns) => (
-      ns.map((n) => (
-        {
-          ...n, data: { ...n.data, overlaped: intersections.includes(n.id) }
-        }
-      ))
-    ))
-  }, [getIntersectingNodes, nodes, setNodes])
+  useHotkeys(Key.ArrowUp, () => handleMoveNode('ArrowUp'))
+  useHotkeys(Key.ArrowDown, () => handleMoveNode('ArrowDown'))
+  useHotkeys(Key.ArrowLeft, () => handleMoveNode('ArrowLeft'))
+  useHotkeys(Key.ArrowRight, () => handleMoveNode('ArrowRight'))
 
   return (
     <div className='w-full h-[700px]'>
       <div className=' hidden' />
-      <div className='absolute top-0 right-0'>{}</div>
+      <div className='absolute top-0 right-0 text-white'>{true ? 'Space' : 'nothing'}</div>
       <ReactFlow
         selectionOnDrag
-        panOnDrag={[1, 2, 3, 4]}
+        nodes={nodes}
         nodeTypes={nodeTypes}
+        onNodesChange={onNodesChange}
+        disableKeyboardA11y={true}
+        fitView
+        panOnDrag={[1, 2, 3, 4]}
         minZoom={0.2}
         maxZoom={5}
         snapToGrid
-        snapGrid={[14, 14]}
-        fitView
+        snapGrid={[10, 10]}
         translateExtent={[[-5000, -5000], [5000, 5000]]}
-        nodes={nodes}
-        onNodesChange={handleNodesChange}
       >
+        <MiniMap pannable zoomable />
         <Controls />
         <Background
           id="1"
-          gap={14}
+          gap={10}
           variant={BackgroundVariant.Dots}
         />
+
+        <NodeToolbar nodeId={selectedNodes} isVisible position={Position.Top}>
+          <Button
+            className=' p-0 h-6 w-6 flex items-center justify-center opacity-25 hover:opacity-100'
+            onClick={() => handleAddNode('top')}
+          >
+            <PlusIcon className='w-4 h-4 flex-shrink-0' />
+          </Button>
+        </NodeToolbar>
+
+        <NodeToolbar nodeId={selectedNodes} isVisible position={Position.Bottom}>
+          <Button
+            className=' p-0 h-6 w-6 flex items-center justify-center opacity-25 hover:opacity-100'
+            onClick={() => handleAddNode('bottom')}
+          >
+            <PlusIcon className='w-4 h-4 flex-shrink-0' />
+          </Button>
+        </NodeToolbar>
+
+        <NodeToolbar nodeId={selectedNodes} isVisible position={Position.Left}>
+          <Button
+            className=' p-0 h-6 w-6 flex items-center justify-center opacity-25 hover:opacity-100'
+            onClick={() => handleAddNode('left')}
+          >
+            <PlusIcon className='w-4 h-4 flex-shrink-0' />
+          </Button>
+        </NodeToolbar>
+
+        <NodeToolbar nodeId={selectedNodes} isVisible position={Position.Right}>
+          <Button
+            className=' p-0 h-6 w-6 flex items-center justify-center opacity-25 hover:opacity-100'
+            onClick={() => handleAddNode('right')}
+          >
+            <PlusIcon className='w-4 h-4 flex-shrink-0' />
+          </Button>
+        </NodeToolbar>
+
       </ReactFlow>
     </div>
   );
@@ -91,34 +147,25 @@ function BasicFlow() {
 function Switch(props: NodeProps) {
   return (
     <div className={cn(
-      'w-[140px] h-[140px] border border-foreground rounded-md bg-secondary relative',
-      props.selected && 'border-2 border-primary',
+      'w-[140px] h-[140px] border-2 border-foreground rounded-md bg-secondary relative',
+      props.selected && 'border-primary',
       props.data.overlaped && 'bg-destructive',
       props.data.overlaped && props.selected && 'border-destructive-foreground',
     )}
       {...props} >
-      {props.selected &&
-        ['t', 'b', 'l', 'r'].map((dir) =>
-          <div key={dir} className={cn(
-            dir === 't' ? 'top-0' : dir === 'b' ? 'bottom-0' : dir === 'l' ? 'left-0' : 'right-0',
-            dir === 't' ? '-translate-y-full' : dir === 'b' ? 'translate-y-full' : dir === 'l' ? '-translate-x-full' : 'translate-x-full',
-            dir === 't' ? 'w-full' : dir === 'b' ? 'w-full' : dir === 'l' ? 'h-full' : 'h-full',
-            'absolute p-3 flex justify-center items-center',
-            'opacity-0 hover:opacity-100 transition-opacity'
-          )}
-          >
-            <Button
-              variant={'default'}
-              onClick={() => console.log(props.xPos, props.yPos, dir)}
-              className={cn(
-                'p-0 h-min w-min',
-              )}
-            >
-              <PlusIcon className='text-primary-foreground w-8 h-8' />
-            </Button>
-          </div>
-        )
-      }
+    </div>
+  );
+}
+
+function AddButton(props: NodeProps) {
+  return (
+    <div className={cn(
+      'w-[40px] h-[40px] border border-foreground rounded-md bg-secondary relative',
+      props.selected && 'border-primary',
+      props.data.overlaped && 'bg-destructive',
+      props.data.overlaped && props.selected && 'border-destructive-foreground',
+    )}
+      {...props} >
     </div>
   );
 }

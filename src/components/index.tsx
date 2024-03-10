@@ -20,6 +20,8 @@ import { Button } from './ui/button';
 import { PlusIcon } from 'lucide-react';
 import { useHotkeys } from 'react-hotkeys-hook'
 import { Key } from 'ts-key-enum'
+import { primitives, booleans, hulls } from '@jscad/modeling'
+import stlSerializer from '@jscad/stl-serializer'
 
 const initialNodes: Node[] = [
   { id: "1", type: 'switch', position: { x: 0, y: 0 }, data: { label: 'Switch' }, }
@@ -32,6 +34,7 @@ export default function Sketcher() {
     </ReactFlowProvider>
   );
 }
+
 
 function BasicFlow() {
 
@@ -77,9 +80,39 @@ function BasicFlow() {
   useHotkeys(Key.ArrowLeft, () => handleMoveNode('ArrowLeft'))
   useHotkeys(Key.ArrowRight, () => handleMoveNode('ArrowRight'))
 
+  function generateModel(nodes: Node[]) {
+    let models = booleans.union(primitives.cuboid({ size: [0, 0, 0] }))
+    nodes.map((node) => {
+      if (node.type === 'switch') {
+        models = hulls.hull(models, primitives.cuboid({ size: [210, 210, 30], center: [node.position.x, node.position.y, 0] }))
+      }
+    })
+    nodes.map((node) => {
+      if (node.type === 'switch') {
+        models = booleans.subtract(models, primitives.cuboid({ size: [140, 140, 35], center: [node.position.x, node.position.y, 0] }))
+      }
+    })
+    const rawData = stlSerializer.serialize({ binary: true }, models)
+    const blob = new Blob(rawData)
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    nodes.map((node) => {
+      if (node.type === 'switch') {
+        models = hulls.hull(models, primitives.cuboid({ size: [190, 190, 30], center: [node.position.x, node.position.y, 0] }))
+      }
+    })
+    a.href = url
+    a.download = 'model.stl'
+    a.click()
+    URL.revokeObjectURL(url)
+    a.remove()
+
+  }
+
   return (
     <div className='w-full h-[700px]'>
       <div className=' hidden' />
+      <Button onClick={() => generateModel(nodes)}>Generate Model</Button>
       <div className='absolute top-0 right-0 text-white'>{true ? 'Space' : 'nothing'}</div>
       <ReactFlow
         selectionOnDrag

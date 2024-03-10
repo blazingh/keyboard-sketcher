@@ -90,6 +90,7 @@ function BasicFlow() {
     nodes.map((node) => {
       if (node.type === 'switch') {
         models = booleans.subtract(models, primitives.cuboid({ size: [140, 140, 35], center: [node.position.x, node.position.y, 0] }))
+        models = booleans.subtract(models, primitives.cuboid({ size: [70, 160, 30], center: [node.position.x, node.position.y, 15] }))
       }
     })
     const rawData = stlSerializer.serialize({ binary: true }, models)

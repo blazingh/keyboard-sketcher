@@ -20,11 +20,15 @@ import { Button } from './ui/button';
 import { PlusIcon } from 'lucide-react';
 import { useHotkeys } from 'react-hotkeys-hook'
 import { Key } from 'ts-key-enum'
-import { primitives, booleans, hulls } from '@jscad/modeling'
+import { primitives, booleans, hulls, extrusions } from '@jscad/modeling'
 import stlSerializer from '@jscad/stl-serializer'
 
 const initialNodes: Node[] = [
-  { id: "1", type: 'switch', position: { x: 0, y: 0 }, data: { label: 'Switch' }, }
+  { id: "1", type: 'switch', position: { x: 0, y: 0 }, data: { label: 'Switch' }, },
+  { id: "2", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch' }, },
+  { id: "3", type: 'switch', position: { x: 380, y: 0 }, data: { label: 'Switch' }, },
+  { id: "4", type: 'switch', position: { x: 190, y: 190 }, data: { label: 'Switch' }, },
+  { id: "5", type: 'switch', position: { x: 380, y: 190 }, data: { label: 'Switch' }, }
 ];
 
 export default function Sketcher() {
@@ -81,33 +85,37 @@ function BasicFlow() {
   useHotkeys(Key.ArrowRight, () => handleMoveNode('ArrowRight'))
 
   function generateModel(nodes: Node[]) {
-    let models = booleans.union(primitives.cuboid({ size: [0, 0, 0] }))
+    let base_plate = booleans.union(primitives.rectangle({ size: [0, 0], center: [0, 0] }))
     nodes.map((node) => {
       if (node.type === 'switch') {
-        models = hulls.hull(models, primitives.cuboid({ size: [210, 210, 30], center: [node.position.x, node.position.y, 0] }))
+        base_plate = hulls.hullChain(
+          base_plate,
+          primitives.roundedRectangle({
+            size: [210, 210],
+            center: [node.position.x, node.position.y],
+            roundRadius: 30,
+            segments: 30
+          }))
       }
     })
+    console.log(base_plate)
+    let base_plate_3d = extrusions.extrudeLinear({ height: 30 }, base_plate)
     nodes.map((node) => {
       if (node.type === 'switch') {
-        models = booleans.subtract(models, primitives.cuboid({ size: [140, 140, 35], center: [node.position.x, node.position.y, 0] }))
-        models = booleans.subtract(models, primitives.cuboid({ size: [70, 160, 30], center: [node.position.x, node.position.y, 15] }))
+        base_plate_3d = booleans.subtract(base_plate_3d, primitives.cuboid({ size: [140, 140, 30], center: [node.position.x, node.position.y, 15] }))
+        base_plate_3d = booleans.subtract(base_plate_3d, primitives.cuboid({ size: [70, 160, 30], center: [node.position.x, node.position.y, 0] }))
       }
     })
-    const rawData = stlSerializer.serialize({ binary: true }, models)
+
+    const rawData = stlSerializer.serialize({ binary: true }, base_plate_3d)
     const blob = new Blob(rawData)
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
-    nodes.map((node) => {
-      if (node.type === 'switch') {
-        models = hulls.hull(models, primitives.cuboid({ size: [190, 190, 30], center: [node.position.x, node.position.y, 0] }))
-      }
-    })
     a.href = url
     a.download = 'model.stl'
     a.click()
     URL.revokeObjectURL(url)
     a.remove()
-
   }
 
   return (

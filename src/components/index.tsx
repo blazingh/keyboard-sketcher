@@ -1,6 +1,6 @@
 "use client";
 import { cn } from '@/lib/utils';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import ReactFlow, {
   Controls,
   Background,
@@ -20,11 +20,8 @@ import { Button } from './ui/button';
 import { PlusIcon } from 'lucide-react';
 import { useHotkeys } from 'react-hotkeys-hook'
 import { Key } from 'ts-key-enum'
-import { primitives, booleans, hulls, extrusions } from '@jscad/modeling'
-import stlSerializer from '@jscad/stl-serializer'
 
 const initialNodes: Node[] = [
-  { id: "1", type: 'switch', position: { x: 0, y: 0 }, data: { label: 'Switch' }, },
   { id: "2", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch' }, },
   { id: "3", type: 'switch', position: { x: 380, y: 0 }, data: { label: 'Switch' }, },
   { id: "4", type: 'switch', position: { x: 190, y: 190 }, data: { label: 'Switch' }, },
@@ -84,44 +81,32 @@ function BasicFlow() {
   useHotkeys(Key.ArrowLeft, () => handleMoveNode('ArrowLeft'))
   useHotkeys(Key.ArrowRight, () => handleMoveNode('ArrowRight'))
 
-  function generateModel(nodes: Node[]) {
-    let base_plate = booleans.union(primitives.rectangle({ size: [0, 0], center: [0, 0] }))
-    nodes.map((node) => {
-      if (node.type === 'switch') {
-        base_plate = hulls.hullChain(
-          base_plate,
-          primitives.roundedRectangle({
-            size: [210, 210],
-            center: [node.position.x, node.position.y],
-            roundRadius: 30,
-            segments: 30
-          }))
-      }
-    })
-    console.log(base_plate)
-    let base_plate_3d = extrusions.extrudeLinear({ height: 30 }, base_plate)
-    nodes.map((node) => {
-      if (node.type === 'switch') {
-        base_plate_3d = booleans.subtract(base_plate_3d, primitives.cuboid({ size: [140, 140, 30], center: [node.position.x, node.position.y, 15] }))
-        base_plate_3d = booleans.subtract(base_plate_3d, primitives.cuboid({ size: [70, 160, 30], center: [node.position.x, node.position.y, 0] }))
-      }
-    })
+  const counter: Worker | null = useMemo(() => typeof window === 'undefined' || !window.Worker ? null : new Worker(new URL("../tempWorker.ts", import.meta.url)), [])
 
-    const rawData = stlSerializer.serialize({ binary: true }, base_plate_3d)
-    const blob = new Blob(rawData)
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'model.stl'
-    a.click()
-    URL.revokeObjectURL(url)
-    a.remove()
-  }
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.Worker || !counter) return
+    counter.onmessage = (e: MessageEvent<string>) => {
+      const blob = new Blob(e.data as any)
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'model.stl'
+      a.click()
+      URL.revokeObjectURL(url)
+      a.remove()
+    };
+  }, [counter]);
 
   return (
     <div className='w-full h-[700px]'>
       <div className=' hidden' />
-      <Button onClick={() => generateModel(nodes)}>Generate Model</Button>
+      <Button onClick={() => {
+        if (typeof window === 'undefined' || !window.Worker || !counter) return
+        counter.postMessage(JSON.stringify({ nodes: nodes }))
+      }}
+      >
+        Generate Model
+      </Button>
       <div className='absolute top-0 right-0 text-white'>{true ? 'Space' : 'nothing'}</div>
       <ReactFlow
         selectionOnDrag

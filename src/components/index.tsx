@@ -39,13 +39,29 @@ export default function Sketcher() {
 
 function BasicFlow() {
 
-  const nodeTypes = useMemo(() => ({ switch: Switch, addButton: AddButton }), []);
-
+  const nodeTypes = useMemo(() => ({ switch: Switch }), []);
   const [nodes, _, onNodesChange] = useNodesState(initialNodes);
 
   const selectedNodes = useMemo(() => {
     return nodes.filter((node) => node.selected).map((node) => node.id)
   }, [nodes])
+
+  const modelGenerator: Worker | null = useMemo(() =>
+    (typeof window === 'undefined' || !window.Worker)
+      ? null
+      : new Worker(new URL("../workers/model-generator.ts", import.meta.url)),
+    [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.Worker || !modelGenerator) return
+    modelGenerator.onmessage = (e: MessageEvent<string>) => {
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(new Blob(e.data as any))
+      a.download = 'model.stl'
+      a.click()
+      a.remove()
+    };
+  }, [modelGenerator]);
 
   function handleAddNode(side: 'left' | 'right' | 'top' | 'bottom') {
     const changes: NodeChange[] = []
@@ -81,33 +97,14 @@ function BasicFlow() {
   useHotkeys(Key.ArrowLeft, () => handleMoveNode('ArrowLeft'))
   useHotkeys(Key.ArrowRight, () => handleMoveNode('ArrowRight'))
 
-  const counter: Worker | null = useMemo(() =>
-    (typeof window === 'undefined' || !window.Worker)
-      ? null
-      : new Worker(new URL("../workers/model-generator.ts", import.meta.url)),
-    [])
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.Worker || !counter) return
-    counter.onmessage = (e: MessageEvent<string>) => {
-      const blob = new Blob(e.data as any)
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'model.stl'
-      a.click()
-      URL.revokeObjectURL(url)
-      a.remove()
-    };
-  }, [counter]);
-
   return (
     <div className='w-full h-full relative'>
       <Button
-        className='absolute top-0 left-0'
+        className='absolute top-0 left-0 z-10'
         onClick={() => {
-          if (typeof window === 'undefined' || !window.Worker || !counter) return
-          counter.postMessage(JSON.stringify({ nodes: nodes }))
+          if (typeof window === 'undefined' || !window.Worker || !modelGenerator) return
+          console.log('generating model')
+          modelGenerator.postMessage(JSON.stringify({ nodes: nodes }))
         }}
       >
         Generate Model
@@ -179,19 +176,6 @@ function Switch(props: NodeProps) {
   return (
     <div className={cn(
       'w-[140px] h-[140px] border-2 border-foreground rounded-md bg-secondary relative',
-      props.selected && 'border-primary',
-      props.data.overlaped && 'bg-destructive',
-      props.data.overlaped && props.selected && 'border-destructive-foreground',
-    )}
-      {...props} >
-    </div>
-  );
-}
-
-function AddButton(props: NodeProps) {
-  return (
-    <div className={cn(
-      'w-[40px] h-[40px] border border-foreground rounded-md bg-secondary relative',
       props.selected && 'border-primary',
       props.data.overlaped && 'bg-destructive',
       props.data.overlaped && props.selected && 'border-destructive-foreground',

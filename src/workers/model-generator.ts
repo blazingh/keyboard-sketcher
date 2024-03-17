@@ -3,18 +3,24 @@ import { primitives, booleans, hulls, extrusions, expansions } from '@jscad/mode
 import stlSerializer from '@jscad/stl-serializer'
 import { Geom2, Geom3 } from '@jscad/modeling/src/geometries/types';
 
-const plateThickness = 30
-const switchGruveThickness = 15
-const switchSize = 140
-const switchPadding = 70
-const caseHeight = 250
-const caseThickhes = 40
+const plateThickness = 3
+const switchGruveThickness = 1.5
+const switchSize = 14
+const switchPadding = 7
+const caseHeight = 25
+const caseThickhes = 4
 const tolenrence = {
-  tight: 2.25
+  tight: 0.225
 }
 
 self.onmessage = async event => {
-  const nodes = (await JSON.parse(event.data)).nodes.filter((node: any) => node.type === "switch")
+  let nodes = (await JSON.parse(event.data)).nodes.filter((node: any) => node.type === "switch")
+  nodes = nodes.map((node: any) => {
+    return {
+      ...node,
+      position: { x: node.position.x / 10, y: node.position.y / 10 },
+    }
+  })
 
   const geoToAdd: Geom2[] = []
   // generate a 2d geometry for each switch
@@ -51,7 +57,7 @@ self.onmessage = async event => {
         primitives.roundedCylinder({
           radius: caseThickhes / 2,
           height: caseHeight / 2,
-          roundRadius: 5,
+          roundRadius: 0.5,
           center: [points[0][0],
           points[0][1], caseThickhes - caseHeight],
           segments: 30
@@ -73,7 +79,7 @@ self.onmessage = async event => {
         center: [node.position.x, node.position.y, plateThickness / 2]
       }),
       primitives.cuboid({
-        size: [switchSize / 2, switchSize + 20, plateThickness - switchGruveThickness],
+        size: [switchSize / 2, switchSize + 2, plateThickness - switchGruveThickness],
         center: [node.position.x, node.position.y, (plateThickness - switchGruveThickness) / 2]
       })
     )

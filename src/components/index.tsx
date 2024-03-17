@@ -174,13 +174,14 @@ function BasicFlow() {
 
 function Switch(props: NodeProps) {
   return (
-    <div className={cn(
-      'w-[140px] h-[140px] border-2 border-foreground rounded-md bg-secondary relative',
-      props.selected && 'border-primary',
-      props.data.overlaped && 'bg-destructive',
-      props.data.overlaped && props.selected && 'border-destructive-foreground',
-    )}
-      {...props} >
+    <div
+      className={cn(
+        'w-[140px] h-[140px] border-2 border-foreground rounded-md bg-secondary relative',
+        props.selected && 'border-primary',
+        props.data.overlaped && 'bg-destructive',
+        props.data.overlaped && props.selected && 'border-destructive-foreground',
+      )}
+    >
     </div>
   );
 }

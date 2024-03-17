@@ -102,16 +102,16 @@ function BasicFlow() {
   }, [counter]);
 
   return (
-    <div className='w-full h-[700px]'>
-      <div className=' hidden' />
-      <Button onClick={() => {
-        if (typeof window === 'undefined' || !window.Worker || !counter) return
-        counter.postMessage(JSON.stringify({ nodes: nodes }))
-      }}
+    <div className='w-full h-full relative'>
+      <Button
+        className='absolute top-0 left-0'
+        onClick={() => {
+          if (typeof window === 'undefined' || !window.Worker || !counter) return
+          counter.postMessage(JSON.stringify({ nodes: nodes }))
+        }}
       >
         Generate Model
       </Button>
-      <div className='absolute top-0 right-0 text-white'>{true ? 'Space' : 'nothing'}</div>
       <ReactFlow
         selectionOnDrag
         nodes={nodes}

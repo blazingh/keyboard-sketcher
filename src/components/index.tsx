@@ -1,6 +1,6 @@
 "use client";
 import { cn } from '@/lib/utils';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import ReactFlow, {
   Controls,
   Background,
@@ -20,6 +20,7 @@ import { Button } from './ui/button';
 import { PlusIcon } from 'lucide-react';
 import { useHotkeys } from 'react-hotkeys-hook'
 import { Key } from 'ts-key-enum'
+import { toast } from 'sonner';
 
 const initialNodes: Node[] = [
   { id: "2", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch' }, },
@@ -46,11 +47,12 @@ function BasicFlow() {
     return nodes.filter((node) => node.selected).map((node) => node.id)
   }, [nodes])
 
-  const modelGenerator: Worker | null = useMemo(() =>
-    (typeof window === 'undefined' || !window.Worker)
-      ? null
-      : new Worker(new URL("../workers/model-generator.ts", import.meta.url)),
-    [])
+  const [modelGenerator, setModelGenerator] = useState<Worker | null>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.Worker) return
+    setModelGenerator(new Worker(new URL("../workers/model-generator.ts", import.meta.url)))
+  }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.Worker || !modelGenerator) return
@@ -60,6 +62,7 @@ function BasicFlow() {
       a.download = 'model.stl'
       a.click()
       a.remove()
+      toast.success('Model Generated')
     };
   }, [modelGenerator]);
 
@@ -103,7 +106,16 @@ function BasicFlow() {
         className='absolute top-0 left-0 z-10'
         onClick={() => {
           if (typeof window === 'undefined' || !window.Worker || !modelGenerator) return
-          console.log('generating model')
+          toast("Generating Model...", {
+            description: new Date().toLocaleString(),
+            action: {
+              label: "Cancel",
+              onClick: () => {
+                modelGenerator.terminate()
+                setModelGenerator(new Worker(new URL("../workers/model-generator.ts", import.meta.url)))
+              },
+            },
+          })
           modelGenerator.postMessage(JSON.stringify({ nodes: nodes }))
         }}
       >

@@ -81,7 +81,11 @@ function BasicFlow() {
   useHotkeys(Key.ArrowLeft, () => handleMoveNode('ArrowLeft'))
   useHotkeys(Key.ArrowRight, () => handleMoveNode('ArrowRight'))
 
-  const counter: Worker | null = useMemo(() => typeof window === 'undefined' || !window.Worker ? null : new Worker(new URL("../tempWorker.ts", import.meta.url)), [])
+  const counter: Worker | null = useMemo(() =>
+    (typeof window === 'undefined' || !window.Worker)
+      ? null
+      : new Worker(new URL("../workers/model-generator.ts", import.meta.url)),
+    [])
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.Worker || !counter) return

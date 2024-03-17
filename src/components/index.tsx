@@ -21,6 +21,9 @@ import { PlusIcon } from 'lucide-react';
 import { useHotkeys } from 'react-hotkeys-hook'
 import { Key } from 'ts-key-enum'
 import { toast } from 'sonner';
+import { signal } from "@preact/signals-react";
+
+const workersStatus = signal<{ [key: number]: string }>({});
 
 const initialNodes: Node[] = [
   { id: "2", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch' }, },
@@ -56,13 +59,14 @@ function BasicFlow() {
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.Worker || !modelGenerator) return
-    modelGenerator.onmessage = (e: MessageEvent<string>) => {
+    modelGenerator.onmessage = (e: MessageEvent<any>) => {
       const a = document.createElement('a')
-      a.href = URL.createObjectURL(new Blob(e.data as any))
+      a.href = URL.createObjectURL(new Blob(e.data.rawData as any))
       a.download = 'model.stl'
       a.click()
       a.remove()
-      toast.success('Model Generated')
+      workersStatus.value[e.data.id] = 'resolved'
+      console.log(workersStatus.value, e.data)
     };
   }, [modelGenerator]);
 
@@ -106,17 +110,46 @@ function BasicFlow() {
         className='absolute top-0 left-0 z-10'
         onClick={() => {
           if (typeof window === 'undefined' || !window.Worker || !modelGenerator) return
-          toast("Generating Model...", {
-            description: new Date().toLocaleString(),
-            action: {
-              label: "Cancel",
-              onClick: () => {
-                modelGenerator.terminate()
-                setModelGenerator(new Worker(new URL("../workers/model-generator.ts", import.meta.url)))
+          const id = Math.random()
+          toast.promise(
+            new Promise((resolve, reject) => {
+              const startTime = Date.now()
+              workersStatus.value[id] = 'pending'
+              modelGenerator.postMessage(JSON.stringify({ nodes: nodes, id: id }))
+              const checkValue = () => {
+                console.log(workersStatus.value[id])
+                if (workersStatus.value[id] === 'resolved') {
+                  resolve({ totalTime: Date.now() - startTime })
+                  return
+                }
+                if (workersStatus.value[id] === 'rejected') {
+                  reject()
+                  return
+                }
+                setTimeout(checkValue, 100)
+              }
+              checkValue()
+            }),
+            {
+              loading: "Generating Model...",
+              description: new Date().toLocaleString(),
+              success: (data: any) => {
+                return `Model Generated in ${data.totalTime / 1000}s`
               },
-            },
-          })
-          modelGenerator.postMessage(JSON.stringify({ nodes: nodes }))
+              action: {
+                label: "Cancel",
+                onClick: () => {
+                  if (workersStatus.value[id] === 'pending') {
+                    modelGenerator.terminate()
+                    workersStatus.value[id] = 'rejected'
+                    toast("Model Generation Cancelled")
+                    setModelGenerator(new Worker(new URL("../workers/model-generator.ts", import.meta.url)))
+                  } else {
+                    toast.warning("Model Generation Already Re")
+                  }
+                },
+              },
+            })
         }}
       >
         Generate Model

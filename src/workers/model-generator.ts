@@ -14,7 +14,8 @@ const tolenrence = {
 }
 
 self.onmessage = async event => {
-  let nodes = (await JSON.parse(event.data)).nodes.filter((node: any) => node.type === "switch")
+  const data = await JSON.parse(event.data)
+  let nodes = data.nodes.filter((node: any) => node.type === "switch")
   nodes = nodes.map((node: any) => {
     return {
       ...node,
@@ -91,7 +92,7 @@ self.onmessage = async event => {
   // serialize the generated geometries into stl blob
   const rawData = stlSerializer.serialize({ binary: true }, base_plate_3d)
   // return the result
-  self.postMessage(rawData);
+  self.postMessage({ rawData: rawData, id: data.id });
 };
 
 export { };

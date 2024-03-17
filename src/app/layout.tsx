@@ -31,7 +31,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          <Toaster expand={false} />
+          <Toaster expand={false} richColors />
         </ThemeProvider>
       </body>
     </html>

@@ -1,6 +1,6 @@
 "use client";
 import { cn } from '@/lib/utils';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import ReactFlow, {
   Controls,
   Background,
@@ -23,14 +23,19 @@ import { Key } from 'ts-key-enum'
 import { toast } from 'sonner';
 import { signal } from "@preact/signals-react";
 
-const workersStatus = signal<{
-  [key: number]: {
-    status: 'pending' | 'resolved' | 'rejected',
-    startTime: Date,
-    resolver: any,
-    rejecter: any
-  }
-}>({});
+type WorkerSignal = {
+  status: 'pending' | 'resolved' | 'rejected',
+  worker: Worker,
+  startTime: Date,
+  resolver: any,
+  rejecter: any
+}
+
+type WorkersSignal = {
+  [key: number]: WorkerSignal
+}
+
+const workersSigals = signal<WorkersSignal>({});
 
 const initialNodes: Node[] = [
   { id: "2", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch' }, },
@@ -47,7 +52,6 @@ export default function Sketcher() {
   );
 }
 
-
 function BasicFlow() {
 
   const nodeTypes = useMemo(() => ({ switch: Switch }), []);
@@ -57,28 +61,7 @@ function BasicFlow() {
     return nodes.filter((node) => node.selected).map((node) => node.id)
   }, [nodes])
 
-  const [modelGenerator, setModelGenerator] = useState<Worker | null>(null)
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.Worker) return
-    setModelGenerator(new Worker(new URL("../workers/model-generator.ts", import.meta.url)))
-  }, [])
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.Worker || !modelGenerator) return
-    modelGenerator.onmessage = (e: MessageEvent<any>) => {
-      const a = document.createElement('a')
-      a.href = URL.createObjectURL(new Blob(e.data.rawData as any))
-      a.download = 'model.stl'
-      a.click()
-      a.remove()
-      workersStatus.value[e.data.id].resolver({ totalTime: Date.now() - workersStatus.value[e.data.id].startTime.getTime() })
-      workersStatus.value[e.data.id].status = 'resolved'
-      console.log(workersStatus.value, e.data)
-    };
-  }, [modelGenerator]);
-
-  function handleAddNode(side: 'left' | 'right' | 'top' | 'bottom') {
+  function handleAddNode(side: Position) {
     const changes: NodeChange[] = []
     let deltas = [0, 0]
     if (side === 'top') deltas = [0, -190]
@@ -87,8 +70,20 @@ function BasicFlow() {
     if (side === 'right') deltas = [190, 0]
     nodes.map((node) => {
       if (!selectedNodes.includes(node.id)) return
-      changes.push({ type: 'select', id: node.id, selected: false })
-      changes.push({ type: 'add', item: { ...node, id: `${Math.random()}`, position: { x: node.position.x + deltas[0], y: node.position.y + deltas[1] }, selected: true } })
+      changes.push({
+        type: 'select',
+        id: node.id,
+        selected: false
+      })
+      changes.push({
+        type: 'add',
+        item: {
+          ...node,
+          id: `${Math.random()}`,
+          position: { x: node.position.x + deltas[0], y: node.position.y + deltas[1] },
+          selected: true
+        }
+      })
     })
     onNodesChange(changes)
   }
@@ -102,11 +97,71 @@ function BasicFlow() {
     if (key === 'ArrowDown') deltas = [0, 10]
     nodes.map((node) => {
       if (!selectedNodes.includes(node.id)) return
-      changes.push({ type: 'position', id: node.id, position: { x: node.position.x + deltas[0], y: node.position.y + deltas[1] } })
+      changes.push({
+        type: 'position',
+        id: node.id,
+        position: { x: node.position.x + deltas[0], y: node.position.y + deltas[1] }
+      })
     })
     onNodesChange(changes)
   }
 
+  function handleCancelGeneration(id: number) {
+    if (typeof window === 'undefined' || !window.Worker) return
+    if (!workersSigals.value[id].worker) {
+      toast.warning("Lost model worker :(")
+      return
+    }
+    if (workersSigals.value[id].status !== 'pending') {
+      toast.warning("Model Generation Already Resolved :|")
+      return
+    }
+    workersSigals.value[id].worker.terminate()
+    console.log(workersSigals.value[id])
+    workersSigals.value[id].status = 'rejected'
+    workersSigals.value[id].rejecter()
+    toast("Model Generation Cancelled")
+  }
+
+  function handleGenerateModel() {
+    if (typeof window === 'undefined' || !window.Worker) return
+    const id = Math.random()
+    const newWorker = new Worker(new URL("../workers/model-generator.ts", import.meta.url))
+    newWorker.onmessage = (e: MessageEvent<any>) => {
+      workersSigals.value[e.data.id].resolver({
+        totalTime: Date.now() - workersSigals.value[e.data.id].startTime.getTime()
+      })
+      workersSigals.value[e.data.id].status = 'resolved'
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(new Blob(e.data.rawData as any))
+      a.download = 'model.stl'
+      a.click()
+      a.remove()
+    };
+    newWorker.postMessage(JSON.stringify({ nodes: nodes, id: id }))
+    toast.promise(
+      new Promise((resolve, reject) =>
+        workersSigals.value[id] = {
+          worker: newWorker,
+          status: 'pending',
+          startTime: new Date(),
+          resolver: resolve,
+          rejecter: reject,
+        }
+      ),
+      {
+        loading: "Generating Model...",
+        description: new Date().toLocaleString(),
+        success: (data: any) => `Model Generated in ${data.totalTime / 1000}s`,
+        action: {
+          label: "Cancel",
+          onClick: () => handleCancelGeneration(id)
+        },
+      }
+    )
+  }
+
+  /* hot keys event handlers */
   useHotkeys(Key.ArrowUp, () => handleMoveNode('ArrowUp'))
   useHotkeys(Key.ArrowDown, () => handleMoveNode('ArrowDown'))
   useHotkeys(Key.ArrowLeft, () => handleMoveNode('ArrowLeft'))
@@ -114,103 +169,49 @@ function BasicFlow() {
 
   return (
     <div className='w-full h-full relative'>
+
       <Button
         className='absolute top-0 left-0 z-10'
-        onClick={() => {
-          if (typeof window === 'undefined' || !window.Worker || !modelGenerator) return
-          const id = Math.random()
-          toast.promise(
-            new Promise((resolve, reject) => {
-              modelGenerator.postMessage(JSON.stringify({ nodes: nodes, id: id }))
-              workersStatus.value[id] = {
-                status: 'pending',
-                startTime: new Date(),
-                resolver: resolve,
-                rejecter: reject,
-              }
-            }),
-            {
-              loading: "Generating Model...",
-              description: new Date().toLocaleString(),
-              success: (data: any) => {
-                return `Model Generated in ${data.totalTime / 1000}s`
-              },
-              action: {
-                label: "Cancel",
-                onClick: () => {
-                  if (workersStatus.value[id].status === 'pending') {
-                    modelGenerator.terminate()
-                    workersStatus.value[id].status = 'rejected'
-                    workersStatus.value[id].rejecter("Model Generation Cancelled")
-                    toast("Model Generation Cancelled")
-                    setModelGenerator(new Worker(new URL("../workers/model-generator.ts", import.meta.url)))
-                  } else {
-                    toast.warning("Model Generation Already Resolved")
-                  }
-                },
-              },
-            })
-        }}
+        onClick={handleGenerateModel}
       >
         Generate Model
       </Button>
+
       <ReactFlow
-        selectionOnDrag
-        nodes={nodes}
-        nodeTypes={nodeTypes}
-        onNodesChange={onNodesChange}
-        disableKeyboardA11y={true}
         fitView
+        snapToGrid
+        selectionOnDrag
+        disableKeyboardA11y
         panOnDrag={[1, 2, 3, 4]}
         minZoom={0.2}
         maxZoom={5}
-        snapToGrid
         snapGrid={[10, 10]}
         translateExtent={[[-5000, -5000], [5000, 5000]]}
+        nodes={nodes}
+        nodeTypes={nodeTypes}
+        onNodesChange={onNodesChange}
       >
-        <MiniMap pannable zoomable />
+
         <Controls />
-        <Background
-          id="1"
-          gap={10}
-          variant={BackgroundVariant.Dots}
-        />
+        <MiniMap pannable zoomable />
+        <Background gap={10} variant={BackgroundVariant.Dots} />
 
-        <NodeToolbar nodeId={selectedNodes} isVisible position={Position.Top}>
-          <Button
-            className=' p-0 h-6 w-6 flex items-center justify-center opacity-25 hover:opacity-100'
-            onClick={() => handleAddNode('top')}
-          >
-            <PlusIcon className='w-4 h-4 flex-shrink-0' />
-          </Button>
-        </NodeToolbar>
-
-        <NodeToolbar nodeId={selectedNodes} isVisible position={Position.Bottom}>
-          <Button
-            className=' p-0 h-6 w-6 flex items-center justify-center opacity-25 hover:opacity-100'
-            onClick={() => handleAddNode('bottom')}
-          >
-            <PlusIcon className='w-4 h-4 flex-shrink-0' />
-          </Button>
-        </NodeToolbar>
-
-        <NodeToolbar nodeId={selectedNodes} isVisible position={Position.Left}>
-          <Button
-            className=' p-0 h-6 w-6 flex items-center justify-center opacity-25 hover:opacity-100'
-            onClick={() => handleAddNode('left')}
-          >
-            <PlusIcon className='w-4 h-4 flex-shrink-0' />
-          </Button>
-        </NodeToolbar>
-
-        <NodeToolbar nodeId={selectedNodes} isVisible position={Position.Right}>
-          <Button
-            className=' p-0 h-6 w-6 flex items-center justify-center opacity-25 hover:opacity-100'
-            onClick={() => handleAddNode('right')}
-          >
-            <PlusIcon className='w-4 h-4 flex-shrink-0' />
-          </Button>
-        </NodeToolbar>
+        {/* switch add buttons */}
+        {[
+          Position.Top,
+          Position.Bottom,
+          Position.Left,
+          Position.Right,
+        ].map((position) => (
+          <NodeToolbar key={position} nodeId={selectedNodes} isVisible position={position}>
+            <Button
+              className=' p-0 h-6 w-6 flex items-center justify-center opacity-25 hover:opacity-100'
+              onClick={() => handleAddNode(position)}
+            >
+              <PlusIcon className='w-4 h-4 flex-shrink-0' />
+            </Button>
+          </NodeToolbar>
+        ))}
 
       </ReactFlow>
     </div>

@@ -23,7 +23,14 @@ import { Key } from 'ts-key-enum'
 import { toast } from 'sonner';
 import { signal } from "@preact/signals-react";
 
-const workersStatus = signal<{ [key: number]: string }>({});
+const workersStatus = signal<{
+  [key: number]: {
+    status: 'pending' | 'resolved' | 'rejected',
+    startTime: Date,
+    resolver: any,
+    rejecter: any
+  }
+}>({});
 
 const initialNodes: Node[] = [
   { id: "2", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch' }, },
@@ -65,7 +72,8 @@ function BasicFlow() {
       a.download = 'model.stl'
       a.click()
       a.remove()
-      workersStatus.value[e.data.id] = 'resolved'
+      workersStatus.value[e.data.id].resolver({ totalTime: Date.now() - workersStatus.value[e.data.id].startTime.getTime() })
+      workersStatus.value[e.data.id].status = 'resolved'
       console.log(workersStatus.value, e.data)
     };
   }, [modelGenerator]);
@@ -113,22 +121,13 @@ function BasicFlow() {
           const id = Math.random()
           toast.promise(
             new Promise((resolve, reject) => {
-              const startTime = Date.now()
-              workersStatus.value[id] = 'pending'
               modelGenerator.postMessage(JSON.stringify({ nodes: nodes, id: id }))
-              const checkValue = () => {
-                console.log(workersStatus.value[id])
-                if (workersStatus.value[id] === 'resolved') {
-                  resolve({ totalTime: Date.now() - startTime })
-                  return
-                }
-                if (workersStatus.value[id] === 'rejected') {
-                  reject()
-                  return
-                }
-                setTimeout(checkValue, 100)
+              workersStatus.value[id] = {
+                status: 'pending',
+                startTime: new Date(),
+                resolver: resolve,
+                rejecter: reject,
               }
-              checkValue()
             }),
             {
               loading: "Generating Model...",
@@ -139,13 +138,14 @@ function BasicFlow() {
               action: {
                 label: "Cancel",
                 onClick: () => {
-                  if (workersStatus.value[id] === 'pending') {
+                  if (workersStatus.value[id].status === 'pending') {
                     modelGenerator.terminate()
-                    workersStatus.value[id] = 'rejected'
+                    workersStatus.value[id].status = 'rejected'
+                    workersStatus.value[id].rejecter("Model Generation Cancelled")
                     toast("Model Generation Cancelled")
                     setModelGenerator(new Worker(new URL("../workers/model-generator.ts", import.meta.url)))
                   } else {
-                    toast.warning("Model Generation Already Re")
+                    toast.warning("Model Generation Already Resolved")
                   }
                 },
               },

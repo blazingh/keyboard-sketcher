@@ -7,8 +7,13 @@ const plateThickness = 3
 const switchGruveThickness = 1.5
 const switchSize = 14
 const switchPadding = 7
-const caseHeight = 25
-const caseThickhes = 4
+const caseThickness = 4
+const standoffThickness = plateThickness
+
+const caseTopRadius = Math.max(caseThickness / 2, 0)
+const caseTopMargin = Math.max(plateThickness + caseTopRadius, 5)
+const caseBottomMargin = Math.max(standoffThickness, 9)
+
 const tolenrence = {
   tight: 0.225
 }
@@ -39,7 +44,7 @@ self.onmessage = async event => {
   // shrink the edges of the plate
   base_plate = expansions.offset({ delta: (-switchSize) / 2 }, base_plate)
 
-  // extrude the palte to a 3d geometry
+  // extrude the plate to a 3d geometry
   let base_plate_3d = extrusions.extrudeLinear({ height: plateThickness }, base_plate)
 
   const case_corners: Geom3[] = []
@@ -48,19 +53,17 @@ self.onmessage = async event => {
     case_corners.push(
       booleans.union(
         primitives.roundedCylinder({
-          radius: caseThickhes / 2,
-          height: caseHeight / 2,
-          roundRadius: caseThickhes / 2,
-          center: [points[0][0],
-          points[0][1], 0],
+          radius: caseThickness / 2,
+          height: caseTopMargin,
+          roundRadius: caseTopRadius,
+          center: [points[0][0], points[0][1], caseTopMargin / 2],
           segments: 30
         }),
         primitives.roundedCylinder({
-          radius: caseThickhes / 2,
-          height: caseHeight / 2,
-          roundRadius: 0.5,
-          center: [points[0][0],
-          points[0][1], caseThickhes - caseHeight],
+          radius: caseThickness / 2,
+          height: caseBottomMargin,
+          roundRadius: 0,
+          center: [points[0][0], points[0][1], caseBottomMargin / -2],
           segments: 30
         }),
       )
@@ -68,8 +71,24 @@ self.onmessage = async event => {
   })
   case_corners.push(case_corners[0])
 
+  const case_standoffs: Geom3[] = []
+  expansions.offset({ delta: tolenrence.tight - switchPadding / 4 }, base_plate).sides.map((points) => {
+    case_standoffs.push(
+      primitives.cylinderElliptic({
+        height: standoffThickness,
+        startRadius: [0, 0],
+        endRadius: [standoffThickness * 0.75, standoffThickness * 0.75],
+        center: [points[0][0], points[0][1], standoffThickness / -2],
+      })
+    )
+  })
+  case_standoffs.push(case_standoffs[0])
+
   // generate the wall of the case from it's edges
-  const base_case_3d = hulls.hullChain(case_corners)
+  const base_case_3d = booleans.union(
+    hulls.hullChain(case_corners),
+    hulls.hullChain(case_standoffs),
+  )
 
   // cut the switches holes and gruves from the plate
   nodes.map((node: any) => {

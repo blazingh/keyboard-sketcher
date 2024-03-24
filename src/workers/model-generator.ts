@@ -1,4 +1,4 @@
-import { primitives, booleans, hulls, extrusions, expansions } from '@jscad/modeling'
+import { primitives, booleans, hulls, extrusions, expansions, transforms } from '@jscad/modeling'
 /* @ts-ignore */
 import stlSerializer from '@jscad/stl-serializer'
 import { Geom2, Geom3 } from '@jscad/modeling/src/geometries/types';
@@ -109,7 +109,7 @@ self.onmessage = async event => {
   base_plate_3d = booleans.union(base_plate_3d, base_case_3d)
 
   // serialize the generated geometries into stl blob
-  const rawData = stlSerializer.serialize({ binary: true }, base_plate_3d)
+  const rawData = stlSerializer.serialize({ binary: true }, transforms.mirrorY(base_plate_3d))
   // return the result
   self.postMessage({ rawData: rawData, id: data.id });
 };

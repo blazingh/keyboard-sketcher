@@ -17,11 +17,20 @@ import ReactFlow, {
 
 import 'reactflow/dist/style.css';
 import { Button } from './ui/button';
-import { PlusIcon } from 'lucide-react';
+import { Option, PencilRuler, PlusIcon, Settings, Settings2 } from 'lucide-react';
 import { useHotkeys } from 'react-hotkeys-hook'
 import { Key } from 'ts-key-enum'
 import { toast } from 'sonner';
 import { signal } from "@preact/signals-react";
+
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 type WorkerSignal = {
   status: 'pending' | 'resolved' | 'rejected',
@@ -45,10 +54,42 @@ const initialNodes: Node[] = [
 ];
 
 export default function Sketcher() {
+  const [settingsOpen, setSettingsOpen] = React.useState(false)
+  const [editOpen, setEditOpen] = React.useState(false)
   return (
     <ReactFlowProvider>
+      <div className={cn(
+        "fixed h-svh z-30 top-0 left-0 bg-background rounded-r-2xl transition-all border-r-2 border-primary ease-in-out",
+        settingsOpen ? "w-[280px] shadow-xl" : "w-0 shadow-none"
+      )}
+      >
+        <Button
+          onClick={() => setSettingsOpen(p => !p)}
+          className={cn(
+            'absolute top-1/2 -translate-y-1/2 right-0 transition-all ease-in-out py-6',
+            settingsOpen ? "translate-x-1/2" : "translate-x-full rounded-l-none"
+          )}
+        >
+          <Settings2 className='w-5 h-5' />
+        </Button>
+      </div>
+      <div className={cn(
+        "fixed h-svh z-30 top-0 right-0 bg-background rounded-l-2xl transition-all border-l-2 border-primary ease-in-out",
+        editOpen ? "w-[280px] shadow-xl" : "w-0 shadow-none"
+      )}
+      >
+        <Button
+          onClick={() => setEditOpen(p => !p)}
+          className={cn(
+            'absolute top-1/2 -translate-y-1/2 left-0 transition-all ease-in-out py-6',
+            editOpen ? "-translate-x-1/2" : "-translate-x-full rounded-r-none"
+          )}
+        >
+          <PencilRuler className='w-5 h-5' />
+        </Button>
+      </div>
       <BasicFlow />
-    </ReactFlowProvider>
+    </ReactFlowProvider >
   );
 }
 

@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@jscad/3mf-serializer": "^2.1.10",
+    "@jscad/io": "^2.4.7",
     "@jscad/io-utils": "^2.0.26",
     "@jscad/modeling": "^2.12.1",
     "@jscad/stl-serializer": "^2.1.16",

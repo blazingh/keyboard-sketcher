@@ -38,10 +38,10 @@ type WorkersSignal = {
 const workersSigals = signal<WorkersSignal>({});
 
 const initialNodes: Node[] = [
-  { id: "2", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch' }, },
-  { id: "3", type: 'switch', position: { x: 380, y: 0 }, data: { label: 'Switch' }, },
-  { id: "4", type: 'switch', position: { x: 190, y: 190 }, data: { label: 'Switch' }, },
-  { id: "5", type: 'switch', position: { x: 380, y: 190 }, data: { label: 'Switch' }, }
+  { id: "2", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch', rotation: '45' }, },
+  { id: "3", type: 'switch', position: { x: 380, y: 0 }, data: { label: 'Switch', rotation: '0' }, },
+  { id: "4", type: 'switch', position: { x: 190, y: 190 }, data: { label: 'Switch', rotation: '0' }, },
+  { id: "5", type: 'switch', position: { x: 380, y: 190 }, data: { label: 'Switch', rotation: '0' }, }
 ];
 
 export default function Sketcher() {
@@ -134,7 +134,7 @@ function BasicFlow() {
       workersSigals.value[e.data.id].status = 'resolved'
       const a = document.createElement('a')
       a.href = URL.createObjectURL(new Blob(e.data.rawData as any))
-      a.download = 'model.stl'
+      a.download = 'model.3mf'
       a.click()
       a.remove()
     };
@@ -227,6 +227,9 @@ function Switch(props: NodeProps) {
         props.data.overlaped && 'bg-destructive',
         props.data.overlaped && props.selected && 'border-destructive-foreground',
       )}
+      style={{
+        transform: `rotate(${props.data.rotation}deg)`,
+      }}
     >
     </div>
   );

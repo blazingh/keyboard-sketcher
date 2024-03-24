@@ -1,12 +1,12 @@
-import { primitives, booleans, hulls, extrusions, expansions, transforms } from '@jscad/modeling'
+import { primitives, booleans, hulls, extrusions, expansions, transforms, utils } from '@jscad/modeling'
 /* @ts-ignore */
-import stlSerializer from '@jscad/stl-serializer'
+import mfSerialize from '@jscad/3mf-serializer'
 import { Geom2, Geom3 } from '@jscad/modeling/src/geometries/types';
 
 const plateThickness = 3
 const switchGruveThickness = 1.5
 const switchSize = 14
-const switchPadding = 7
+const switchPadding = 13
 const caseThickness = 4
 const standoffThickness = plateThickness
 
@@ -15,7 +15,7 @@ const caseTopMargin = Math.max(plateThickness + caseTopRadius, 5)
 const caseBottomMargin = Math.max(standoffThickness, 9)
 
 const tolenrence = {
-  tight: 0.225
+  tight: 0.254
 }
 
 self.onmessage = async event => {
@@ -24,6 +24,7 @@ self.onmessage = async event => {
   nodes = nodes.map((node: any) => {
     return {
       ...node,
+      rotation: node.data.rotation,
       position: { x: node.position.x / 10, y: node.position.y / 10 },
     }
   })
@@ -32,17 +33,23 @@ self.onmessage = async event => {
   // generate a 2d geometry for each switch
   nodes.map((node: any) => {
     geoToAdd.push(
-      primitives.rectangle({
-        size: [(switchSize + switchPadding) * 2, (switchSize + switchPadding) * 2],
-        center: [node.position.x, node.position.y],
-      })
+      transforms.translate(
+        [node.position.x, node.position.y],
+        transforms.rotateZ(
+          utils.degToRad(node.rotation),
+          primitives.rectangle({
+            size: [switchSize + switchPadding, switchSize + switchPadding],
+            center: [0, 0],
+          })
+        )
+      )
     )
   })
 
   // joint all 2d geometries into a plate
-  let base_plate = booleans.union(geoToAdd) as Geom2 || null
+  let base_plate = hulls.hull(geoToAdd) as Geom2 || null
   // shrink the edges of the plate
-  base_plate = expansions.offset({ delta: (-switchSize) / 2 }, base_plate)
+  //base_plate = expansions.offset({ delta: 0 }, base_plate)
 
   // extrude the plate to a 3d geometry
   let base_plate_3d = extrusions.extrudeLinear({ height: plateThickness }, base_plate)
@@ -72,7 +79,7 @@ self.onmessage = async event => {
   case_corners.push(case_corners[0])
 
   const case_standoffs: Geom3[] = []
-  expansions.offset({ delta: tolenrence.tight - switchPadding / 4 }, base_plate).sides.map((points) => {
+  expansions.offset({ delta: tolenrence.tight - standoffThickness / 2 }, base_plate).sides.map((points) => {
     case_standoffs.push(
       primitives.cylinderElliptic({
         height: standoffThickness,
@@ -94,22 +101,44 @@ self.onmessage = async event => {
   nodes.map((node: any) => {
     base_plate_3d = booleans.subtract(
       base_plate_3d,
-      primitives.cuboid({
-        size: [switchSize, switchSize, plateThickness],
-        center: [node.position.x, node.position.y, plateThickness / 2]
-      }),
-      primitives.cuboid({
-        size: [switchSize / 2, switchSize + 2, plateThickness - switchGruveThickness],
-        center: [node.position.x, node.position.y, (plateThickness - switchGruveThickness) / 2]
-      })
+      transforms.translate(
+        [node.position.x, node.position.y, plateThickness / 2],
+        transforms.rotateZ(
+          utils.degToRad(node.rotation),
+          primitives.cuboid({
+            size: [switchSize, switchSize, plateThickness],
+            center: [0, 0, 0]
+          })
+        )
+      ),
+      transforms.translate(
+        [node.position.x, node.position.y, (plateThickness - switchGruveThickness) / 2],
+        transforms.rotateZ(
+          utils.degToRad(node.rotation),
+          primitives.cuboid({
+            size: [switchSize + 2, switchSize + 2, plateThickness - switchGruveThickness],
+            center: [0, 0, 0]
+          })
+        )
+      )
     )
   })
 
   // temp: join the case and the plate
-  base_plate_3d = booleans.union(base_plate_3d, base_case_3d)
+  // base_plate_3d = booleans.union(base_plate_3d, base_case_3d)
 
   // serialize the generated geometries into stl blob
-  const rawData = stlSerializer.serialize({ binary: true }, transforms.mirrorY(base_plate_3d))
+  const rawData = mfSerialize.serialize(
+    {
+      units: 'millimeter',
+      metadata: true,
+      comperess: true
+    },
+    [
+      transforms.mirrorY(base_plate_3d),
+      transforms.mirrorX(base_case_3d),
+    ]
+  )
   // return the result
   self.postMessage({ rawData: rawData, id: data.id });
 };

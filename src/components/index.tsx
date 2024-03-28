@@ -17,20 +17,12 @@ import ReactFlow, {
 
 import 'reactflow/dist/style.css';
 import { Button } from './ui/button';
-import { Option, PencilRuler, PlusIcon, Settings, Settings2 } from 'lucide-react';
+import { InfoIcon, Option, PencilRuler, PlusIcon, Settings, Settings2 } from 'lucide-react';
 import { useHotkeys } from 'react-hotkeys-hook'
 import { Key } from 'ts-key-enum'
 import { toast } from 'sonner';
 import { signal } from "@preact/signals-react";
-
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
+import EditorDialogTrigger from './modals/editor-info';
 
 type WorkerSignal = {
   status: 'pending' | 'resolved' | 'rejected',
@@ -47,7 +39,7 @@ type WorkersSignal = {
 const workersSigals = signal<WorkersSignal>({});
 
 const initialNodes: Node[] = [
-  { id: "2", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch', rotation: '45' }, },
+  { id: "2", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch', rotation: '0' }, },
   { id: "3", type: 'switch', position: { x: 380, y: 0 }, data: { label: 'Switch', rotation: '0' }, },
   { id: "4", type: 'switch', position: { x: 190, y: 190 }, data: { label: 'Switch', rotation: '0' }, },
   { id: "5", type: 'switch', position: { x: 380, y: 190 }, data: { label: 'Switch', rotation: '0' }, }
@@ -212,14 +204,18 @@ function BasicFlow() {
     <div className='w-full h-full relative'>
 
       <Button
-        className='absolute top-0 left-0 z-10'
+        className='absolute top-0 left-0 z-10 -translate-y-1/2'
         onClick={handleGenerateModel}
       >
         Generate Model
       </Button>
 
+      <EditorDialogTrigger
+        className='absolute top-0 right-0 z-10 -translate-y-1/2'
+      />
+
+
       <ReactFlow
-        fitView
         snapToGrid
         selectionOnDrag
         disableKeyboardA11y
@@ -234,7 +230,6 @@ function BasicFlow() {
       >
 
         <Controls />
-        <MiniMap pannable zoomable />
         <Background gap={10} variant={BackgroundVariant.Dots} />
 
         {/* switch add buttons */}

@@ -241,7 +241,7 @@ function BasicFlow() {
         ].map((position) => (
           <NodeToolbar key={position} nodeId={selectedNodes} isVisible position={position}>
             <Button
-              className=' p-0 h-6 w-6 flex items-center justify-center opacity-25 hover:opacity-100'
+              className=' p-0 h-8 w-8 flex items-center justify-center opacity-25 hover:opacity-100'
               onClick={() => handleAddNode(position)}
             >
               <PlusIcon className='w-4 h-4 flex-shrink-0' />

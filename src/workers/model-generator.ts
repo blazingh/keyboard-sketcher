@@ -136,7 +136,7 @@ self.onmessage = async event => {
     },
     [
       transforms.mirrorY(base_plate_3d),
-      transforms.mirrorX(base_case_3d),
+      transforms.mirrorY(base_case_3d),
     ]
   )
   // return the result

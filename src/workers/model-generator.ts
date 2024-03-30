@@ -14,14 +14,17 @@ const caseTopRadius = Math.max(caseThickness / 2, 0)
 const caseTopMargin = Math.max(plateThickness + caseTopRadius, 5)
 const caseBottomMargin = Math.max(standoffThickness, 9)
 
-const tolenrence = {
-  tight: 0.254
+const tolerance = {
+  tight: 0.254,
+  loose: 0.508
 }
 
 self.onmessage = async event => {
   const data = await JSON.parse(event.data)
-  let nodes = data.nodes.filter((node: any) => node.type === "switch")
-  nodes = nodes.map((node: any) => {
+  let switch_nodes = data.nodes.filter((node: any) => node.type === "switch")
+  let mcu_nodes = data.nodes.filter((node: any) => node.type === "mcu")
+
+  switch_nodes = switch_nodes.map((node: any) => {
     return {
       ...node,
       rotation: node.data.rotation,
@@ -29,9 +32,19 @@ self.onmessage = async event => {
     }
   })
 
+  mcu_nodes = mcu_nodes.map((node: any) => {
+    return {
+      ...node,
+      rotation: node.data.rotation,
+      position: { x: node.position.x / 10, y: node.position.y / 10 },
+      width: node.data.width / 10,
+      height: node.data.height / 10
+    }
+  })
+
   const geoToAdd: Geom2[] = []
-  // generate a 2d geometry for each switch
-  nodes.map((node: any) => {
+  // generate a 2d geometry for each node
+  switch_nodes.map((node: any) => {
     geoToAdd.push(
       transforms.translate(
         [node.position.x, node.position.y],
@@ -45,18 +58,40 @@ self.onmessage = async event => {
       )
     )
   })
+  mcu_nodes.map((node: any) => {
+    geoToAdd.push(
+      transforms.translate(
+        [node.position.x, node.position.y],
+        transforms.rotateZ(
+          utils.degToRad(node.rotation),
+          primitives.rectangle({
+            size: [node.width + tolerance.loose * 2, node.height + tolerance.loose * 2],
+            center: [0, 0]
+          })
+        )
+      )
+    )
+  })
 
   // joint all 2d geometries into a plate
   let base_plate = hulls.hull(geoToAdd) as Geom2 || null
-  // shrink the edges of the plate
-  //base_plate = expansions.offset({ delta: 0 }, base_plate)
 
   // extrude the plate to a 3d geometry
   let base_plate_3d = extrusions.extrudeLinear({ height: plateThickness }, base_plate)
 
   const case_corners: Geom3[] = []
+  const case_bottoms: Geom3[] = []
   // generate the sides of the case from the sides of the plate
-  expansions.offset({ delta: tolenrence.tight + caseThickness / 2 }, base_plate).sides.map((points) => {
+  expansions.offset({ delta: tolerance.tight + caseThickness / 2 }, base_plate).sides.map((points) => {
+    case_bottoms.push(
+      primitives.roundedCylinder({
+        radius: caseThickness / 2,
+        height: 3,
+        roundRadius: 0,
+        center: [points[0][0], points[0][1], -caseBottomMargin - 1.5],
+        segments: 30
+      }),
+    )
     case_corners.push(
       booleans.union(
         primitives.roundedCylinder({
@@ -77,9 +112,10 @@ self.onmessage = async event => {
     )
   })
   case_corners.push(case_corners[0])
+  case_bottoms.push(case_bottoms[0])
 
   const case_standoffs: Geom3[] = []
-  expansions.offset({ delta: tolenrence.tight - standoffThickness / 2 + caseThickness / 2 }, base_plate).sides.map((points) => {
+  expansions.offset({ delta: tolerance.tight - standoffThickness / 2 + caseThickness / 2 }, base_plate).sides.map((points) => {
     case_standoffs.push(
       primitives.cylinderElliptic({
         height: standoffThickness,
@@ -91,14 +127,32 @@ self.onmessage = async event => {
   })
   case_standoffs.push(case_standoffs[0])
 
-  // generate the wall of the case from it's edges
-  const base_case_3d = booleans.union(
+  // generate the walls and floor of the case from it's edges
+  let base_case_3d = booleans.union(
     hulls.hullChain(case_corners),
     hulls.hullChain(case_standoffs),
+    hulls.hull(case_bottoms)
   )
 
+  // cut the mcu from the case
+  mcu_nodes.map((node: any) => {
+    base_case_3d = booleans.subtract(
+      base_case_3d,
+      transforms.translate(
+        [node.position.x, node.position.y, -caseBottomMargin],
+        transforms.rotateZ(
+          utils.degToRad(node.rotation),
+          primitives.cuboid({
+            size: [node.width + (tolerance.loose) * 2, node.height + (tolerance.loose + tolerance.tight) * 2, 3],
+            center: [0, 0, 0]
+          })
+        )
+      )
+    )
+  })
+
   // cut the switches holes and gruves from the plate
-  nodes.map((node: any) => {
+  switch_nodes.map((node: any) => {
     base_plate_3d = booleans.subtract(
       base_plate_3d,
       transforms.translate(
@@ -132,7 +186,7 @@ self.onmessage = async event => {
     {
       units: 'millimeter',
       metadata: true,
-      comperess: true
+      comperess: false
     },
     [
       transforms.mirrorY(base_plate_3d),

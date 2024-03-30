@@ -39,10 +39,16 @@ type WorkersSignal = {
 const workersSigals = signal<WorkersSignal>({});
 
 const initialNodes: Node[] = [
-  { id: "2", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch', rotation: '0' }, },
-  { id: "3", type: 'switch', position: { x: 380, y: 0 }, data: { label: 'Switch', rotation: '0' }, },
-  { id: "4", type: 'switch', position: { x: 190, y: 190 }, data: { label: 'Switch', rotation: '0' }, },
-  { id: "5", type: 'switch', position: { x: 380, y: 190 }, data: { label: 'Switch', rotation: '0' }, }
+  { id: "1", type: 'mcu', position: { x: 190, y: 130 }, data: { label: 'mcu', rotation: '0', width: 220, height: 520 }, zIndex: 0 },
+  { id: "2", type: 'switch', position: { x: 0, y: 0 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
+  { id: "3", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
+  { id: "4", type: 'switch', position: { x: 380, y: 0 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
+  { id: "5", type: 'switch', position: { x: 0, y: 190 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
+  { id: "6", type: 'switch', position: { x: 190, y: 190 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
+  { id: "7", type: 'switch', position: { x: 380, y: 190 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
+  { id: "8", type: 'switch', position: { x: 0, y: 380 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
+  { id: "9", type: 'switch', position: { x: 190, y: 380 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
+  { id: "10", type: 'switch', position: { x: 380, y: 380 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
 ];
 
 export default function Sketcher() {
@@ -59,7 +65,7 @@ export default function Sketcher() {
           onClick={() => setSettingsOpen(p => !p)}
           className={cn(
             'absolute top-1/2 -translate-y-1/2 right-0 transition-all ease-in-out py-6',
-            settingsOpen ? "translate-x-1/2" : "translate-x-full rounded-l-none"
+            settingsOpen ? "translate-x-1/2 px-1.5" : "translate-x-full rounded-l-none"
           )}
         >
           <Settings2 className='w-5 h-5' />
@@ -74,7 +80,7 @@ export default function Sketcher() {
           onClick={() => setEditOpen(p => !p)}
           className={cn(
             'absolute top-1/2 -translate-y-1/2 left-0 transition-all ease-in-out py-6',
-            editOpen ? "-translate-x-1/2" : "-translate-x-full rounded-r-none"
+            editOpen ? "-translate-x-1/2 px-1.5" : "-translate-x-full rounded-r-none"
           )}
         >
           <PencilRuler className='w-5 h-5' />
@@ -87,7 +93,7 @@ export default function Sketcher() {
 
 function BasicFlow() {
 
-  const nodeTypes = useMemo(() => ({ switch: Switch }), []);
+  const nodeTypes = useMemo(() => ({ switch: Switch, mcu: MCU }), []);
   const [nodes, _, onNodesChange] = useNodesState(initialNodes);
 
   const selectedNodes = useMemo(() => {
@@ -217,9 +223,11 @@ function BasicFlow() {
 
       <ReactFlow
         snapToGrid
+        fitView
         selectionOnDrag
         disableKeyboardA11y
         panOnDrag={[1, 2, 3, 4]}
+        nodeOrigin={[0.5, 0.5]}
         minZoom={0.2}
         maxZoom={5}
         snapGrid={[10, 10]}
@@ -265,8 +273,30 @@ function Switch(props: NodeProps) {
       )}
       style={{
         transform: `rotate(${props.data.rotation}deg)`,
+        zIndex: 2
       }}
     >
+    </div>
+  );
+}
+
+function MCU(props: NodeProps) {
+  return (
+    <div
+      className={cn(
+        'w-[140px] h-[140px] border-2 border-foreground rounded-md bg-green-500 relative opacity-50',
+        props.selected && 'border-primary',
+        props.data.overlaped && 'bg-destructive',
+        props.data.overlaped && props.selected && 'border-destructive-foreground',
+      )}
+      style={{
+        transform: `rotate(${props.data.rotation}deg)`,
+        width: `${props.data.width || 140}px`,
+        height: `${props.data.height || 280}px`,
+        zIndex: 1
+      }}
+    >
+      <div className="bg-green-700 w-[90px] h-[30px] rounded-b absolute top-0 left-1/2 -translate-x-1/2" />
     </div>
   );
 }

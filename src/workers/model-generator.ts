@@ -56,7 +56,7 @@ self.onmessage = async event => {
 
   const case_corners: Geom3[] = []
   // generate the sides of the case from the sides of the plate
-  expansions.offset({ delta: tolenrence.tight }, base_plate).sides.map((points) => {
+  expansions.offset({ delta: tolenrence.tight + caseThickness / 2 }, base_plate).sides.map((points) => {
     case_corners.push(
       booleans.union(
         primitives.roundedCylinder({
@@ -79,7 +79,7 @@ self.onmessage = async event => {
   case_corners.push(case_corners[0])
 
   const case_standoffs: Geom3[] = []
-  expansions.offset({ delta: tolenrence.tight - standoffThickness / 2 }, base_plate).sides.map((points) => {
+  expansions.offset({ delta: tolenrence.tight - standoffThickness / 2 + caseThickness / 2 }, base_plate).sides.map((points) => {
     case_standoffs.push(
       primitives.cylinderElliptic({
         height: standoffThickness,

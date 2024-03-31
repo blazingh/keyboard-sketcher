@@ -65,7 +65,7 @@ self.onmessage = async event => {
         transforms.rotateZ(
           utils.degToRad(node.rotation),
           primitives.rectangle({
-            size: [node.width + tolerance.loose * 2, node.height + tolerance.loose * 2],
+            size: [node.width + tolerance.loose * 2, node.height + tolerance.loose * 2 - caseThickness * 2],
             center: [0, 0]
           })
         )
@@ -139,11 +139,11 @@ self.onmessage = async event => {
     base_case_3d = booleans.subtract(
       base_case_3d,
       transforms.translate(
-        [node.position.x, node.position.y, -caseBottomMargin],
+        [node.position.x, node.position.y, -caseBottomMargin + 1],
         transforms.rotateZ(
           utils.degToRad(node.rotation),
           primitives.cuboid({
-            size: [node.width + (tolerance.loose) * 2, node.height + (tolerance.loose + tolerance.tight) * 2, 3],
+            size: [node.width + (tolerance.loose + tolerance.tight) * 2, node.height + (tolerance.loose + tolerance.tight) * 2, 5],
             center: [0, 0, 0]
           })
         )

@@ -2,27 +2,27 @@
 import { cn } from '@/lib/utils';
 import React, { useMemo } from 'react';
 import ReactFlow, {
-  Controls,
   Background,
-  useNodesState,
   BackgroundVariant,
+  Controls,
+  MiniMap,
   Node,
+  NodeChange,
   NodeProps,
-  ReactFlowProvider,
   NodeToolbar,
   Position,
-  NodeChange,
-  MiniMap,
+  ReactFlowProvider,
+  useNodesState,
 } from 'reactflow';
 
-import 'reactflow/dist/style.css';
-import { Button } from './ui/button';
-import { InfoIcon, Option, PencilRuler, PlusIcon, Settings, Settings2 } from 'lucide-react';
-import { useHotkeys } from 'react-hotkeys-hook'
-import { Key } from 'ts-key-enum'
-import { toast } from 'sonner';
 import { signal } from "@preact/signals-react";
+import { InfoIcon, Option, PencilRuler, PlusIcon, Settings, Settings2 } from 'lucide-react';
+import { useHotkeys } from 'react-hotkeys-hook';
+import 'reactflow/dist/style.css';
+import { toast } from 'sonner';
+import { Key } from 'ts-key-enum';
 import EditorDialogTrigger from './modals/editor-info';
+import { Button, buttonVariants } from './ui/button';
 
 type WorkerSignal = {
   status: 'pending' | 'resolved' | 'rejected',
@@ -247,13 +247,18 @@ function BasicFlow() {
           Position.Left,
           Position.Right,
         ].map((position) => (
-          <NodeToolbar key={position} nodeId={selectedNodes} isVisible position={position}>
-            <Button
-              className=' p-0 h-8 w-8 flex items-center justify-center opacity-25 hover:opacity-100'
-              onClick={() => handleAddNode(position)}
-            >
-              <PlusIcon className='w-4 h-4 flex-shrink-0' />
-            </Button>
+          <NodeToolbar
+            isVisible
+            key={position}
+            nodeId={selectedNodes}
+            position={position}
+            onClick={() => handleAddNode(position)}
+            className={cn(
+              buttonVariants(),
+              'p-0 h-8 w-8 flex items-center justify-center opacity-25 hover:opacity-100',
+            )}
+          >
+            <PlusIcon className='w-4 h-4 flex-shrink-0' />
           </NodeToolbar>
         ))}
 

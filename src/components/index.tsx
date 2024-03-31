@@ -16,7 +16,7 @@ import ReactFlow, {
 } from 'reactflow';
 
 import { signal } from "@preact/signals-react";
-import { InfoIcon, Option, PencilRuler, PlusIcon, Settings, Settings2 } from 'lucide-react';
+import { Check, CheckCircle, CheckCircle2, InfoIcon, Loader2, Option, PencilRuler, PlusIcon, Settings, Settings2 } from 'lucide-react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import 'reactflow/dist/style.css';
 import { toast } from 'sonner';
@@ -39,7 +39,7 @@ type WorkersSignal = {
 const workersSigals = signal<WorkersSignal>({});
 
 const initialNodes: Node[] = [
-  { id: "1", type: 'mcu', position: { x: 190, y: 130 }, data: { label: 'mcu', rotation: '0', width: 220, height: 520 }, zIndex: 0 },
+  { id: "1", type: 'mcu', position: { x: 190, y: 130 }, data: { label: 'mcu', rotation: '0', width: 210, height: 520 }, zIndex: 0 },
   { id: "2", type: 'switch', position: { x: 0, y: 0 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
   { id: "3", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
   { id: "4", type: 'switch', position: { x: 380, y: 0 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
@@ -134,6 +134,8 @@ function BasicFlow() {
     if (key === 'ArrowRight') deltas = [10, 0]
     if (key === 'ArrowUp') deltas = [0, -10]
     if (key === 'ArrowDown') deltas = [0, 10]
+    const isMcu = nodes.find((node) => node.selected && node.type === 'mcu')
+    if (isMcu) deltas = [deltas[0] * 0.5, deltas[1] * 0.5]
     nodes.map((node) => {
       if (!selectedNodes.includes(node.id)) return
       changes.push({
@@ -145,7 +147,8 @@ function BasicFlow() {
     onNodesChange(changes)
   }
 
-  function handleCancelGeneration(id: number) {
+  function handleCancelGeneration(id: number, toastId?: any) {
+    if (toastId) toast.dismiss(toastId)
     if (typeof window === 'undefined' || !window.Worker) return
     if (!workersSigals.value[id].worker) {
       toast.warning("Lost model worker :(")
@@ -156,10 +159,26 @@ function BasicFlow() {
       return
     }
     workersSigals.value[id].worker.terminate()
-    console.log(workersSigals.value[id])
     workersSigals.value[id].status = 'rejected'
     workersSigals.value[id].rejecter()
     toast("Model Generation Cancelled")
+  }
+
+  function handleViewModel(id: number, toastId?: any) {
+    if (toastId) toast.dismiss(toastId)
+    if (typeof window === 'undefined' || typeof document === 'undefined') return
+    const a = document.getElementById(`pending-modal-${id}`)
+    if (!a) return
+    a.click()
+    a.remove()
+    toast.dismiss()
+  }
+
+  function handleDeleteModel(id: number) {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return
+    const a = document.getElementById(`pending-modal-${id}`)
+    if (!a) return
+    a.remove()
   }
 
   function handleGenerateModel() {
@@ -174,11 +193,15 @@ function BasicFlow() {
       const a = document.createElement('a')
       a.href = URL.createObjectURL(new Blob(e.data.rawData as any))
       a.download = 'model.3mf'
-      a.click()
-      a.remove()
+      a.id = `pending-modal-${id}`
+      a.style.display = "none"
+      document.body.appendChild(a)
+      setTimeout(() => {
+        handleDeleteModel(id)
+      }, 1000 * 60 * 2)
     };
     newWorker.postMessage(JSON.stringify({ nodes: nodes, id: id }))
-    toast.promise(
+    const toastId = toast.promise(
       new Promise((resolve, reject) =>
         workersSigals.value[id] = {
           worker: newWorker,
@@ -189,12 +212,32 @@ function BasicFlow() {
         }
       ),
       {
-        loading: "Generating Model...",
-        description: new Date().toLocaleString(),
-        success: (data: any) => `Model Generated in ${data.totalTime / 1000}s`,
-        action: {
-          label: "Cancel",
-          onClick: () => handleCancelGeneration(id)
+        duration: 1000 * 60 * 2,// 1 min
+        loading: function() {
+          return (
+            <div className='w-full h-full flex items-center justify-between'>
+              <span className='flex items-center gap-2'>
+                <Loader2 className='w-5 h-5 animate-spin' />
+                Generating Model...
+              </span>
+              <Button variant="destructive" size="sm" className='h-6 rounded-sm text-xs' onClick={() => handleCancelGeneration(id, toastId)}>
+                Cancel
+              </Button>
+            </div>
+          )
+        }(),
+        success: function(data: any) {
+          return (
+            <div className='w-full h-full flex items-center justify-between'>
+              <span className='flex items-center gap-2'>
+                <CheckCircle2 className='w-5 h-5' />
+                Model Generated in {data.totalTime / 1000}s
+              </span>
+              <Button size="sm" className='h-6 rounded-sm text-xs' onClick={() => handleViewModel(id, toastId)}>
+                View
+              </Button>
+            </div>
+          )
         },
       }
     )

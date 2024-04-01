@@ -1,13 +1,7 @@
 "use client";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
-import { signal } from "@preact/signals-react";
 import { PlusIcon } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import ReactFlow, {
   Background,
@@ -19,42 +13,20 @@ import ReactFlow, {
   useNodesState,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { toast } from 'sonner';
 import { Key } from 'ts-key-enum';
 import EditorDialogTrigger from './modals/editor-info';
 import { Button, buttonVariants } from './ui/button';
 import MCU from "./sketcher/nodes/mcu";
 import Switch from "./sketcher/nodes/switch";
 import { initialNodes } from "@/constants/temp";
-import ToastFinishModel from "./sketcher/toasts/finished-model";
-import ToastPendingModel from "./sketcher/toasts/pending-model";
-import ModelPreview from "./sketcher/modals/model-preview";
-
-type WorkerSignal = {
-  status: 'pending' | 'resolved' | 'rejected',
-  worker: Worker,
-  startTime: Date,
-  resolver: any,
-  rejecter: any
-}
-
-type WorkersSignal = {
-  [key: number]: WorkerSignal
-}
-
-const workersSigals = signal<WorkersSignal>({});
+import { useModelActions } from "@/hooks/model-actions";
 
 export function SketcherWorkSpace() {
 
   const nodeTypes = useMemo(() => ({ switch: Switch, mcu: MCU }), []);
   const [nodes, _, onNodesChange] = useNodesState(initialNodes);
-  const [modelsGeo, setModelsGeo] = useState<any>()
 
-  const [previewData, setPreviewData] = useState({
-    case_geo: null,
-    plate_geo: null,
-    open: false
-  })
+  const modelActions = useModelActions()
 
   const selectedNodes = useMemo(() => {
     return nodes.filter((node) => node.selected).map((node) => node.id)
@@ -107,83 +79,6 @@ export function SketcherWorkSpace() {
     onNodesChange(changes)
   }
 
-  function handleCancelGeneration(id: number, toastId?: any) {
-    if (toastId) toast.dismiss(toastId)
-    if (typeof window === 'undefined' || !window.Worker) return
-    if (!workersSigals.value[id].worker) {
-      toast.warning("Lost model worker :(")
-      return
-    }
-    if (workersSigals.value[id].status !== 'pending') {
-      toast.warning("Model Generation Already Resolved :|")
-      return
-    }
-    workersSigals.value[id].worker.terminate()
-    workersSigals.value[id].status = 'rejected'
-    workersSigals.value[id].rejecter()
-    toast("Model Generation Cancelled")
-  }
-
-  function handleViewModel(id: number, toastId?: any) {
-    setPreviewData({ ...previewData, open: true })
-    return
-    /*
-    if (toastId) toast.dismiss(toastId)
-    if (typeof window === 'undefined' || typeof document === 'undefined') return
-    const a = document.getElementById(`pending-modal-${id}`)
-    if (!a) return
-    a.click()
-    a.remove()
-    toast.dismiss()
-    */
-  }
-
-  function handleDeleteModel(id: number) {
-    if (typeof window === 'undefined' || typeof document === 'undefined') return
-    const a = document.getElementById(`pending-modal-${id}`)
-    if (!a) return
-    a.remove()
-  }
-
-  function handleGenerateModel() {
-    if (typeof window === 'undefined' || !window.Worker) return
-    const id = Math.random()
-    const newWorker = new Worker(new URL("../workers/model-generator.ts", import.meta.url))
-    newWorker.onmessage = (e: MessageEvent<any>) => {
-      workersSigals.value[e.data.id].resolver({
-        totalTime: Date.now() - workersSigals.value[e.data.id].startTime.getTime()
-      })
-      workersSigals.value[e.data.id].status = 'resolved'
-      setModelsGeo(e.data.rawData)
-      setTimeout(() => {
-        handleDeleteModel(id)
-      }, 1000 * 60 * 2)
-    };
-    newWorker.postMessage(JSON.stringify({ nodes: nodes, id: id }))
-    let toastId: any
-    toastId = toast.promise(
-      new Promise((resolve, reject) =>
-        workersSigals.value[id] = {
-          worker: newWorker,
-          status: 'pending',
-          startTime: new Date(),
-          resolver: resolve,
-          rejecter: reject,
-        }
-      ),
-      {
-        duration: 1000 * 60 * 2,
-        onDismiss: () => handleDeleteModel(id),
-        loading: ToastPendingModel({ onActionClick: () => handleViewModel(id, toastId) }),
-        success: (data: any) =>
-          <ToastFinishModel
-            totalTime={data.totalTime}
-            onActionClick={() => handleViewModel(id, toastId)}
-          />,
-      }
-    )
-  }
-
   /* hot keys event handlers */
   useHotkeys(Key.ArrowUp, () => handleMoveNode('ArrowUp'))
   useHotkeys(Key.ArrowDown, () => handleMoveNode('ArrowDown'))
@@ -193,16 +88,11 @@ export function SketcherWorkSpace() {
   return (
     <div className='w-full h-full relative'>
 
-      <Dialog open={previewData.open} onOpenChange={(state) => setPreviewData({ ...previewData, open: state })} >
-        <DialogTrigger>Open</DialogTrigger>
-        <DialogContent className='h-[60svh] max-w-2xl'>
-          <ModelPreview fiberGeometries={modelsGeo} />
-        </DialogContent>
-      </Dialog>
+      <modelActions.ModelPreviewJsx />
 
       <Button
         className='absolute top-0 left-0 z-10 -translate-y-1/2'
-        onClick={handleGenerateModel}
+        onClick={() => modelActions.generateModel(nodes)}
       >
         Generate Model
       </Button>

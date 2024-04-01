@@ -1,28 +1,34 @@
 "use client";
+import {
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { cn } from '@/lib/utils';
-import React, { useMemo } from 'react';
+import { signal } from "@preact/signals-react";
+import { PlusIcon } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useHotkeys } from 'react-hotkeys-hook';
 import ReactFlow, {
   Background,
   BackgroundVariant,
   Controls,
-  MiniMap,
-  Node,
   NodeChange,
-  NodeProps,
   NodeToolbar,
   Position,
-  ReactFlowProvider,
   useNodesState,
 } from 'reactflow';
-
-import { signal } from "@preact/signals-react";
-import { Check, CheckCircle, CheckCircle2, InfoIcon, Loader2, Option, PencilRuler, PlusIcon, Settings, Settings2 } from 'lucide-react';
-import { useHotkeys } from 'react-hotkeys-hook';
 import 'reactflow/dist/style.css';
 import { toast } from 'sonner';
 import { Key } from 'ts-key-enum';
 import EditorDialogTrigger from './modals/editor-info';
 import { Button, buttonVariants } from './ui/button';
+import MCU from "./sketcher/nodes/mcu";
+import Switch from "./sketcher/nodes/switch";
+import { initialNodes } from "@/constants/temp";
+import ToastFinishModel from "./sketcher/toasts/finished-model";
+import ToastPendingModel from "./sketcher/toasts/pending-model";
+import ModelPreview from "./sketcher/modals/model-preview";
 
 type WorkerSignal = {
   status: 'pending' | 'resolved' | 'rejected',
@@ -38,63 +44,17 @@ type WorkersSignal = {
 
 const workersSigals = signal<WorkersSignal>({});
 
-const initialNodes: Node[] = [
-  { id: "1", type: 'mcu', position: { x: 190, y: 130 }, data: { label: 'mcu', rotation: '0', width: 210, height: 520 }, zIndex: 0 },
-  { id: "2", type: 'switch', position: { x: 0, y: 0 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
-  { id: "3", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
-  { id: "4", type: 'switch', position: { x: 380, y: 0 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
-  { id: "5", type: 'switch', position: { x: 0, y: 190 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
-  { id: "6", type: 'switch', position: { x: 190, y: 190 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
-  { id: "7", type: 'switch', position: { x: 380, y: 190 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
-  { id: "8", type: 'switch', position: { x: 0, y: 380 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
-  { id: "9", type: 'switch', position: { x: 190, y: 380 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
-  { id: "10", type: 'switch', position: { x: 380, y: 380 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
-];
-
-export default function Sketcher() {
-  const [settingsOpen, setSettingsOpen] = React.useState(false)
-  const [editOpen, setEditOpen] = React.useState(false)
-  return (
-    <ReactFlowProvider>
-      <div className={cn(
-        "fixed h-svh z-30 top-0 left-0 bg-background rounded-r-2xl transition-all border-r-2 border-primary ease-in-out",
-        settingsOpen ? "w-[280px] shadow-xl" : "w-0 shadow-none"
-      )}
-      >
-        <Button
-          onClick={() => setSettingsOpen(p => !p)}
-          className={cn(
-            'absolute top-1/2 -translate-y-1/2 right-0 transition-all ease-in-out py-6',
-            settingsOpen ? "translate-x-1/2 px-1.5" : "translate-x-full rounded-l-none"
-          )}
-        >
-          <Settings2 className='w-5 h-5' />
-        </Button>
-      </div>
-      <div className={cn(
-        "fixed h-svh z-30 top-0 right-0 bg-background rounded-l-2xl transition-all border-l-2 border-primary ease-in-out",
-        editOpen ? "w-[280px] shadow-xl" : "w-0 shadow-none"
-      )}
-      >
-        <Button
-          onClick={() => setEditOpen(p => !p)}
-          className={cn(
-            'absolute top-1/2 -translate-y-1/2 left-0 transition-all ease-in-out py-6',
-            editOpen ? "-translate-x-1/2 px-1.5" : "-translate-x-full rounded-r-none"
-          )}
-        >
-          <PencilRuler className='w-5 h-5' />
-        </Button>
-      </div>
-      <BasicFlow />
-    </ReactFlowProvider >
-  );
-}
-
-function BasicFlow() {
+export function SketcherWorkSpace() {
 
   const nodeTypes = useMemo(() => ({ switch: Switch, mcu: MCU }), []);
   const [nodes, _, onNodesChange] = useNodesState(initialNodes);
+  const [modelsGeo, setModelsGeo] = useState<any>()
+
+  const [previewData, setPreviewData] = useState({
+    case_geo: null,
+    plate_geo: null,
+    open: false
+  })
 
   const selectedNodes = useMemo(() => {
     return nodes.filter((node) => node.selected).map((node) => node.id)
@@ -165,6 +125,9 @@ function BasicFlow() {
   }
 
   function handleViewModel(id: number, toastId?: any) {
+    setPreviewData({ ...previewData, open: true })
+    return
+    /*
     if (toastId) toast.dismiss(toastId)
     if (typeof window === 'undefined' || typeof document === 'undefined') return
     const a = document.getElementById(`pending-modal-${id}`)
@@ -172,6 +135,7 @@ function BasicFlow() {
     a.click()
     a.remove()
     toast.dismiss()
+    */
   }
 
   function handleDeleteModel(id: number) {
@@ -190,18 +154,14 @@ function BasicFlow() {
         totalTime: Date.now() - workersSigals.value[e.data.id].startTime.getTime()
       })
       workersSigals.value[e.data.id].status = 'resolved'
-      const a = document.createElement('a')
-      a.href = URL.createObjectURL(new Blob(e.data.rawData as any))
-      a.download = 'model.3mf'
-      a.id = `pending-modal-${id}`
-      a.style.display = "none"
-      document.body.appendChild(a)
+      setModelsGeo(e.data.rawData)
       setTimeout(() => {
         handleDeleteModel(id)
       }, 1000 * 60 * 2)
     };
     newWorker.postMessage(JSON.stringify({ nodes: nodes, id: id }))
-    const toastId = toast.promise(
+    let toastId: any
+    toastId = toast.promise(
       new Promise((resolve, reject) =>
         workersSigals.value[id] = {
           worker: newWorker,
@@ -212,33 +172,14 @@ function BasicFlow() {
         }
       ),
       {
-        duration: 1000 * 60 * 2,// 1 min
-        loading: function() {
-          return (
-            <div className='w-full h-full flex items-center justify-between'>
-              <span className='flex items-center gap-2'>
-                <Loader2 className='w-5 h-5 animate-spin' />
-                Generating Model...
-              </span>
-              <Button variant="destructive" size="sm" className='h-6 rounded-sm text-xs' onClick={() => handleCancelGeneration(id, toastId)}>
-                Cancel
-              </Button>
-            </div>
-          )
-        }(),
-        success: function(data: any) {
-          return (
-            <div className='w-full h-full flex items-center justify-between'>
-              <span className='flex items-center gap-2'>
-                <CheckCircle2 className='w-5 h-5' />
-                Model Generated in {data.totalTime / 1000}s
-              </span>
-              <Button size="sm" className='h-6 rounded-sm text-xs' onClick={() => handleViewModel(id, toastId)}>
-                View
-              </Button>
-            </div>
-          )
-        },
+        duration: 1000 * 60 * 2,
+        onDismiss: () => handleDeleteModel(id),
+        loading: ToastPendingModel({ onActionClick: () => handleViewModel(id, toastId) }),
+        success: (data: any) =>
+          <ToastFinishModel
+            totalTime={data.totalTime}
+            onActionClick={() => handleViewModel(id, toastId)}
+          />,
       }
     )
   }
@@ -251,6 +192,13 @@ function BasicFlow() {
 
   return (
     <div className='w-full h-full relative'>
+
+      <Dialog open={previewData.open} onOpenChange={(state) => setPreviewData({ ...previewData, open: state })} >
+        <DialogTrigger>Open</DialogTrigger>
+        <DialogContent className='h-[60svh] max-w-2xl'>
+          <ModelPreview fiberGeometries={modelsGeo} />
+        </DialogContent>
+      </Dialog>
 
       <Button
         className='absolute top-0 left-0 z-10 -translate-y-1/2'
@@ -306,45 +254,6 @@ function BasicFlow() {
         ))}
 
       </ReactFlow>
-    </div>
-  );
-}
-
-function Switch(props: NodeProps) {
-  return (
-    <div
-      className={cn(
-        'w-[140px] h-[140px] border-2 border-foreground rounded-md bg-secondary relative',
-        props.selected && 'border-primary',
-        props.data.overlaped && 'bg-destructive',
-        props.data.overlaped && props.selected && 'border-destructive-foreground',
-      )}
-      style={{
-        transform: `rotate(${props.data.rotation}deg)`,
-        zIndex: 2
-      }}
-    >
-    </div>
-  );
-}
-
-function MCU(props: NodeProps) {
-  return (
-    <div
-      className={cn(
-        'w-[140px] h-[140px] border-2 border-foreground rounded-md bg-green-500 relative opacity-50',
-        props.selected && 'border-primary',
-        props.data.overlaped && 'bg-destructive',
-        props.data.overlaped && props.selected && 'border-destructive-foreground',
-      )}
-      style={{
-        transform: `rotate(${props.data.rotation}deg)`,
-        width: `${props.data.width || 140}px`,
-        height: `${props.data.height || 280}px`,
-        zIndex: 1
-      }}
-    >
-      <div className="bg-green-700 w-[90px] h-[30px] rounded-b absolute top-0 left-1/2 -translate-x-1/2" />
     </div>
   );
 }

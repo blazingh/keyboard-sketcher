@@ -1,4 +1,4 @@
-import Sketch from "@/components";
+import MainWorkSpace from "@/components/sketcher/main";
 
 export default function Home() {
   return (
@@ -6,7 +6,7 @@ export default function Home() {
       {/*
       <PointPlotter />
       */}
-      <Sketch />
+      <MainWorkSpace />
     </main >
   );
 }

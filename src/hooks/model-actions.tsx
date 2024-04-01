@@ -14,7 +14,7 @@ type WorkerSignal = {
   resolver: any,
   rejecter: any,
   toastId?: any,
-  stlUrl?: string
+  rawData?: any
 }
 
 type WorkersSignal = {
@@ -80,8 +80,7 @@ export function useModelActions() {
       workersSigals.value[e.data.id].resolver({
         totalTime: Date.now() - workersSigals.value[e.data.id].startTime.getTime()
       })
-      const newUrl = URL.createObjectURL(new Blob(e.data.rawData))
-      workersSigals.value[e.data.id].stlUrl = newUrl
+      workersSigals.value[e.data.id].rawData = e.data.rawData
       setTimeout(() => {
         clearWorker(id)
       }, 1000 * 60 * 2)
@@ -113,6 +112,8 @@ export function useModelActions() {
   }
 
   function ModelPreviewJsx() {
+    if (typeof window === "undefined" || !workersSigals.value[openModelPreviewId]) return
+    const modelUrl = URL.createObjectURL(new Blob(workersSigals.value[openModelPreviewId].rawData))
     return (
       <Dialog open={openModelPreviewId !== 0}  >
         <DialogContent className='max-w-4xl' onInteractOutside={(e) => e?.preventDefault} >
@@ -122,10 +123,11 @@ export function useModelActions() {
               shadows
               className='w-full h-full'
               modelProps={{ color: "indianred" }}
-              url={workersSigals.value[openModelPreviewId]?.stlUrl || ""}
+              url={modelUrl}
             />
             <div className='flex w-full items-center justify-between'>
               <Button
+                variant="destructive"
                 onClick={() => {
                   deleteModel(openModelPreviewId)
                   setOpenModelPreviewId(0)
@@ -133,9 +135,14 @@ export function useModelActions() {
               >
                 delete
               </Button>
-              <Button>
-                Download
-              </Button>
+              <a
+                href={modelUrl}
+                download="my_model.stl"
+              >
+                <Button>
+                  Download
+                </Button>
+              </a>
             </div>
           </div>
         </DialogContent>

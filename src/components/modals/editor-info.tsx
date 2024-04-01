@@ -14,7 +14,7 @@ import IconMouseScrollWheel from "@/icons/mouse-scroll-wheel"
 export default function EditorDialogTrigger(props: ButtonProps) {
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button
           {...props}
         >

@@ -182,8 +182,11 @@ self.onmessage = async event => {
 
   // temp: join the case and the plate
   base_plate_3d = booleans.union(
-    transforms.mirrorY(base_plate_3d),
     transforms.mirrorY(base_case_3d),
+    transforms.translateZ(
+      (caseTopMargin + caseBottomMargin) * 2,
+      transforms.mirrorY(base_plate_3d),
+    )
   )
 
   // serialize the generated geometries into stl blob

@@ -1,6 +1,8 @@
 import { primitives, booleans, hulls, extrusions, expansions, transforms, utils } from '@jscad/modeling'
 /* @ts-ignore */
 import mfSerialize from '@jscad/3mf-serializer'
+/* @ts-ignore */
+import stlSerializer from '@jscad/stl-serializer'
 import { Geom2, Geom3 } from '@jscad/modeling/src/geometries/types';
 
 const plateThickness = 3
@@ -179,22 +181,26 @@ self.onmessage = async event => {
   })
 
   // temp: join the case and the plate
-  // base_plate_3d = booleans.union(base_plate_3d, base_case_3d)
+  base_plate_3d = booleans.union(
+    transforms.mirrorY(base_plate_3d),
+    transforms.mirrorY(base_case_3d),
+  )
 
   // serialize the generated geometries into stl blob
-  const rawData = mfSerialize.serialize(
+  const rawData = stlSerializer.serialize(
     {
-      units: 'millimeter',
-      metadata: true,
-      comperess: false
+      binary: true
     },
-    [
-      transforms.mirrorY(base_plate_3d),
-      transforms.mirrorY(base_case_3d),
-    ]
+    base_plate_3d
   )
+
   // return the result
-  self.postMessage({ rawData: rawData, id: data.id });
+  self.postMessage({
+    //    case_geo: transforms.mirrorY(base_case_3d),
+    //    plate_geo: transforms.mirrorY(base_plate_3d),
+    rawData: rawData,
+    id: data.id
+  });
 };
 
 export { };

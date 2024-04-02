@@ -12,8 +12,8 @@ const switchPadding = 13
 const caseThickness = 4
 const standoffThickness = plateThickness
 
-const caseTopRadius = Math.max(caseThickness / 2, 0)
-const caseTopMargin = Math.max(plateThickness + caseTopRadius, 5)
+const caseTopRadius = 0 // Math.max(caseThickness / 2, 0)
+const caseTopMargin = Math.max(plateThickness + caseTopRadius, 12)
 const caseBottomMargin = Math.max(standoffThickness, 9)
 
 const tolerance = {

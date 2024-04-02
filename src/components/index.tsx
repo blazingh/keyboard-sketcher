@@ -20,10 +20,11 @@ import MCU from "./sketcher/nodes/mcu";
 import Switch from "./sketcher/nodes/switch";
 import { initialNodes } from "@/constants/temp";
 import { useModelActions } from "@/hooks/model-actions";
+import { Outline } from './sketcher/nodes/outline';
 
 export function SketcherWorkSpace() {
 
-  const nodeTypes = useMemo(() => ({ switch: Switch, mcu: MCU }), []);
+  const nodeTypes = useMemo(() => ({ switch: Switch, mcu: MCU, outline: Outline }), []);
   const [nodes, _, onNodesChange] = useNodesState(initialNodes);
 
   const modelActions = useModelActions()
@@ -112,7 +113,7 @@ export function SketcherWorkSpace() {
         minZoom={0.2}
         maxZoom={5}
         snapGrid={[10, 10]}
-        translateExtent={[[-5000, -5000], [5000, 5000]]}
+        translateExtent={[[-2000, -2000], [2000, 2000]]}
         nodes={nodes}
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}

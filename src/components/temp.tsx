@@ -37,7 +37,6 @@ function PointPlotter() {
         return newPoints[i]; // map index to point
       });
     });
-    console.log(clusters)
     const newHull = hull(newPoints, 198)
     return newHull
   }, points1)

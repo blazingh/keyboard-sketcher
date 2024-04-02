@@ -1,9 +1,10 @@
-import { primitives, booleans, hulls, extrusions, expansions, transforms, utils } from '@jscad/modeling'
+import { primitives, booleans, hulls, extrusions, expansions, transforms, utils, geometries } from '@jscad/modeling'
 /* @ts-ignore */
 import mfSerialize from '@jscad/3mf-serializer'
 /* @ts-ignore */
 import stlSerializer from '@jscad/stl-serializer'
 import { Geom2, Geom3 } from '@jscad/modeling/src/geometries/types';
+import { getNodesBorderPoints } from '@/lib/hull-nodes';
 
 const plateThickness = 3
 const switchGruveThickness = 1.5
@@ -44,39 +45,15 @@ self.onmessage = async event => {
     }
   })
 
-  const geoToAdd: Geom2[] = []
-  // generate a 2d geometry for each node
-  switch_nodes.map((node: any) => {
-    geoToAdd.push(
-      transforms.translate(
-        [node.position.x, node.position.y],
-        transforms.rotateZ(
-          utils.degToRad(node.rotation),
-          primitives.rectangle({
-            size: [switchSize + switchPadding, switchSize + switchPadding],
-            center: [0, 0],
-          })
-        )
-      )
-    )
-  })
-  mcu_nodes.map((node: any) => {
-    geoToAdd.push(
-      transforms.translate(
-        [node.position.x, node.position.y],
-        transforms.rotateZ(
-          utils.degToRad(node.rotation),
-          primitives.rectangle({
-            size: [node.width + tolerance.loose * 2, node.height + tolerance.loose * 2 - caseThickness * 2],
-            center: [0, 0]
-          })
-        )
-      )
-    )
+  const BP = getNodesBorderPoints(data.nodes)
+  const sides: number[][][] = []
+
+  BP.map((point, index) => {
+    if (index == BP.length - 1) return
+    sides.push([point, BP[index + 1]])
   })
 
-  // joint all 2d geometries into a plate
-  let base_plate = hulls.hull(geoToAdd) as Geom2 || null
+  let base_plate = transforms.scale([0.1, 0.1, 1], geometries.geom2.create(sides as any))
 
   // extrude the plate to a 3d geometry
   let base_plate_3d = extrusions.extrudeLinear({ height: plateThickness }, base_plate)
@@ -133,7 +110,17 @@ self.onmessage = async event => {
   let base_case_3d = booleans.union(
     hulls.hullChain(case_corners),
     hulls.hullChain(case_standoffs),
-    hulls.hull(case_bottoms)
+    hulls.hullChain(case_bottoms),
+    transforms.translateZ(
+      -caseBottomMargin - plateThickness,
+      extrusions.extrudeLinear({ height: plateThickness },
+        expansions.offset({
+          delta: tolerance.tight + caseThickness / 2
+        },
+          base_plate
+        )
+      )
+    )
   )
 
   // cut the mcu from the case

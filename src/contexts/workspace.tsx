@@ -17,7 +17,6 @@ export function WorkSpaceOtpionsContextProvider({ children }: any) {
   const [options, setOptions] = useState(initialOptions)
 
   const updateOption: contextType['updateOption'] = (key, value) => {
-    console.log(options)
     setOptions(prevOptions => ({
       ...prevOptions,
       [key]: value

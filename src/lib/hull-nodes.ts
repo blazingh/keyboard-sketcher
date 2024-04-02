@@ -10,12 +10,25 @@ export function getNodesBorderPoints(nodes: Node[], padding: number = 65): outli
   const initPoints: any = []
   switch_nodes.forEach(node => {
     const { x, y } = node.position;
-    const offsets = [-70 - padding, 0, 70 + padding];
+    const offsets = [-70 - padding, 0, 70 + padding, 35 + padding, -35 - padding];
     offsets.forEach(offsetX => {
       offsets.forEach(offsetY => {
         initPoints.push([x + offsetX, y + offsetY]);
       });
     });
+  });
+
+  mcu_nodes.forEach(node => {
+    const { x, y } = node.position;
+    initPoints.push([x, y]);
+    initPoints.push([x + 105, y]);
+    initPoints.push([x - 105, y]);
+    initPoints.push([x, y + 260]);
+    initPoints.push([x, y - 220]);
+    initPoints.push([x + 105, y + 260]);
+    initPoints.push([x - 105, y + 260]);
+    initPoints.push([x + 105, y - 220]);
+    initPoints.push([x - 105, y - 220]);
   });
 
   /*
@@ -28,7 +41,7 @@ export function getNodesBorderPoints(nodes: Node[], padding: number = 65): outli
   });
   */
 
-  const newHull = hull(initPoints, Math.sqrt(2) * (70 + padding)) // 198 is the switch diagnol lenght
+  const newHull = hull(initPoints, Math.sqrt(2) * (70 + padding * 2)) // 198 is the switch diagnol lenght
   return newHull as number[][]
 }
 

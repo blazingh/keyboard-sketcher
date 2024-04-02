@@ -35,14 +35,12 @@ export function Outline() {
     if (wsc?.options.renderOuline && cleared) {
       setCleared(false)
     }
-    console.log(cleared, wsc?.options)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Connect points with lines from the second array
-    ctx.strokeStyle = 'white'; // Set line color (adjust as needed)
+    ctx.strokeStyle = 'white';
     ctx.lineWidth = 1; // Set line width (adjust as needed)
     ctx.beginPath(); // Start a new path for lines
     points.inner.forEach(([x1, y1]: any, index: number) => {
-      if (index > 0) { // Skip the first point to avoid starting without a previous point
+      if (index > 0) {
         const [x2, y2] = points.inner[index - 1] as any; // Get previous point coordinates
         ctx.moveTo(x2 + canvas.width * 0.5, y2 + canvas.width * 0.5); // Move to previous point
         ctx.lineTo(x1 + canvas.width * 0.5, y1 + canvas.width * 0.5); // Draw line to current point
@@ -55,7 +53,7 @@ export function Outline() {
         ctx.lineTo(x1 + canvas.width * 0.5, y1 + canvas.width * 0.5); // Draw line to current point
       }
     });
-    ctx.stroke(); // Draw all lines
+    ctx.stroke();
   }, [points, cleared]);
 
   return (

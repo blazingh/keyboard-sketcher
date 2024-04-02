@@ -1,4 +1,5 @@
 import MainWorkSpace from "@/components/sketcher/main";
+import { WorkSpaceOtpionsContextProvider } from "@/contexts/workspace";
 
 export default function Home() {
   return (
@@ -6,7 +7,9 @@ export default function Home() {
       {/*
       <PointPlotter />
       */}
-      <MainWorkSpace />
+      <WorkSpaceOtpionsContextProvider>
+        <MainWorkSpace />
+      </WorkSpaceOtpionsContextProvider>
     </main >
   );
 }

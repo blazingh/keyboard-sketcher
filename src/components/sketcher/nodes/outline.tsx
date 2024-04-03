@@ -10,6 +10,13 @@ export function Outline() {
   const ref = useRef<any>(!null)
 
   const [cleared, setCleared] = useState(false)
+  const [size, setSize] = useState(5)
+
+  useEffect(() => {
+    setTimeout(function() {
+      setSize(5000)
+    }, 1000);
+  }, [setSize])
 
   const wsc = useContext(workSpaceOptionsContext)
 
@@ -57,8 +64,8 @@ export function Outline() {
   }, [points, cleared]);
 
   return (
-    <div className='w-[4000px] h-[4000px]'>
-      <canvas className='w-full h-full' ref={ref} width={4000} height={4000}>
+    <div style={{ width: size, height: size }}>
+      <canvas className='w-full h-full' ref={ref} width={5000} height={5000}>
       </canvas>
     </div>
   )

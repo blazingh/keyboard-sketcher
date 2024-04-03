@@ -1,7 +1,7 @@
 "use client";
 import { cn } from '@/lib/utils';
 import { PlusIcon } from 'lucide-react';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import ReactFlow, {
   Background,
@@ -85,6 +85,26 @@ export function SketcherWorkSpace() {
   useHotkeys(Key.ArrowDown, () => handleMoveNode('ArrowDown'))
   useHotkeys(Key.ArrowLeft, () => handleMoveNode('ArrowLeft'))
   useHotkeys(Key.ArrowRight, () => handleMoveNode('ArrowRight'))
+
+
+  useEffect(() => {
+    const changes: NodeChange[] = []
+    changes.push({
+      type: 'add',
+      item: {
+        id: "0",
+        type: 'outline',
+        position: { x: 0, y: 0 },
+        data: { label: 'outline' },
+        zIndex: 0,
+        width: 5000,
+        height: 5000,
+        selectable: false,
+        draggable: false,
+      },
+    })
+    onNodesChange(changes)
+  }, [])
 
   return (
     <div className='w-full h-full relative'>

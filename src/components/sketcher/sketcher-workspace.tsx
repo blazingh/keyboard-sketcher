@@ -14,13 +14,13 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Key } from 'ts-key-enum';
-import EditorDialogTrigger from './modals/editor-info';
-import { Button, buttonVariants } from './ui/button';
-import MCU from "./sketcher/nodes/mcu";
-import Switch from "./sketcher/nodes/switch";
+import EditorDialogTrigger from '@/components/modals/editor-info';
+import { Button, buttonVariants } from '@/components/ui/button';
+import MCU from "@/components/sketcher/nodes/mcu";
+import Switch from "@/components/sketcher/nodes/switch";
 import { initialNodes } from "@/constants/temp";
 import { useModelActions } from "@/hooks/model-actions";
-import { Outline } from './sketcher/nodes/outline';
+import { Outline } from '@/components/sketcher/nodes/outline';
 
 export function SketcherWorkSpace() {
 

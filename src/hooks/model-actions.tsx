@@ -14,7 +14,9 @@ type WorkerSignal = {
   resolver: any,
   rejecter: any,
   toastId?: any,
-  rawData?: any
+  previewStlData?: any
+  caseStlData?: any
+  plateStlData?: any
 }
 
 type WorkersSignal = {
@@ -33,7 +35,6 @@ export function useModelActions() {
   }
 
   function deleteModel(id: number) {
-
   }
 
   function cancelModelGeneration(id: number) {
@@ -54,20 +55,6 @@ export function useModelActions() {
     if (!worker) return
     if (worker.toastId) toast.dismiss(worker.toastId)
     setOpenModelPreviewId(id)
-    // setPreviewData({ workerId: id, open: true })
-    /*
-    if (toastId) toast.dismiss(toastId)
-    if (typeof window === 'undefined' || typeof document === 'undefined' || !workersSigals.value[id]) return
-    if (!workersSigals.value[id].stlUrl || typeof workersSigals.value[id].stlUrl !== "string") {
-      toast.error("Model no longer availble")
-      return
-    }
-    const a = document.createElement("a")
-    a.href = workersSigals.value[id].stlUrl || ""
-    a.click()
-    a.remove()
-        handleClearWorker(id)
-    */
   }
 
   function generateModel(nodes: Node[]) {
@@ -80,13 +67,15 @@ export function useModelActions() {
       workersSigals.value[e.data.id].resolver({
         totalTime: Date.now() - workersSigals.value[e.data.id].startTime.getTime()
       })
-      workersSigals.value[e.data.id].rawData = e.data.rawData
+      workersSigals.value[e.data.id].previewStlData = e.data.previewStlData
+      workersSigals.value[e.data.id].caseStlData = e.data.caseStlData
+      workersSigals.value[e.data.id].plateStlData = e.data.plateStlData
       setTimeout(() => {
         clearWorker(id)
       }, 1000 * 60 * 2)
     };
 
-    newWorker.postMessage(JSON.stringify({ nodes: nodes, id: id }))
+    newWorker.postMessage({ nodes: nodes, id: id })
 
     const toastId = toast.promise(
       new Promise((resolve, reject) =>
@@ -111,9 +100,24 @@ export function useModelActions() {
     workersSigals.value[id].toastId = toastId
   }
 
+  function downloadModels(id: number) {
+    const worker = workersSigals.value[id]
+    if (!worker || typeof window === "undefined") return
+
+    [worker.plateStlData, worker.caseStlData].map((item, index) => {
+      const modelUrl = URL.createObjectURL(new Blob(item))
+      const a = document.createElement("a")
+      a.href = modelUrl
+      a.download = index === 1 ? "plate.stl" : "case.stl"
+      a.click()
+      a.remove()
+    })
+
+  }
+
   function ModelPreviewJsx() {
     if (typeof window === "undefined" || !workersSigals.value[openModelPreviewId]) return
-    const modelUrl = URL.createObjectURL(new Blob(workersSigals.value[openModelPreviewId].rawData))
+    const modelUrl = URL.createObjectURL(new Blob(workersSigals.value[openModelPreviewId].previewStlData))
     return (
       <Dialog open={openModelPreviewId !== 0}  >
         <DialogContent className='max-w-4xl' onInteractOutside={(e) => e?.preventDefault} >
@@ -135,14 +139,15 @@ export function useModelActions() {
               >
                 delete
               </Button>
-              <a
-                href={modelUrl}
-                download="my_model.stl"
+              <Button
+                onClick={() => {
+                  downloadModels(openModelPreviewId)
+                  setOpenModelPreviewId(0)
+                  toast.success("Downoloaded Models ;)")
+                }}
               >
-                <Button>
-                  Download
-                </Button>
-              </a>
+                Download
+              </Button>
             </div>
           </div>
         </DialogContent>

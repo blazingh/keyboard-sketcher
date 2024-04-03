@@ -1,7 +1,5 @@
 import { primitives, booleans, hulls, extrusions, expansions, transforms, utils, geometries } from '@jscad/modeling'
 /* @ts-ignore */
-import mfSerialize from '@jscad/3mf-serializer'
-/* @ts-ignore */
 import stlSerializer from '@jscad/stl-serializer'
 import { Geom2, Geom3 } from '@jscad/modeling/src/geometries/types';
 import { getNodesBorderPoints } from '@/lib/hull-nodes';
@@ -22,10 +20,14 @@ const tolerance = {
   loose: 0.508
 }
 
-self.onmessage = async event => {
-  const data = await JSON.parse(event.data)
-  let switch_nodes = data.nodes.filter((node: any) => node.type === "switch")
-  let mcu_nodes = data.nodes.filter((node: any) => node.type === "mcu")
+type WorkerMessageData = {
+  nodes: Node[]
+  id: number
+}
+
+self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
+  let switch_nodes = e.data.nodes.filter((node: any) => node.type === "switch")
+  let mcu_nodes = e.data.nodes.filter((node: any) => node.type === "mcu")
 
   switch_nodes = switch_nodes.map((node: any) => {
     return {
@@ -45,7 +47,7 @@ self.onmessage = async event => {
     }
   })
 
-  const BP = getNodesBorderPoints(data.nodes)
+  const BP = getNodesBorderPoints(e.data.nodes as any)
   const sides: number[][][] = []
 
   BP.map((point, index) => {
@@ -167,29 +169,33 @@ self.onmessage = async event => {
     )
   })
 
-  // temp: join the case and the plate
-  base_plate_3d = booleans.union(
-    transforms.mirrorY(base_case_3d),
-    transforms.translateZ(
-      (caseTopMargin + caseBottomMargin) * 2,
-      transforms.mirrorY(base_plate_3d),
-    )
+  const plateStlData = stlSerializer.serialize(
+    { binary: true },
+    transforms.mirrorY(base_plate_3d)
   )
 
-  // serialize the generated geometries into stl blob
-  const rawData = stlSerializer.serialize(
-    {
-      binary: true
-    },
-    base_plate_3d
+  const caseStlData = stlSerializer.serialize(
+    { binary: true },
+    transforms.mirrorY(base_case_3d)
+  )
+
+  const previewStlData = stlSerializer.serialize(
+    { binary: true },
+    booleans.union(
+      transforms.mirrorY(base_case_3d),
+      transforms.translateZ(
+        (caseTopMargin + caseBottomMargin) * 2,
+        transforms.mirrorY(base_plate_3d),
+      )
+    )
   )
 
   // return the result
   self.postMessage({
-    //    case_geo: transforms.mirrorY(base_case_3d),
-    //    plate_geo: transforms.mirrorY(base_plate_3d),
-    rawData: rawData,
-    id: data.id
+    plateStlData,
+    caseStlData,
+    previewStlData,
+    id: e.data.id
   });
 };
 

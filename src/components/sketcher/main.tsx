@@ -3,10 +3,9 @@ import { cn } from "@/lib/utils"
 import { ReactFlowProvider } from "reactflow"
 import { Button } from "@/components/ui/button"
 import { PencilRuler } from "lucide-react"
-import { useContext, useState } from "react"
-import { SketcherWorkSpace } from ".."
-import { workSpaceOptionsContext } from "@/contexts/workspace"
+import { useState } from "react"
 import LeftSidebar from "./sidebars/left-sidebar"
+import { SketcherWorkSpace } from "./sketcher-workspace"
 
 export default function MainWorkSpace() {
 

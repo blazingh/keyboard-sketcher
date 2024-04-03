@@ -10,6 +10,7 @@ import IconMouseLeftClick from "@/icons/mouse-left-click"
 import { Badge } from "../ui/badge"
 import IconMouseRightclick from "@/icons/mouse-right-click"
 import IconMouseScrollWheel from "@/icons/mouse-scroll-wheel"
+import { Separator } from "../ui/separator"
 
 export default function EditorDialogTrigger(props: ButtonProps) {
   return (
@@ -87,6 +88,23 @@ export default function EditorDialogTrigger(props: ButtonProps) {
             </span>
           </li>
         </ul>
+        <Separator />
+        <div>
+          <p className="my-4 font-medium w-ful text-center">
+            have something to say ?
+          </p>
+          <div className="flex items-center justify-around">
+            <span>
+              <a href="mailto:the.one.and.only@hadibaalbaki.com" target="_blank" className="underline text-primary">Email</a>
+            </span>
+            <span>
+              <a href="https://www.instagram.com/hady_baal/" target="_blank" className="underline text-primary">Instagram</a>
+            </span>
+            <span>
+              <a href="discordapp.com/users/hadibaal" target="_blank" className="underline text-primary">Discord</a>
+            </span>
+          </div>
+        </div>
       </DialogContent>
     </Dialog>
   )

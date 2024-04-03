@@ -1,7 +1,12 @@
 import { Node } from "reactflow";
 import hull from 'hull.js'
+import polygonClipping, { Polygon } from "polygon-clipping"
 
 type outlinePoints = number[][]
+
+function mirrorPointsHorizontally(points: number[][]) {
+  return points.map(point => [point[0] * -1, point[1]]);
+}
 
 export function getNodesBorderPoints(nodes: Node[], padding: number = 65): outlinePoints {
   let switch_nodes = nodes.filter((node: any) => node.type === "switch")
@@ -10,14 +15,16 @@ export function getNodesBorderPoints(nodes: Node[], padding: number = 65): outli
   const initPoints: any = []
   switch_nodes.forEach(node => {
     const { x, y } = node.position;
-    const offsets = [-70 - padding, 0, 70 + padding, 35 + padding, -35 - padding];
-    offsets.forEach(offsetX => {
-      offsets.forEach(offsetY => {
-        initPoints.push([x + offsetX, y + offsetY]);
-      });
-    });
+    initPoints.push([x + 70 + padding, y + 70 + padding]);
+    initPoints.push([x + 70 + padding, y - 70 - padding]);
+    initPoints.push([x - 70 - padding, y + 70 + padding]);
+    initPoints.push([x - 70 - padding, y - 70 - padding]);
   });
 
+
+  const flippedPoints = mirrorPointsHorizontally(initPoints)
+
+  /*
   mcu_nodes.forEach(node => {
     const { x, y } = node.position;
     initPoints.push([x, y]);
@@ -41,29 +48,12 @@ export function getNodesBorderPoints(nodes: Node[], padding: number = 65): outli
   });
   */
 
-  const newHull = hull(initPoints, Math.sqrt(2) * (70 + padding * 2)) // 198 is the switch diagnol lenght
-  return newHull as number[][]
-}
-
-export function expandPolygon(polygon: number[][], expansionFactor: number) {
-  // Calculate centroid
-  let centroidX = 0, centroidY = 0;
-  for (let i = 0; i < polygon.length; i++) {
-    centroidX += polygon[i][0];
-    centroidY += polygon[i][1];
-  }
-  centroidX /= polygon.length;
-  centroidY /= polygon.length;
-
-  // Calculate expanded points
-  let expandedPolygon = [];
-  for (let i = 0; i < polygon.length; i++) {
-    let vectorX = polygon[i][0] - centroidX;
-    let vectorY = polygon[i][1] - centroidY;
-    let expandedX = centroidX + vectorX * expansionFactor;
-    let expandedY = centroidY + vectorY * expansionFactor;
-    expandedPolygon.push([expandedX, expandedY]);
-  }
-
-  return expandedPolygon;
+  const originalHull = hull(initPoints, (70 + padding) * 5)
+  const flippedHull = hull(flippedPoints, (70 + padding) * 5)
+  const finalHull = polygonClipping.union(
+    [mirrorPointsHorizontally(flippedHull as number[][])] as Polygon,
+    [originalHull as number[][]] as Polygon
+  )[0][0] as any
+  //  console.log(newHull1, finalHull)
+  return finalHull
 }

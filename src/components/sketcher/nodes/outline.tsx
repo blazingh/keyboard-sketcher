@@ -15,7 +15,7 @@ export function Outline() {
 
   const points = useMemo(() => {
     if (wsc?.options.renderOuline === false) return { inner: [], outer: [] }
-    const basePoints = getNodesBorderPoints(nodes, 130 / 2)
+    const basePoints = getNodesBorderPoints(nodes, 140 / 2)
     const offset = new Offset()
     return {
       inner: basePoints,

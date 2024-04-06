@@ -120,6 +120,7 @@ export function SketcherWorkSpace() {
           Position.Right,
         ].map((position) => (
           <NodeToolbar
+            key={position}
             isVisible
             nodeId={selectedNodes}
             position={position}

@@ -10,12 +10,12 @@ export function Outline() {
   const ref = useRef<any>(!null)
 
   const [cleared, setCleared] = useState(false)
-  const [size, setSize] = useState(5)
+  const [size, setSize] = useState(750)
 
   useEffect(() => {
     setTimeout(function() {
       setSize(5000)
-    }, 1000);
+    }, 200);
   }, [setSize])
 
   const wsc = useContext(workSpaceContext)

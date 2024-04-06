@@ -83,9 +83,9 @@ export default function LeftSidebar() {
 
         <Button
           variant="outline"
-          onClick={() => setSelectedTab({ visible: true, title: "Performance", content: PerforanceTab })}
+          onClick={() => setSelectedTab({ visible: true, title: "Editor Performance", content: PerforanceTab })}
         >
-          Performance
+          Editor Performance
         </Button>
 
         <div className="absolute bottom-0 left-0 w-full flex flex-col gap-4 p-4">

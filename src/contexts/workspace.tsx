@@ -2,7 +2,7 @@
 import { createContext, useState } from 'react';
 
 const initialOptions = {
-  renderOuline: false as boolean
+  renderOuline: true as boolean
 }
 
 type contextType = {

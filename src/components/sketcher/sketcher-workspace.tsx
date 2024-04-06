@@ -1,4 +1,9 @@
 "use client";
+import MCU from "@/components/sketcher/nodes/mcu";
+import { Outline } from '@/components/sketcher/nodes/outline';
+import Switch from "@/components/sketcher/nodes/switch";
+import { buttonVariants } from '@/components/ui/button';
+import { initialNodes } from "@/constants/temp";
 import { cn } from '@/lib/utils';
 import { PlusIcon } from 'lucide-react';
 import { useMemo } from 'react';
@@ -13,20 +18,11 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Key } from 'ts-key-enum';
-import EditorDialogTrigger from '@/components/modals/editor-info';
-import { buttonVariants } from '@/components/ui/button';
-import MCU from "@/components/sketcher/nodes/mcu";
-import Switch from "@/components/sketcher/nodes/switch";
-import { initialNodes } from "@/constants/temp";
-import { useModelActions } from "@/hooks/model-actions";
-import { Outline } from '@/components/sketcher/nodes/outline';
 
 export function SketcherWorkSpace() {
 
   const nodeTypes = useMemo(() => ({ switch: Switch, mcu: MCU, outline: Outline }), []);
   const [nodes, _, onNodesChange] = useNodesState(initialNodes);
-
-  const modelActions = useModelActions()
 
   const selectedNodes = useMemo(() => {
     return nodes.filter((node) => node.selected).map((node) => node.id)
@@ -88,9 +84,11 @@ export function SketcherWorkSpace() {
   return (
     <div className='relative w-svw h-svh'>
 
+      {/*
       <EditorDialogTrigger
         className='absolute top-5 right-5 z-10'
       />
+      */}
 
       <ReactFlow
         snapToGrid

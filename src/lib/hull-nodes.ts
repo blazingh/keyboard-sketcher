@@ -24,7 +24,6 @@ export function getNodesBorderPoints(nodes: Node[], padding: number = 65): outli
 
   const flippedPoints = mirrorPointsHorizontally(initPoints)
 
-  /*
   mcu_nodes.forEach(node => {
     const { x, y } = node.position;
     initPoints.push([x, y]);

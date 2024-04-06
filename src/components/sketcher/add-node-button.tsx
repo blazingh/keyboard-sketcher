@@ -23,7 +23,7 @@ export default function AddNodeButton() {
       <Button className="h-10 w-10" onClick={toggle}>
         <Plus className="flex-shrink-0" />
       </Button>
-      <div className="flex flex-col items-start justify-start py-2 gap-2">
+      <div className="flex flex-col items-end justify-start py-2 gap-2">
         <Button variant="secondary" onClick={toggle}>
           MCU
         </Button>

@@ -92,10 +92,14 @@ export default function LeftSidebar() {
           <Separator />
           <Button
             className='w-full'
-            onClick={() => modelActions.generateModel(nodes)}
+            onClick={() => {
+              modelActions.generateModel(nodes)
+              setSettingsOpen(false)
+            }}
           >
             Generate Model
           </Button>
+          <modelActions.ModelPreviewJsx />
         </div>
 
 

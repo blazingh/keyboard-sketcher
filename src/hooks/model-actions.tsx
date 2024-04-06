@@ -3,12 +3,13 @@ import ToastPendingModel from "@/components/sketcher/toasts/pending-model"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog"
 import { signal } from "@preact/signals-react"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { StlViewer } from "react-stl-viewer"
 import { Node } from "reactflow"
 import { toast } from "sonner"
 
 type WorkerSignal = {
+  id: number,
   worker: Worker,
   startTime: Date,
   resolver: any,
@@ -27,7 +28,7 @@ export const workersSigals = signal<WorkersSignal>({});
 
 export function useModelActions() {
 
-  const [openModelPreviewId, setOpenModelPreviewId] = useState(0)
+  const [openModelData, setOpenModelData] = useState<WorkerSignal | null>(null)
 
   function clearWorker(id: number) {
     if (!workersSigals.value[id]) return
@@ -54,7 +55,7 @@ export function useModelActions() {
     const worker = workersSigals.value[id]
     if (!worker) return
     if (worker.toastId) toast.dismiss(worker.toastId)
-    setOpenModelPreviewId(id)
+    setOpenModelData(worker)
   }
 
   function generateModel(nodes: Node[]) {
@@ -80,6 +81,7 @@ export function useModelActions() {
     const toastId = toast.promise(
       new Promise((resolve, reject) =>
         workersSigals.value[id] = {
+          id: id,
           worker: newWorker,
           startTime: new Date(),
           resolver: resolve,
@@ -115,11 +117,11 @@ export function useModelActions() {
 
   }
 
-  function ModelPreviewJsx() {
-    if (typeof window === "undefined" || !workersSigals.value[openModelPreviewId]) return
-    const modelUrl = URL.createObjectURL(new Blob(workersSigals.value[openModelPreviewId].previewStlData))
+  const ModelPreviewJsx = useCallback(() => {
+    if (!openModelData) return
+    const modelUrl = URL.createObjectURL(new Blob(openModelData.previewStlData))
     return (
-      <Dialog open={openModelPreviewId !== 0}  >
+      <Dialog open={true}  >
         <DialogContent className='max-w-4xl' onInteractOutside={(e) => e?.preventDefault} >
           <div className='w-full h-[70svh] flex flex-col gap-4'>
             <StlViewer
@@ -133,16 +135,16 @@ export function useModelActions() {
               <Button
                 variant="destructive"
                 onClick={() => {
-                  deleteModel(openModelPreviewId)
-                  setOpenModelPreviewId(0)
+                  deleteModel(openModelData.id)
+                  setOpenModelData(null)
                 }}
               >
                 delete
               </Button>
               <Button
                 onClick={() => {
-                  downloadModels(openModelPreviewId)
-                  setOpenModelPreviewId(0)
+                  downloadModels(openModelData.id)
+                  setOpenModelData(null)
                   toast.success("Downoloaded Models ;)")
                 }}
               >
@@ -153,7 +155,7 @@ export function useModelActions() {
         </DialogContent>
       </Dialog>
     )
-  }
+  }, [openModelData])
 
   return {
     generateModel,

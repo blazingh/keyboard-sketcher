@@ -88,13 +88,9 @@ export function SketcherWorkSpace() {
   return (
     <div className='relative w-svw h-svh'>
 
-      <modelActions.ModelPreviewJsx />
-
-
       <EditorDialogTrigger
         className='absolute top-5 right-5 z-10'
       />
-
 
       <ReactFlow
         snapToGrid

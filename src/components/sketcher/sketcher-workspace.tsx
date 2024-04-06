@@ -107,28 +107,28 @@ export function SketcherWorkSpace() {
   }, [])
 
   return (
-    <div className='w-full h-full relative'>
+    <div className='relative w-svw h-svh'>
 
       <modelActions.ModelPreviewJsx />
 
       <Button
-        className='absolute top-0 left-0 z-10 -translate-y-1/2'
+        className='absolute bottom-5 right-5 z-10'
         onClick={() => modelActions.generateModel(nodes)}
       >
         Generate Model
       </Button>
 
       <EditorDialogTrigger
-        className='absolute top-0 right-0 z-10 -translate-y-1/2'
+        className='absolute top-5 right-5 z-10'
       />
 
 
       <ReactFlow
         snapToGrid
         fitView
-        selectionOnDrag
         disableKeyboardA11y
-        panOnDrag={[1, 2, 3, 4]}
+        preventScrolling
+        zoomOnScroll
         nodeOrigin={[0.5, 0.5]}
         minZoom={0.2}
         maxZoom={5}
@@ -139,7 +139,6 @@ export function SketcherWorkSpace() {
         onNodesChange={onNodesChange}
       >
 
-        <Controls />
         <Background gap={10} variant={BackgroundVariant.Dots} />
 
         {/* switch add buttons */}

@@ -6,8 +6,8 @@ import {
 import { Button, ButtonProps } from "@/components/ui/button"
 import { ChevronDownSquareIcon, ChevronLeftSquareIcon, ChevronUpSquareIcon, InfoIcon } from "lucide-react"
 import IconMouseMiddleClick from "@/icons/mouse-middle-click"
-import IconMouseLeftClick from "@/icons/mouse-left-click"
 import { Badge } from "../ui/badge"
+import IconMouseLeftClick from "@/icons/mouse-left-click"
 import IconMouseRightclick from "@/icons/mouse-right-click"
 import IconMouseScrollWheel from "@/icons/mouse-scroll-wheel"
 import { Separator } from "../ui/separator"
@@ -30,7 +30,7 @@ export default function EditorDialogTrigger(props: ButtonProps) {
             </b>
             :
             <span className='flex flex-row gap-2 items-center'>
-              <IconMouseMiddleClick className='w-8 h-8' /> or <IconMouseRightclick className='w-8 h-8' />
+              <IconMouseMiddleClick className='w-8 h-8' /> or <IconMouseLeftClick className='w-8 h-8' />
             </span>
           </li>
           <li className='flex flex-row gap-4 items-center text-sm'>
@@ -57,16 +57,9 @@ export default function EditorDialogTrigger(props: ButtonProps) {
             </b>
             :
             <span className='flex flex-row gap-2 items-center'>
-              <Badge variant='secondary'>cntrl</Badge> + <IconMouseLeftClick className='w-8 h-8' />
-            </span>
-          </li>
-          <li className='flex flex-row gap-4 items-center text-sm'>
-            <b className='min-w-40'>
-              Select Multiple Items
-            </b>
-            :
-            <span className='flex flex-row gap-2 items-center'>
-              <Badge variant='secondary'>hold</Badge>   <IconMouseLeftClick className='w-8 h-8' /> +  <Badge variant='secondary'>drag</Badge>
+              <span className="font-medium">hold</span>
+              <Badge variant='secondary'>Ctrl</Badge>
+              + <IconMouseLeftClick className='w-8 h-8' />
             </span>
           </li>
           <li className='flex flex-row gap-4 items-center text-sm'>

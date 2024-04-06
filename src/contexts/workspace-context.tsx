@@ -10,9 +10,9 @@ type contextType = {
   updateOption: <K extends keyof typeof initialOptions>(key: K, value: typeof initialOptions[K]) => void
 }
 
-export const workSpaceOptionsContext = createContext<contextType | null>(null);
+export const workSpaceContext = createContext<contextType | null>(null);
 
-export function WorkSpaceOtpionsContextProvider({ children }: any) {
+export function WorkSpaceContextProvider({ children }: any) {
 
   const [options, setOptions] = useState(initialOptions)
 
@@ -24,9 +24,9 @@ export function WorkSpaceOtpionsContextProvider({ children }: any) {
   };
 
   return (
-    <workSpaceOptionsContext.Provider value={{ options, updateOption }}>
+    <workSpaceContext.Provider value={{ options, updateOption }}>
       {children}
-    </workSpaceOptionsContext.Provider>
+    </workSpaceContext.Provider>
   )
 }
 

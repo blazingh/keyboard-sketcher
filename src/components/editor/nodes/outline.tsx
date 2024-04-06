@@ -3,7 +3,7 @@ import { useRef, useMemo, useEffect, useContext, useState } from "react";
 import { useNodes } from "reactflow";
 /* @ts-ignore */
 import Offset from "polygon-offset";
-import { workSpaceOptionsContext } from "@/contexts/workspace";
+import { workSpaceContext } from "@/contexts/workspace-context";
 
 export function Outline() {
   const nodes = useNodes();
@@ -18,7 +18,7 @@ export function Outline() {
     }, 1000);
   }, [setSize])
 
-  const wsc = useContext(workSpaceOptionsContext)
+  const wsc = useContext(workSpaceContext)
 
   const points = useMemo(() => {
     if (wsc?.options.renderOuline === false) return { inner: [], outer: [] }

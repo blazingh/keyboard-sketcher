@@ -1,10 +1,7 @@
-import MainWorkSpace from "@/components/sketcher/main";
-import { WorkSpaceOtpionsContextProvider } from "@/contexts/workspace";
+import WorkSpace from "@/components/editor/workspace";
 
 export default function Home() {
   return (
-    <WorkSpaceOtpionsContextProvider>
-      <MainWorkSpace />
-    </WorkSpaceOtpionsContextProvider>
+    <WorkSpace />
   );
 }

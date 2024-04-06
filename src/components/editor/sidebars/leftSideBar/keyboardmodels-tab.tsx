@@ -1,12 +1,12 @@
 'use client'
-import { workSpaceOptionsContext } from "@/contexts/workspace";
+import { workSpaceContext } from "@/contexts/workspace-context";
 import { useContext } from "react";
 import { Select, SelectValue, SelectItem, SelectContent, SelectTrigger } from "@/components/ui/select";
 import { HelpCircle } from "lucide-react";
 
 export default function KeyboardModelsTab() {
 
-  const wsc = useContext(workSpaceOptionsContext)
+  const wsc = useContext(workSpaceContext)
 
   return (
     <div className="flex flex-col gap-4" >

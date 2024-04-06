@@ -1,11 +1,11 @@
 'use client'
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { workSpaceOptionsContext } from "@/contexts/workspace";
+import { workSpaceContext } from "@/contexts/workspace-context";
 import { useContext } from "react";
 
 export default function PerforanceTab() {
-  const wsc = useContext(workSpaceOptionsContext)
+  const wsc = useContext(workSpaceContext)
   return (
     <div className="flex flex-col gap-2" >
 

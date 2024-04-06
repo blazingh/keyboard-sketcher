@@ -1,35 +1,52 @@
 "use client";
-import { BrowserView, MobileView, isBrowser, isMobile } from 'react-device-detect';
-import MCU from "@/components/sketcher/nodes/mcu";
-import { Outline } from '@/components/sketcher/nodes/outline';
-import Switch from "@/components/sketcher/nodes/switch";
-import { buttonVariants } from '@/components/ui/button';
+import { Mcu } from "@/components/editor/nodes/mcu";
+import { Outline } from "@/components/editor/nodes/outline";
+import { Switch } from "@/components/editor/nodes/switch";
+import { buttonVariants } from "@/components/ui/button";
 import { initialNodes } from "@/constants/temp";
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, PlusIcon } from 'lucide-react';
-import { useMemo } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
-import ReactFlow, {
-  Background,
-  BackgroundVariant,
-  NodeChange,
-  NodeToolbar,
-  Position,
-  useNodesState,
-} from 'reactflow';
+import { ReactNode, createContext, useMemo, useState } from "react";
+import { isMobile } from 'react-device-detect';
+import { useHotkeys } from "react-hotkeys-hook";
+import ReactFlow, { Background, BackgroundVariant, Node, NodeChange, NodeToolbar, Position, ReactFlowProvider, useNodesState, useOnSelectionChange } from "reactflow";
+import { Key } from "ts-key-enum";
 import 'reactflow/dist/style.css';
-import { Key } from 'ts-key-enum';
 
-export function SketcherWorkSpace() {
+type EditorContext = {
+  nodes: Node[]
+  selectedNodes: string[]
+  moveSelectedNodes: (dir: "U" | "D" | "L" | "R") => void
+  duplicateSelectedNodes: (sid: Position) => void
+}
 
-  const nodeTypes = useMemo(() => ({ switch: Switch, mcu: MCU, outline: Outline }), []);
+export const EditorContext = createContext<EditorContext | null>(null);
+
+export function EditorContextProvider({ children }: { children: ReactNode }) {
+  return (
+    <ReactFlowProvider>
+      <FlowEditorContextProvider>
+        {children}
+      </FlowEditorContextProvider>
+    </ReactFlowProvider>
+  )
+}
+
+export function FlowEditorContextProvider({ children }: any) {
+
+  const nodeTypes = useMemo(() => ({ switch: Switch, mcu: Mcu, outline: Outline }), []);
+
   const [nodes, _, onNodesChange] = useNodesState(initialNodes);
 
-  const selectedNodes = useMemo(() => {
-    return nodes.filter((node) => node.selected).map((node) => node.id)
-  }, [nodes])
+  const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
 
-  function handleAddNode(side: Position) {
+  useOnSelectionChange({
+    onChange: ({ nodes }: { nodes: Node[] }) => {
+      setSelectedNodes(nodes.map((node) => node.id));
+    },
+  });
+
+  function duplicateSelectedNodes(side: Position) {
     const changes: NodeChange[] = []
     let deltas = [0, 0]
     if (side === 'top') deltas = [0, -190]
@@ -56,15 +73,17 @@ export function SketcherWorkSpace() {
     onNodesChange(changes)
   }
 
-  function handleMoveNode(key: 'ArrowLeft' | 'ArrowRight' | 'ArrowUp' | 'ArrowDown') {
+  function moveSelectedNodes(dir: "U" | "D" | "L" | "R") {
     const changes: NodeChange[] = []
     let deltas = [0, 0]
-    if (key === 'ArrowLeft') deltas = [-10, 0]
-    if (key === 'ArrowRight') deltas = [10, 0]
-    if (key === 'ArrowUp') deltas = [0, -10]
-    if (key === 'ArrowDown') deltas = [0, 10]
+    if (dir === 'L') deltas = [-10, 0]
+    if (dir === 'R') deltas = [10, 0]
+    if (dir === 'U') deltas = [0, -10]
+    if (dir === 'D') deltas = [0, 10]
+
     const isMcu = nodes.find((node) => node.selected && node.type === 'mcu')
-    if (isMcu) deltas = [deltas[0] * 0.5, deltas[1] * 0.5]
+    if (isMcu && selectedNodes.length === 1) deltas = [deltas[0] * 0.5, deltas[1] * 0.5]
+
     nodes.map((node) => {
       if (!selectedNodes.includes(node.id)) return
       changes.push({
@@ -76,21 +95,19 @@ export function SketcherWorkSpace() {
     onNodesChange(changes)
   }
 
-  /* hot keys event handlers */
-  useHotkeys(Key.ArrowUp, () => handleMoveNode('ArrowUp'))
-  useHotkeys(Key.ArrowDown, () => handleMoveNode('ArrowDown'))
-  useHotkeys(Key.ArrowLeft, () => handleMoveNode('ArrowLeft'))
-  useHotkeys(Key.ArrowRight, () => handleMoveNode('ArrowRight'))
+  useHotkeys(Key.ArrowUp, () => moveSelectedNodes('U'))
+  useHotkeys(Key.ArrowDown, () => moveSelectedNodes('D'))
+  useHotkeys(Key.ArrowLeft, () => moveSelectedNodes('L'))
+  useHotkeys(Key.ArrowRight, () => moveSelectedNodes('R'))
 
   return (
-    <div className='relative w-svw h-svh'>
-
-      {/*
-      <EditorDialogTrigger
-        className='absolute top-5 right-5 z-10'
-      />
-      */}
-
+    <EditorContext.Provider
+      value={{
+        nodes,
+        selectedNodes,
+        moveSelectedNodes,
+        duplicateSelectedNodes
+      }}>
       <ReactFlow
         snapToGrid
         fitView
@@ -108,10 +125,9 @@ export function SketcherWorkSpace() {
         nodes={nodes}
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
+        className="relative"
       >
-
         <Background gap={10} variant={BackgroundVariant.Dots} />
-
         {/* switch move buttons */}
         {false && [
           Position.Top,
@@ -124,7 +140,7 @@ export function SketcherWorkSpace() {
             isVisible
             nodeId={selectedNodes}
             position={position}
-            onClick={() => handleMoveNode('ArrowUp')}
+            onClick={() => moveSelectedNodes('U')}
             className={cn(
               buttonVariants(),
               'p-0 h-8 w-8 flex items-center justify-center opacity-50 hover:opacity-100 z-10 ',
@@ -161,7 +177,7 @@ export function SketcherWorkSpace() {
             key={position}
             nodeId={selectedNodes}
             position={position}
-            onClick={() => handleAddNode(position)}
+            onClick={() => duplicateSelectedNodes(position)}
             className={cn(
               buttonVariants(),
               'p-0 h-8 w-8 flex items-center justify-center opacity-50 hover:opacity-100',
@@ -175,8 +191,9 @@ export function SketcherWorkSpace() {
             <PlusIcon className='w-4 h-4 flex-shrink-0' />
           </NodeToolbar>
         ))}
-
+        {children}
       </ReactFlow>
-    </div>
-  );
+    </EditorContext.Provider>
+  )
+
 }

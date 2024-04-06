@@ -76,7 +76,8 @@
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.163.0",
-    "ts-key-enum": "^2.0.12"
+    "ts-key-enum": "^2.0.12",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@types/node": "^20",

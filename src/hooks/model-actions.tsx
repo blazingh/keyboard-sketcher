@@ -1,5 +1,5 @@
-import ToastFinishModel from "@/components/sketcher/toasts/finished-model"
-import ToastPendingModel from "@/components/sketcher/toasts/pending-model"
+import ToastFinishModel from "@/components/editor/toasts/finished-model"
+import ToastPendingModel from "@/components/editor/toasts/pending-model"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog"
 import { signal } from "@preact/signals-react"

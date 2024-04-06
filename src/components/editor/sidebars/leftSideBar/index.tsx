@@ -27,28 +27,33 @@ export default function LeftSidebar() {
 
   return (
     <div className={cn(
-      "fixed h-svh z-30 top-0 left-0 transition-all  ease-in-out w-[280px]",
-      open ? "shadow-xl" : "-translate-x-[278px] shadow-none"
+      "fixed bottom-0 left-0 transition-all ease-in-out w-svw md:w-[282px] h-[282px] md:h-svh z-20",
+      "translate-y-[calc(100%-280px)] md:translate-y-0 md:-translate-x-[2px]",
+      open && "z-30",
+      !open && "md:-translate-x-[280px]",
+      !open && "translate-y-[calc(100%-2px)]"
     )}
     >
       {/* side bar toggle button */}
       <Button
+        variant={open ? "default" : "secondary"}
         onClick={() => workspace?.updateOption("openBar", open ? "" : "left")}
         className={cn(
-          'absolute top-4 right-0 transition-all ease-in-out py-6 z-20 translate-x-full rounded-l-none',
-          'flex items-center justify-center',
-          open ? "px-2 pl-1" : "px-3 pl-2"
+          'absolute transition-all ease-in-out py-6 z-20 rounded-b-none md:rounded-l-none md:rounded-r-md',
+          "top-0 md:top-5 left-5 md:right-0 md:left-[unset] -translate-y-full md:translate-y-0 md:translate-x-full",
+          'flex items-center justify-center p-3 md:px-2 border border-primary',
+          !open && workspace?.options.openBar !== "" && "-translate-y-[calc(100%+278px)] md:translate-x-[calc(100%+278px)] md:translate-y-0"
         )}
       >
-        <Blocks className='w-5 h-5' />
+        <Blocks className='w-5 h-5 md:w-6 md:h-6' />
       </Button>
 
 
       {/* tabs content */}
       <div
         className={cn(
-          "w-full h-full overflow-hidden flex flex-col p-4 gap-4 relative border-r-2 border-primary bg-background",
-          open && "rounded-r-2xl"
+          "w-full h-full overflow-hidden flex flex-col p-4 gap-4 relative border-2 border-primary bg-background",
+          open && "rounded-t-2xl md:rounded-r-2xl md:rounded-l-none"
         )}
       >
         <div

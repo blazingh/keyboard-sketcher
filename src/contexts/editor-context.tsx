@@ -111,6 +111,7 @@ export function FlowEditorContextProvider({ children }: any) {
         moveSelectedNodes,
         duplicateSelectedNodes
       }}>
+      {children}
       <ReactFlow
         snapToGrid
         fitView
@@ -195,7 +196,6 @@ export function FlowEditorContextProvider({ children }: any) {
             <PlusIcon className='w-4 h-4 flex-shrink-0' />
           </NodeToolbar>
         ))}
-        {children}
       </ReactFlow>
     </EditorContext.Provider>
   )

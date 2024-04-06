@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { ChevronLeft, PencilRuler } from "lucide-react"
+import { Blocks, ChevronLeft, PencilRuler } from "lucide-react"
 import { useState } from "react"
 import PerforanceTab from "./performance-tab"
 import KeyboardModelsTab from "./keyboardmodels-tab"
@@ -38,7 +38,7 @@ export default function LeftSidebar() {
           settingsOpen ? "px-2 pl-1" : "px-3 pl-2"
         )}
       >
-        <PencilRuler className='w-5 h-5' />
+        <Blocks className='w-5 h-5' />
       </Button>
 
 

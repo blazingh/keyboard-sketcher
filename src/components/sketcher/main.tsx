@@ -14,10 +14,13 @@ export default function MainWorkSpace() {
   return (
     <ReactFlowProvider>
       <SketcherWorkSpace />
+
       <div className="absolute top-5 left-5 z-10">
         <AddNodeButton />
       </div>
+
       <LeftSidebar />
+
       <div className={cn(
         "fixed h-svh z-30 top-0 right-0 bg-background rounded-l-2xl transition-all border-l-2 border-primary ease-in-out",
         editOpen ? "w-[280px] shadow-xl" : "w-0 shadow-none"

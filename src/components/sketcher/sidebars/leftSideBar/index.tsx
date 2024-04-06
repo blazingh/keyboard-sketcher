@@ -1,16 +1,12 @@
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { workSpaceOptionsContext } from "@/contexts/workspace"
 import { cn } from "@/lib/utils"
 import { ChevronLeft, Settings2 } from "lucide-react"
-import { ReactNode, useContext, useState } from "react"
+import { useState } from "react"
 import PerforanceTab from "./performance-tab"
 import KeyboardModelsTab from "./keyboardmodels-tab"
 
 export default function LeftSidebar() {
 
-  const wsc = useContext(workSpaceOptionsContext)
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   const [selectedTab, setSelectedTab] = useState({
@@ -22,7 +18,7 @@ export default function LeftSidebar() {
   return (
     <div className={cn(
       "fixed h-svh z-30 top-0 left-0 transition-all  ease-in-out w-[280px]",
-      settingsOpen ? "shadow-xl" : "-translate-x-[280px] shadow-none"
+      settingsOpen ? "shadow-xl" : "-translate-x-[279px] shadow-none"
     )}
     >
       {/* side bar toggle button */}

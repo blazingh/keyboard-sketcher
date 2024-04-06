@@ -1,11 +1,12 @@
 "use client";
+import { BrowserView, MobileView, isBrowser, isMobile } from 'react-device-detect';
 import MCU from "@/components/sketcher/nodes/mcu";
 import { Outline } from '@/components/sketcher/nodes/outline';
 import Switch from "@/components/sketcher/nodes/switch";
 import { buttonVariants } from '@/components/ui/button';
 import { initialNodes } from "@/constants/temp";
 import { cn } from '@/lib/utils';
-import { PlusIcon } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, PlusIcon } from 'lucide-react';
 import { useMemo } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import ReactFlow, {
@@ -96,17 +97,56 @@ export function SketcherWorkSpace() {
         disableKeyboardA11y
         preventScrolling
         zoomOnScroll
+        selectionOnDrag
+        zoomOnDoubleClick={false}
         nodeOrigin={[0.5, 0.5]}
         minZoom={0.2}
         maxZoom={5}
         snapGrid={[10, 10]}
         translateExtent={[[-2000, -2000], [2000, 2000]]}
+        nodesDraggable={!isMobile}
         nodes={nodes}
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
       >
 
         <Background gap={10} variant={BackgroundVariant.Dots} />
+
+        {/* switch move buttons */}
+        {false && [
+          Position.Top,
+          Position.Bottom,
+          Position.Left,
+          Position.Right,
+        ].map((position) => (
+          <NodeToolbar
+            isVisible
+            nodeId={selectedNodes}
+            position={position}
+            onClick={() => handleMoveNode('ArrowUp')}
+            className={cn(
+              buttonVariants(),
+              'p-0 h-8 w-8 flex items-center justify-center opacity-50 hover:opacity-100 z-10 ',
+              position === Position.Top && "mt-8",
+              position === Position.Bottom && "-mt-8",
+              position === Position.Left && "ml-8",
+              position === Position.Right && "-ml-8",
+            )}
+          >
+            {position === Position.Top && (
+              <ChevronUp className='w-6 h-6 flex-shrink-0' />
+            )}
+            {position === Position.Bottom && (
+              <ChevronDown className='w-6 h-6 flex-shrink-0' />
+            )}
+            {position === Position.Left && (
+              <ChevronLeft className='w-6 h-6 flex-shrink-0' />
+            )}
+            {position === Position.Right && (
+              <ChevronRight className='w-6 h-6 flex-shrink-0' />
+            )}
+          </NodeToolbar>
+        ))}
 
         {/* switch add buttons */}
         {[
@@ -123,7 +163,12 @@ export function SketcherWorkSpace() {
             onClick={() => handleAddNode(position)}
             className={cn(
               buttonVariants(),
-              'p-0 h-8 w-8 flex items-center justify-center opacity-25 hover:opacity-100',
+              'p-0 h-8 w-8 flex items-center justify-center opacity-50 hover:opacity-100',
+              position === Position.Top && "-mt-2",
+              position === Position.Bottom && "mt-2",
+              position === Position.Left && "-ml-2",
+              position === Position.Right && "ml-2",
+
             )}
           >
             <PlusIcon className='w-4 h-4 flex-shrink-0' />

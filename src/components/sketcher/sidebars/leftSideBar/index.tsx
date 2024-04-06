@@ -1,13 +1,21 @@
+"use client"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { ChevronLeft, Settings2 } from "lucide-react"
+import { ChevronLeft, PencilRuler } from "lucide-react"
 import { useState } from "react"
 import PerforanceTab from "./performance-tab"
 import KeyboardModelsTab from "./keyboardmodels-tab"
+import { Separator } from "@/components/ui/separator"
+import { useModelActions } from "@/hooks/model-actions"
+import { useNodes } from "reactflow"
 
 export default function LeftSidebar() {
 
   const [settingsOpen, setSettingsOpen] = useState(false)
+
+  const modelActions = useModelActions()
+
+  const nodes = useNodes()
 
   const [selectedTab, setSelectedTab] = useState({
     visible: false as Boolean,
@@ -25,17 +33,21 @@ export default function LeftSidebar() {
       <Button
         onClick={() => setSettingsOpen(p => !p)}
         className={cn(
-          'absolute top-1/2 -translate-y-1/2 right-0 transition-all ease-in-out py-6 z-20',
-          settingsOpen ? "translate-x-1/2 px-1.5" : "translate-x-full rounded-l-none"
+          'absolute top-4 right-0 transition-all ease-in-out py-6 z-20 translate-x-full rounded-l-none',
+          'flex items-center justify-center',
+          settingsOpen ? "px-2 pl-1" : "px-3 pl-2"
         )}
       >
-        <Settings2 className='w-5 h-5' />
+        <PencilRuler className='w-5 h-5' />
       </Button>
 
 
       {/* tabs content */}
       <div
-        className="w-full h-full overflow-hidden flex flex-col p-4 gap-4 relative border-r-2 border-primary  bg-background rounded-r-2xl"
+        className={cn(
+          "w-full h-full overflow-hidden flex flex-col p-4 gap-4 relative border-r-2 border-primary bg-background",
+          settingsOpen && "rounded-r-2xl"
+        )}
       >
         <div
           className={cn(
@@ -76,8 +88,19 @@ export default function LeftSidebar() {
           Performance
         </Button>
 
-      </div>
+        <div className="absolute bottom-0 left-0 w-full flex flex-col gap-4 p-4">
+          <Separator />
+          <Button
+            className='w-full'
+            onClick={() => modelActions.generateModel(nodes)}
+          >
+            Generate Model
+          </Button>
+        </div>
 
-    </div>
+
+      </div >
+
+    </div >
   )
 }

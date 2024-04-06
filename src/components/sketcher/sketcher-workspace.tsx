@@ -14,7 +14,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { Key } from 'ts-key-enum';
 import EditorDialogTrigger from '@/components/modals/editor-info';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import MCU from "@/components/sketcher/nodes/mcu";
 import Switch from "@/components/sketcher/nodes/switch";
 import { initialNodes } from "@/constants/temp";
@@ -90,12 +90,6 @@ export function SketcherWorkSpace() {
 
       <modelActions.ModelPreviewJsx />
 
-      <Button
-        className='absolute bottom-5 right-5 z-10'
-        onClick={() => modelActions.generateModel(nodes)}
-      >
-        Generate Model
-      </Button>
 
       <EditorDialogTrigger
         className='absolute top-5 right-5 z-10'

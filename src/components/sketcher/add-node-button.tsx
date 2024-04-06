@@ -16,7 +16,7 @@ export default function AddNodeButton() {
     <div
       ref={ref}
       className={cn(
-        "transition-all overflow-hidden duration-300 ease-in-out",
+        "transition-all overflow-hidden duration-300 ease-in-out flex flex-col-reverse items-end",
         open ? "h-[168px]" : "h-10"
       )}
     >
@@ -25,10 +25,10 @@ export default function AddNodeButton() {
       </Button>
       <div className="flex flex-col items-start justify-start py-2 gap-2">
         <Button variant="secondary" onClick={toggle}>
-          Switch
+          MCU
         </Button>
         <Button variant="secondary" onClick={toggle}>
-          MCU
+          Switch
         </Button>
       </div>
     </div>

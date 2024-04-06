@@ -61,7 +61,7 @@ export function Outline() {
       }
     });
     ctx.stroke();
-  }, [points, cleared]);
+  }, [points, cleared, wsc?.options.renderOuline]);
 
   return (
     <div style={{ width: size, height: size }}>

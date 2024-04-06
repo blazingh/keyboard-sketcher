@@ -1,3 +1,4 @@
+/*
 "use client"
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import hull from 'hull.js'
@@ -92,3 +93,4 @@ function PointPlotter() {
 }
 
 export default PointPlotter;
+*/

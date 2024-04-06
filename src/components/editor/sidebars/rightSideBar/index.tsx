@@ -1,19 +1,17 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { ChevronLeft, PencilRuler } from "lucide-react"
-import { useContext, useEffect, useMemo, useState } from "react"
-import { useModelActions } from "@/hooks/model-actions"
-import { useNodes } from "reactflow"
 import { EditorContext } from "@/contexts/editor-context"
+import { workSpaceContext } from "@/contexts/workspace-context"
 import { calculateCenterPosition } from "@/lib/positions"
+import { cn } from "@/lib/utils"
+import { PencilRuler } from "lucide-react"
+import { useContext, useMemo, useState } from "react"
 
 
 export default function RightSidebar() {
 
-  const [open, setOpen] = useState(false)
-
   const editor = useContext(EditorContext)
+  const workspace = useContext(workSpaceContext)
 
   const centerPos: { x: number, y: number } = useMemo(() => {
     if (!editor?.nodes) return { x: 0, y: 0 }
@@ -26,20 +24,21 @@ export default function RightSidebar() {
     return center || { x: 0, y: 0 }
   }, [editor?.nodes])
 
+  const open = workspace?.options.openBar === "right"
+
   return (
     <div className={cn(
       "fixed h-svh z-30 top-0 right-0 transition-all  ease-in-out w-[280px]",
-      open ? "shadow-xl" : "translate-x-[279px] shadow-none"
+      open ? "shadow-xl" : "translate-x-[278px] shadow-none"
     )}
     >
       {/* side bar toggle button */}
       <Button
-        onClick={() => setOpen(p => !p)}
+        onClick={() => workspace?.updateOption('openBar', open ? "" : "right")}
         className={cn(
           'absolute top-4 left-0 transition-all ease-in-out py-6 z-20 -translate-x-full rounded-r-none',
           'flex items-center justify-center',
           open ? "px-2 pr-1" : "px-3 pr-2",
-          !open && editor?.selectedNodes && editor.selectedNodes.length < 1 && 'hidden'
         )}
       >
         <PencilRuler className='w-5 h-5' />

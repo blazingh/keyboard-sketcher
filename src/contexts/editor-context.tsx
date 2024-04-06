@@ -6,12 +6,13 @@ import { buttonVariants } from "@/components/ui/button";
 import { initialNodes } from "@/constants/temp";
 import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, PlusIcon } from 'lucide-react';
-import { ReactNode, createContext, useMemo, useState } from "react";
+import { ReactNode, createContext, useContext, useMemo, useState } from "react";
 import { isMobile } from 'react-device-detect';
 import { useHotkeys } from "react-hotkeys-hook";
 import ReactFlow, { Background, BackgroundVariant, Node, NodeChange, NodeToolbar, Position, ReactFlowProvider, useNodesState, useOnSelectionChange } from "reactflow";
 import { Key } from "ts-key-enum";
 import 'reactflow/dist/style.css';
+import { workSpaceContext } from "./workspace-context";
 
 type EditorContext = {
   nodes: Node[]
@@ -39,6 +40,8 @@ export function FlowEditorContextProvider({ children }: any) {
   const [nodes, _, onNodesChange] = useNodesState(initialNodes);
 
   const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
+
+  const workspace = useContext(workSpaceContext)
 
   useOnSelectionChange({
     onChange: ({ nodes }: { nodes: Node[] }) => {
@@ -126,6 +129,7 @@ export function FlowEditorContextProvider({ children }: any) {
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         className="relative"
+        onDoubleClick={() => workspace?.updateOption("openBar", "")}
       >
         <Background gap={10} variant={BackgroundVariant.Dots} />
         {/* switch move buttons */}

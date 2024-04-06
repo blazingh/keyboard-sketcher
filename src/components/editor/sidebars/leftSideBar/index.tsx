@@ -2,18 +2,18 @@
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Blocks, ChevronLeft, PencilRuler } from "lucide-react"
-import { useState } from "react"
+import { useContext, useState } from "react"
 import PerforanceTab from "./performance-tab"
 import KeyboardModelsTab from "./keyboardmodels-tab"
 import { Separator } from "@/components/ui/separator"
 import { useModelActions } from "@/hooks/model-actions"
 import { useNodes } from "reactflow"
+import { workSpaceContext } from "@/contexts/workspace-context"
 
 export default function LeftSidebar() {
 
-  const [settingsOpen, setSettingsOpen] = useState(false)
-
   const modelActions = useModelActions()
+  const workspace = useContext(workSpaceContext)
 
   const nodes = useNodes()
 
@@ -23,19 +23,21 @@ export default function LeftSidebar() {
     content: () => null as unknown as JSX.Element
   })
 
+  const open = workspace?.options.openBar === "left"
+
   return (
     <div className={cn(
       "fixed h-svh z-30 top-0 left-0 transition-all  ease-in-out w-[280px]",
-      settingsOpen ? "shadow-xl" : "-translate-x-[279px] shadow-none"
+      open ? "shadow-xl" : "-translate-x-[278px] shadow-none"
     )}
     >
       {/* side bar toggle button */}
       <Button
-        onClick={() => setSettingsOpen(p => !p)}
+        onClick={() => workspace?.updateOption("openBar", open ? "" : "left")}
         className={cn(
           'absolute top-4 right-0 transition-all ease-in-out py-6 z-20 translate-x-full rounded-l-none',
           'flex items-center justify-center',
-          settingsOpen ? "px-2 pl-1" : "px-3 pl-2"
+          open ? "px-2 pl-1" : "px-3 pl-2"
         )}
       >
         <Blocks className='w-5 h-5' />
@@ -46,7 +48,7 @@ export default function LeftSidebar() {
       <div
         className={cn(
           "w-full h-full overflow-hidden flex flex-col p-4 gap-4 relative border-r-2 border-primary bg-background",
-          settingsOpen && "rounded-r-2xl"
+          open && "rounded-r-2xl"
         )}
       >
         <div
@@ -94,7 +96,7 @@ export default function LeftSidebar() {
             className='w-full'
             onClick={() => {
               modelActions.generateModel(nodes)
-              setSettingsOpen(false)
+              workspace?.updateOption("openBar", "")
             }}
           >
             Generate Model

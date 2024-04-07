@@ -11,13 +11,10 @@ export default function WorkSpace() {
       <div className="w-svw h-svh">
         <EditorContextProvider>
 
-          <div className="absolute bottom-5 right-5 z-10">
-            <AddNodeButton />
-          </div>
-
           <LeftSidebar />
-
+          {/*
           <RightSidebar />
+          */}
 
         </EditorContextProvider>
       </div>

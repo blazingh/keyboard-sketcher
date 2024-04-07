@@ -54,7 +54,7 @@ export default function NodesControll() {
 
   const visible = editor && editor.selectedNodes.length > 0
 
-  if (!visible) return null
+  if (!editor) return null
 
   return (
     <Draggable
@@ -65,6 +65,7 @@ export default function NodesControll() {
           "absolute bottom-5 right-5 z-10 w-[160px] h-[160px]",
           "bg-background p-4 rounded-lg border",
           "flex flex-col gap-2",
+          !visible && "hidden"
         )}
       >
         <div className='handle absolute -top-2 left-1/2 -translate-x-1/2 bg-secondary rounded px-1 opacity-50 hover:opacity-100'>

@@ -15,7 +15,7 @@ export function Outline() {
   useEffect(() => {
     setTimeout(function() {
       setSize(5000)
-    }, 200);
+    }, 500);
   }, [setSize])
 
   const wsc = useContext(workSpaceContext)

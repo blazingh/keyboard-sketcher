@@ -6,19 +6,27 @@ import { buttonVariants } from "@/components/ui/button";
 import { initialNodes } from "@/constants/temp";
 import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, PlusIcon } from 'lucide-react';
-import { ReactNode, createContext, useContext, useMemo, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from "react";
 import { isMobile } from 'react-device-detect';
 import { useHotkeys } from "react-hotkeys-hook";
 import ReactFlow, { Background, BackgroundVariant, Node, NodeChange, NodeToolbar, Position, ReactFlowProvider, useNodesState, useOnSelectionChange } from "reactflow";
 import { Key } from "ts-key-enum";
 import 'reactflow/dist/style.css';
 import { workSpaceContext } from "./workspace-context";
+import { calculateCenterPosition } from "@/lib/positions";
+import NodesControll from "@/components/editor/node-controlls";
 
 type EditorContext = {
   nodes: Node[]
   selectedNodes: string[]
   moveSelectedNodes: (dir: "U" | "D" | "L" | "R") => void
   duplicateSelectedNodes: (sid: Position) => void
+  store: {
+    basePos: {
+      x: number
+      y: number
+    }
+  }
 }
 
 export const EditorContext = createContext<EditorContext | null>(null);
@@ -43,9 +51,30 @@ export function FlowEditorContextProvider({ children }: any) {
 
   const workspace = useContext(workSpaceContext)
 
+  const [store, setStore] = useState<EditorContext["store"]>({
+    basePos: { x: 0, y: 0 }
+  })
+
+  function handleNodeChange(changes: NodeChange[]) {
+    const modChanges = changes.map((node: NodeChange) => {
+      if (
+        node.type === "select"
+        && workspace?.options.selectActive
+        && selectedNodes.length !== changes.length
+      ) {
+        return { ...node, selected: true }
+      }
+      return node
+    })
+    onNodesChange(modChanges)
+  }
+
   useOnSelectionChange({
     onChange: ({ nodes }: { nodes: Node[] }) => {
       setSelectedNodes(nodes.map((node) => node.id));
+      const positions = nodes.map((node) => node.position)
+      const center = calculateCenterPosition(positions)
+      setStore(p => ({ ...p, basePos: center || { x: 0, y: 0 } }))
     },
   });
 
@@ -95,6 +124,7 @@ export function FlowEditorContextProvider({ children }: any) {
         position: { x: node.position.x + deltas[0], y: node.position.y + deltas[1] }
       })
     })
+
     onNodesChange(changes)
   }
 
@@ -109,8 +139,10 @@ export function FlowEditorContextProvider({ children }: any) {
         nodes,
         selectedNodes,
         moveSelectedNodes,
-        duplicateSelectedNodes
+        duplicateSelectedNodes,
+        store
       }}>
+      <NodesControll />
       {children}
       <ReactFlow
         snapToGrid
@@ -118,7 +150,6 @@ export function FlowEditorContextProvider({ children }: any) {
         disableKeyboardA11y
         preventScrolling
         zoomOnScroll
-        selectionOnDrag
         zoomOnDoubleClick={false}
         nodeOrigin={[0.5, 0.5]}
         minZoom={0.2}
@@ -128,47 +159,11 @@ export function FlowEditorContextProvider({ children }: any) {
         nodesDraggable={!isMobile}
         nodes={nodes}
         nodeTypes={nodeTypes}
-        onNodesChange={onNodesChange}
+        onNodesChange={handleNodeChange}
         className="relative"
-        onDoubleClick={() => workspace?.updateOption("openBar", "")}
+      //        onNodeDoubleClick={(_, node) => onNodesChange([{ type: "select", id: node.id, selected: false }])}
       >
         <Background gap={10} variant={BackgroundVariant.Dots} />
-        {/* switch move buttons */}
-        {false && [
-          Position.Top,
-          Position.Bottom,
-          Position.Left,
-          Position.Right,
-        ].map((position) => (
-          <NodeToolbar
-            key={position}
-            isVisible
-            nodeId={selectedNodes}
-            position={position}
-            onClick={() => moveSelectedNodes('U')}
-            className={cn(
-              buttonVariants(),
-              'p-0 h-8 w-8 flex items-center justify-center opacity-50 hover:opacity-100 z-10 ',
-              position === Position.Top && "mt-8",
-              position === Position.Bottom && "-mt-8",
-              position === Position.Left && "ml-8",
-              position === Position.Right && "-ml-8",
-            )}
-          >
-            {position === Position.Top && (
-              <ChevronUp className='w-6 h-6 flex-shrink-0' />
-            )}
-            {position === Position.Bottom && (
-              <ChevronDown className='w-6 h-6 flex-shrink-0' />
-            )}
-            {position === Position.Left && (
-              <ChevronLeft className='w-6 h-6 flex-shrink-0' />
-            )}
-            {position === Position.Right && (
-              <ChevronRight className='w-6 h-6 flex-shrink-0' />
-            )}
-          </NodeToolbar>
-        ))}
 
         {/* switch add buttons */}
         {[
@@ -185,7 +180,7 @@ export function FlowEditorContextProvider({ children }: any) {
             onClick={() => duplicateSelectedNodes(position)}
             className={cn(
               buttonVariants(),
-              'p-0 h-8 w-8 flex items-center justify-center opacity-50 hover:opacity-100',
+              'p-0 h-6 w-6 lg:h-8 lg:w-8 flex items-center justify-center opacity-50 hover:opacity-100',
               position === Position.Top && "-mt-2",
               position === Position.Bottom && "mt-2",
               position === Position.Left && "-ml-2",

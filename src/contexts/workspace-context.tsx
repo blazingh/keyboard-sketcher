@@ -3,7 +3,8 @@ import { createContext, useState } from 'react';
 
 const initialOptions = {
   renderOuline: true as boolean,
-  openBar: "" as "" | "left" | "right"
+  openBar: "" as "" | "left" | "right",
+  selectActive: true as boolean
 }
 
 type contextType = {

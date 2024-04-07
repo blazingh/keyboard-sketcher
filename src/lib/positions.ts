@@ -4,6 +4,10 @@ export function calculateCenterPosition(positions: { x: number, y: number }[], d
     return null; // No center position if there are no points
   }
 
+  if (positions.length === 1) {
+    return positions[0]; // No center position if there are no points
+  }
+
   let totalX = 0;
   let totalY = 0;
 

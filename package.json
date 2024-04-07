@@ -67,6 +67,7 @@
     "react-detect-click-outside": "^1.1.7",
     "react-device-detect": "^2.2.3",
     "react-dom": "^18",
+    "react-draggable": "^4.4.6",
     "react-hotkeys-hook": "^4.5.0",
     "react-konva": "^18.2.10",
     "react-resizable-panels": "^2.0.16",

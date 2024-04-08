@@ -1,18 +1,14 @@
 import { primitives, booleans, hulls, extrusions, expansions, transforms, utils, geometries } from '@jscad/modeling'
-/* @ts-ignore */
 import { Geom3 } from '@jscad/modeling/src/geometries/types';
 import { getNodesBorderPoints } from '@/lib/hull-nodes';
 
 const plateThickness = 3
 const switchGruveThickness = 1.5
-const switchSize = 14
-const switchPadding = 13
 const caseThickness = 4
 const standoffThickness = plateThickness
-
-const caseTopRadius = 0 // Math.max(caseThickness / 2, 0)
+const caseTopRadius = Math.min(caseThickness / 2, 0)
 const caseTopMargin = Math.max(plateThickness + caseTopRadius, 0)
-const caseBottomMargin = Math.max(standoffThickness, 9)
+const caseBottomMargin = Math.max(standoffThickness, 0)
 
 const tolerance = {
   tight: 0.254,
@@ -33,35 +29,31 @@ type WorkerMessageData = {
   id: number
 }
 
+type SimpleNode = {
+  type: "switch" | "mcu"
+  position: { x: number, y: number, r: number }
+  size: { w: number, h: number }
+}
+
 self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
 
-  let switch_nodes = e.data.nodes.filter((node: any) => node.type === "switch")
-  let mcu_nodes = e.data.nodes.filter((node: any) => node.type === "mcu")
-
-  switch_nodes = switch_nodes.map((node: any) => {
+  const nodes: SimpleNode[] = e.data.nodes.map((node: any) => {
     return {
-      ...node,
-      rotation: node.data.rotation,
-      position: { x: node.position.x / 10, y: node.position.y / 10 },
+      type: node.type,
+      position: { x: node.position.x / 10, y: node.position.y / 10, r: node.data.rotation },
+      size: { w: node.data.width / 10, h: node.data.height / 10 }
     }
   })
 
-  mcu_nodes = mcu_nodes.map((node: any) => {
-    return {
-      ...node,
-      rotation: node.data.rotation,
-      position: { x: node.position.x / 10, y: node.position.y / 10 },
-      width: node.data.width / 10,
-      height: node.data.height / 10
-    }
-  })
+  const switch_nodes = nodes.filter((node: any) => node.type === "switch")
+  const mcu_nodes = nodes.filter((node: any) => node.type === "mcu")
 
-  const BP = getNodesBorderPoints(e.data.nodes as any)
+  const borderPoints = getNodesBorderPoints(e.data.nodes as any)
   const sides: number[][][] = []
 
-  BP.map((point, index) => {
-    if (index == BP.length - 1) return
-    sides.push([point, BP[index + 1]])
+  borderPoints.map((point, index) => {
+    if (index == borderPoints.length - 1) return
+    sides.push([point, borderPoints[index + 1]])
   })
 
   let base_plate = transforms.scale([0.1, 0.1, 1], geometries.geom2.create(sides as any))
@@ -135,15 +127,15 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   )
 
   // cut the mcu from the case
-  mcu_nodes.map((node: any) => {
+  mcu_nodes.map((node) => {
     base_case_3d = booleans.subtract(
       base_case_3d,
       transforms.translate(
         [node.position.x, node.position.y, -caseBottomMargin + 1],
         transforms.rotateZ(
-          utils.degToRad(node.rotation),
+          utils.degToRad(node.position.r),
           primitives.cuboid({
-            size: [node.width + (tolerance.loose + tolerance.tight) * 2, node.height + (tolerance.loose + tolerance.tight) * 2, 5],
+            size: [node.size.w + (tolerance.loose + tolerance.tight) * 2, node.size.h + (tolerance.loose + tolerance.tight) * 2, 5],
             center: [0, 0, 0]
           })
         )
@@ -152,15 +144,15 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   })
 
   // cut the switches holes and gruves from the plate
-  switch_nodes.map((node: any) => {
+  switch_nodes.map((node) => {
     base_plate_3d = booleans.subtract(
       base_plate_3d,
       transforms.translate(
         [node.position.x, node.position.y, plateThickness / 2],
         transforms.rotateZ(
-          utils.degToRad(node.rotation),
+          utils.degToRad(node.position.r),
           primitives.cuboid({
-            size: [switchSize, switchSize, plateThickness],
+            size: [node.size.w, node.size.h, plateThickness],
             center: [0, 0, 0]
           })
         )
@@ -168,9 +160,9 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
       transforms.translate(
         [node.position.x, node.position.y, (plateThickness - switchGruveThickness) / 2],
         transforms.rotateZ(
-          utils.degToRad(node.rotation),
+          utils.degToRad(node.position.r),
           primitives.cuboid({
-            size: [switchSize + 2, switchSize + 2, plateThickness - switchGruveThickness],
+            size: [node.size.w + 2, node.size.h + 2, plateThickness - switchGruveThickness],
             center: [0, 0, 0]
           })
         )

@@ -12,7 +12,7 @@ export const initialNodes: Node[] = [
     selectable: false,
     draggable: false,
   },
-  { id: "1", type: 'mcu', position: { x: 0, y: -110 }, data: { label: 'mcu', rotation: '0', width: 210, height: 520 }, zIndex: 0 },
+  { id: "1", type: 'mcu', position: { x: 0, y: -105 }, data: { label: 'mcu', rotation: '0', width: 210, height: 520 }, zIndex: 0 },
   { id: "2", type: 'switch', position: { x: 0, y: 0 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
   { id: "3", type: 'switch', position: { x: 190, y: 0 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },
   { id: "4", type: 'switch', position: { x: -190, y: 0 }, data: { label: 'Switch', rotation: '0', width: 140, height: 140 }, zIndex: 10 },

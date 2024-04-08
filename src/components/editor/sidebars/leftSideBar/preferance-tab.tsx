@@ -4,12 +4,12 @@ import { Switch } from "@/components/ui/switch";
 import { workSpaceContext } from "@/contexts/workspace-context";
 import { useContext } from "react";
 
-export default function PerforanceTab() {
+export default function PreferanceTab() {
   const wsc = useContext(workSpaceContext)
   return (
-    <div className="flex flex-col gap-2" >
+    <div className="flex flex-col gap-4" >
 
-      <div className="flex items-center space-x-2">
+      <div className="flex w-full justify-between items-center">
         <Label htmlFor="render-outline">
           Render case outline
         </Label>
@@ -17,6 +17,17 @@ export default function PerforanceTab() {
           id="render-outline"
           checked={wsc?.options.renderOuline}
           onCheckedChange={(v) => wsc?.updateOption('renderOuline', v)}
+        />
+      </div>
+
+      <div className="flex w-full justify-between items-center">
+        <Label htmlFor="render-outline">
+          Show nodes controller
+        </Label>
+        <Switch
+          id="render-outline"
+          checked={wsc?.options.showNodeController}
+          onCheckedChange={(v) => wsc?.updateOption('showNodeController', v)}
         />
       </div>
 

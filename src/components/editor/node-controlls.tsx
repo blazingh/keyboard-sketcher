@@ -52,7 +52,7 @@ export default function NodesControll() {
     }
   }()
 
-  const visible = editor && editor.selectedNodes.length > 0
+  const visible = editor && editor.selectedNodes.length > 0 && workspace?.options.showNodeController
 
   if (!editor) return null
 

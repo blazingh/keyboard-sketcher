@@ -3,12 +3,12 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Blocks, ChevronLeft, PencilRuler } from "lucide-react"
 import { useContext, useState } from "react"
-import PerforanceTab from "./performance-tab"
 import KeyboardModelsTab from "./keyboardmodels-tab"
 import { Separator } from "@/components/ui/separator"
 import { useModelActions } from "@/hooks/model-actions"
 import { useNodes } from "reactflow"
 import { workSpaceContext } from "@/contexts/workspace-context"
+import PreferanceTab from "./preferance-tab"
 
 export default function LeftSidebar() {
 
@@ -90,7 +90,7 @@ export default function LeftSidebar() {
 
         <Button
           variant="outline"
-          onClick={() => setSelectedTab({ visible: true, title: "Editor Performance", content: PerforanceTab })}
+          onClick={() => setSelectedTab({ visible: true, title: "Editor Preferance", content: PreferanceTab })}
         >
           Editor Performance
         </Button>

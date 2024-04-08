@@ -3,6 +3,7 @@ import { createContext, useState } from 'react';
 
 const initialOptions = {
   renderOuline: true as boolean,
+  showNodeController: true as boolean,
   openBar: "" as "" | "left" | "right",
   selectActive: true as boolean
 }

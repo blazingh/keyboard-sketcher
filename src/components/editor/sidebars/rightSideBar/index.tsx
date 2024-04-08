@@ -1,12 +1,11 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { EditorContext } from "@/contexts/editor-context"
 import { workSpaceContext } from "@/contexts/workspace-context"
 import { calculateCenterPosition } from "@/lib/positions"
 import { cn } from "@/lib/utils"
-import { ArrowUp, ArrowRight, ArrowDown, ArrowLeft, PencilRuler, RotateCcw, RotateCw, MoveHorizontal, MoveVertical, RefreshCw } from "lucide-react"
-import { useContext, useEffect, useMemo, useState } from "react"
+import { ArrowUp, ArrowRight, ArrowDown, ArrowLeft, PencilRuler, MoveHorizontal, MoveVertical } from "lucide-react"
+import { useContext, useEffect, useState } from "react"
 
 
 export default function RightSidebar() {

@@ -12,6 +12,9 @@ import { toast } from "sonner"
 import { BackSide, DirectionalLight, Material, MeshBasicMaterial, MeshNormalMaterial, MeshStandardMaterial, PCFSoftShadowMap, PointLight } from "three"
 import { CSG2Geom } from "@/lib/geometries"
 import { ModelWorkerResult } from "@/workers/model-generator"
+import { Switch } from "@/components/ui/switch"
+/* @ts-ignore */
+import stlSerializer from '@jscad/stl-serializer'
 
 type WorkerSignal = {
   id: number,
@@ -35,6 +38,7 @@ export const workersSigals = signal<WorkersSignal>({});
 export function useModelActions() {
 
   const [openModelData, setOpenModelData] = useState<WorkerSignal | null>(null)
+
 
   function clearWorker(id: number) {
     if (!workersSigals.value[id]) return
@@ -113,11 +117,12 @@ export function useModelActions() {
     const worker = workersSigals.value[id]
     if (!worker || typeof window === "undefined") return
 
-    [worker.plateStlData, worker.caseStlData].map((item, index) => {
-      const modelUrl = URL.createObjectURL(new Blob(item))
+    worker.geoms.map((csg: ModelWorkerResult["geometries"][number]) => {
+      const stlData = stlSerializer.serialize({ binary: true }, csg.geom)
+      const modelUrl = URL.createObjectURL(new Blob(stlData))
       const a = document.createElement("a")
       a.href = modelUrl
-      a.download = index === 1 ? "plate.stl" : "case.stl"
+      a.download = `${csg.label}.stl`
       a.click()
       a.remove()
     })
@@ -126,21 +131,20 @@ export function useModelActions() {
 
   const ModelPreviewJsx = useCallback(() => {
 
+    const [hiddenGeoms, setHiddenGeoms] = useState<number[]>([])
     if (!openModelData) return
 
     const light = new DirectionalLight('white', 1);
     light.position.set(0, 0, 0);
 
-
     const mat = new MeshStandardMaterial({ side: BackSide })
-
-    console.log(openModelData)
 
     return (
       <Dialog open={true}  >
-        <DialogContent className='max-w-4xl' onInteractOutside={(e) => e?.preventDefault} >
-          <div className='w-full h-[70svh] flex flex-col gap-4'>
+        <DialogContent className='max-w-4xl p-0 overflow-hidden' onInteractOutside={(e) => e?.preventDefault} >
+          <div className='w-full h-[70svh] flex flex-col gap-4 relative '>
             <Canvas
+              className="w-full h-full"
               shadows
               gl={{
                 preserveDrawingBuffer: true,
@@ -154,19 +158,43 @@ export function useModelActions() {
               <OrbitControls />
               <ambientLight intensity={0.3} color={'white'} />
 
-              {openModelData.geoms.map((csg: ModelWorkerResult["geometries"][number], index: number) => {
-                const geos = CSG2Geom(csg.geom)
-                return (
-                  <mesh geometry={geos} position={[0, 0, 0]} material={mat} scale={0.1} />
-                )
-              })}
+              {openModelData.geoms.map((csg: ModelWorkerResult["geometries"][number]) => !hiddenGeoms.includes(csg.id) && (
+                <mesh geometry={CSG2Geom(csg.geom)} position={[0, 0, 0]} material={mat} scale={0.1} />
+              ))}
 
             </Canvas>
+            <div className="absolute top-4 left-4 flex flex-col gap-2">
+              {openModelData.geoms.map((csg: ModelWorkerResult["geometries"][number]) => (
+                <div className="flex gap-2">
+                  <Switch
+                    checked={!hiddenGeoms.includes(csg.id)}
+                    onCheckedChange={(v) =>
+                      setHiddenGeoms(p =>
+                        p.includes(csg.id)
+                          ? p.filter(el => el !== csg.id)
+                          : [...p, csg.id]
+                      )}
+                  />
+                  <label>{csg.label}</label>
+                </div>
+              ))}
+            </div>
             <Button
+              className="absolute bottom-4 left-4 w-1/3"
               variant="destructive"
               onClick={() => {
                 deleteModel(openModelData.id)
                 setOpenModelData(null)
+              }}
+            >
+              delete
+            </Button>
+            <Button
+              className="absolute bottom-4 right-4 w-1/3"
+              onClick={() => {
+                downloadModels(openModelData.id)
+                setOpenModelData(null)
+                toast.success("Downoloaded Models ;)")
               }}
             >
               delete

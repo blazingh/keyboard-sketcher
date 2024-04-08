@@ -1,9 +1,7 @@
 import { primitives, booleans, hulls, extrusions, expansions, transforms, utils, geometries } from '@jscad/modeling'
 /* @ts-ignore */
-import stlSerializer from '@jscad/stl-serializer'
-import { Geom2, Geom3 } from '@jscad/modeling/src/geometries/types';
+import { Geom3 } from '@jscad/modeling/src/geometries/types';
 import { getNodesBorderPoints } from '@/lib/hull-nodes';
-import { CSG2Geom } from '@/lib/geometries';
 
 const plateThickness = 3
 const switchGruveThickness = 1.5
@@ -24,6 +22,7 @@ const tolerance = {
 export type ModelWorkerResult = {
   id: number
   geometries: {
+    id: number
     label: string
     geom: any
   }[]
@@ -179,34 +178,14 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
     )
   })
 
-
-  const plateStlData = stlSerializer.serialize(
-    { binary: true },
-    transforms.mirrorY(base_plate_3d)
-  )
-
-  const caseStlData = stlSerializer.serialize(
-    { binary: true },
-    transforms.mirrorY(base_case_3d)
-  )
-
-  const previewStlData = stlSerializer.serialize(
-    { binary: true },
-    booleans.union(
-      transforms.mirrorY(base_case_3d),
-      transforms.translateZ(
-        (caseTopMargin + caseBottomMargin) * 2,
-        transforms.mirrorY(base_plate_3d),
-      )
-    )
-  )
-
   const geoms: ModelWorkerResult["geometries"] = [
     {
+      id: 1,
       label: "Plate",
       geom: transforms.mirrorY(base_plate_3d)
     },
     {
+      id: 2,
       label: "Case",
       geom: transforms.mirrorY(base_case_3d)
     },
@@ -215,9 +194,6 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   // return the result
   self.postMessage({
     geoms,
-    plateStlData,
-    caseStlData,
-    previewStlData,
     id: e.data.id
   });
 };

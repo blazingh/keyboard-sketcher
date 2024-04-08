@@ -39,7 +39,6 @@ export function useModelActions() {
 
   const [openModelData, setOpenModelData] = useState<WorkerSignal | null>(null)
 
-
   function clearWorker(id: number) {
     if (!workersSigals.value[id]) return
     delete workersSigals.value[id]
@@ -129,9 +128,10 @@ export function useModelActions() {
 
   }
 
-  const ModelPreviewJsx = useCallback(() => {
+  const ModelPreviewJsx = () => {
 
     const [hiddenGeoms, setHiddenGeoms] = useState<number[]>([])
+
     if (!openModelData) return
 
     const light = new DirectionalLight('white', 1);
@@ -159,13 +159,13 @@ export function useModelActions() {
               <ambientLight intensity={0.3} color={'white'} />
 
               {openModelData.geoms.map((csg: ModelWorkerResult["geometries"][number]) => !hiddenGeoms.includes(csg.id) && (
-                <mesh geometry={CSG2Geom(csg.geom)} position={[0, 0, 0]} material={mat} scale={0.1} />
+                <mesh key={csg.id} geometry={CSG2Geom(csg.geom)} position={[0, 0, 0]} material={mat} scale={0.1} />
               ))}
 
             </Canvas>
             <div className="absolute top-4 left-4 flex flex-col gap-2">
               {openModelData.geoms.map((csg: ModelWorkerResult["geometries"][number]) => (
-                <div className="flex gap-2">
+                <div key={csg.id} className="flex gap-2">
                   <Switch
                     checked={!hiddenGeoms.includes(csg.id)}
                     onCheckedChange={(v) =>
@@ -203,48 +203,7 @@ export function useModelActions() {
         </DialogContent>
       </Dialog>
     )
-  }, [openModelData])
-  /*
-  const ModelPreviewJsx = useCallback(() => {
-    if (!openModelData) return
-    const modelUrl = URL.createObjectURL(new Blob(openModelData.previewStlData))
-    return (
-      <Dialog open={true}  >
-        <DialogContent className='max-w-4xl' onInteractOutside={(e) => e?.preventDefault} >
-          <div className='w-full h-[70svh] flex flex-col gap-4'>
-            <StlViewer
-              orbitControls
-              shadows
-              className='w-full h-full'
-              modelProps={{ color: "indianred" }}
-              url={modelUrl}
-            />
-            <div className='flex w-full items-center justify-between'>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  deleteModel(openModelData.id)
-                  setOpenModelData(null)
-                }}
-              >
-                delete
-              </Button>
-              <Button
-                onClick={() => {
-                  downloadModels(openModelData.id)
-                  setOpenModelData(null)
-                  toast.success("Downoloaded Models ;)")
-                }}
-              >
-                Download
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    )
-  }, [openModelData])
-  */
+  }
 
   return {
     generateModel,

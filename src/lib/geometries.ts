@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Geom3 } from "@jscad/modeling/src/geometries/types";
 import { NormalBufferAttributes } from "three";
 import {

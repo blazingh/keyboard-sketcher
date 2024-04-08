@@ -181,10 +181,10 @@ export function FlowEditorContextProvider({ children }: any) {
             className={cn(
               buttonVariants(),
               'p-0 h-6 w-6 lg:h-8 lg:w-8 flex items-center justify-center opacity-50 hover:opacity-100',
-              position === Position.Top && "-mt-2",
-              position === Position.Bottom && "mt-2",
-              position === Position.Left && "-ml-2",
-              position === Position.Right && "ml-2",
+              position === Position.Top && "mt-2",
+              position === Position.Bottom && "-mt-2",
+              position === Position.Left && "ml-2",
+              position === Position.Right && "-ml-2",
 
             )}
           >

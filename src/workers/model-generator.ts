@@ -3,6 +3,7 @@ import { primitives, booleans, hulls, extrusions, expansions, transforms, utils,
 import stlSerializer from '@jscad/stl-serializer'
 import { Geom2, Geom3 } from '@jscad/modeling/src/geometries/types';
 import { getNodesBorderPoints } from '@/lib/hull-nodes';
+import { CSG2Geom } from '@/lib/geometries';
 
 const plateThickness = 3
 const switchGruveThickness = 1.5
@@ -12,12 +13,20 @@ const caseThickness = 4
 const standoffThickness = plateThickness
 
 const caseTopRadius = 0 // Math.max(caseThickness / 2, 0)
-const caseTopMargin = Math.max(plateThickness + caseTopRadius, 12)
+const caseTopMargin = Math.max(plateThickness + caseTopRadius, 0)
 const caseBottomMargin = Math.max(standoffThickness, 9)
 
 const tolerance = {
   tight: 0.254,
   loose: 0.508
+}
+
+export type ModelWorkerResult = {
+  id: number
+  geometries: {
+    label: string
+    geom: any
+  }[]
 }
 
 type WorkerMessageData = {
@@ -26,6 +35,7 @@ type WorkerMessageData = {
 }
 
 self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
+
   let switch_nodes = e.data.nodes.filter((node: any) => node.type === "switch")
   let mcu_nodes = e.data.nodes.filter((node: any) => node.type === "mcu")
 
@@ -169,6 +179,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
     )
   })
 
+
   const plateStlData = stlSerializer.serialize(
     { binary: true },
     transforms.mirrorY(base_plate_3d)
@@ -190,8 +201,20 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
     )
   )
 
+  const geoms: ModelWorkerResult["geometries"] = [
+    {
+      label: "Plate",
+      geom: transforms.mirrorY(base_plate_3d)
+    },
+    {
+      label: "Case",
+      geom: transforms.mirrorY(base_case_3d)
+    },
+  ]
+
   // return the result
   self.postMessage({
+    geoms,
     plateStlData,
     caseStlData,
     previewStlData,

@@ -1,12 +1,17 @@
 import ToastFinishModel from "@/components/editor/toasts/finished-model"
 import ToastPendingModel from "@/components/editor/toasts/pending-model"
+import { Canvas } from '@react-three/fiber'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog"
 import { signal } from "@preact/signals-react"
 import { useCallback, useState } from "react"
 import { StlViewer } from "react-stl-viewer"
+import { CameraControls, OrbitControls } from "@react-three/drei"
 import { Node } from "reactflow"
 import { toast } from "sonner"
+import { BackSide, DirectionalLight, Material, MeshBasicMaterial, MeshNormalMaterial, MeshStandardMaterial, PCFSoftShadowMap, PointLight } from "three"
+import { CSG2Geom } from "@/lib/geometries"
+import { ModelWorkerResult } from "@/workers/model-generator"
 
 type WorkerSignal = {
   id: number,
@@ -15,6 +20,7 @@ type WorkerSignal = {
   resolver: any,
   rejecter: any,
   toastId?: any,
+  geoms?: any,
   previewStlData?: any
   caseStlData?: any
   plateStlData?: any
@@ -71,6 +77,7 @@ export function useModelActions() {
       workersSigals.value[e.data.id].previewStlData = e.data.previewStlData
       workersSigals.value[e.data.id].caseStlData = e.data.caseStlData
       workersSigals.value[e.data.id].plateStlData = e.data.plateStlData
+      workersSigals.value[e.data.id].geoms = e.data.geoms
       setTimeout(() => {
         clearWorker(id)
       }, 1000 * 60 * 2)
@@ -118,6 +125,59 @@ export function useModelActions() {
   }
 
   const ModelPreviewJsx = useCallback(() => {
+
+    if (!openModelData) return
+
+    const light = new DirectionalLight('white', 1);
+    light.position.set(0, 0, 0);
+
+
+    const mat = new MeshStandardMaterial({ side: BackSide })
+
+    console.log(openModelData)
+
+    return (
+      <Dialog open={true}  >
+        <DialogContent className='max-w-4xl' onInteractOutside={(e) => e?.preventDefault} >
+          <div className='w-full h-[70svh] flex flex-col gap-4'>
+            <Canvas
+              shadows
+              gl={{
+                preserveDrawingBuffer: true,
+                shadowMapType: PCFSoftShadowMap,
+                antialias: true
+              }}
+              onCreated={({ camera, scene }) => {
+                camera.add(light);
+                scene.add(camera);
+              }}>
+              <OrbitControls />
+              <ambientLight intensity={0.3} color={'white'} />
+
+              {openModelData.geoms.map((csg: ModelWorkerResult["geometries"][number], index: number) => {
+                const geos = CSG2Geom(csg.geom)
+                return (
+                  <mesh geometry={geos} position={[0, 0, 0]} material={mat} scale={0.1} />
+                )
+              })}
+
+            </Canvas>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                deleteModel(openModelData.id)
+                setOpenModelData(null)
+              }}
+            >
+              delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    )
+  }, [openModelData])
+  /*
+  const ModelPreviewJsx = useCallback(() => {
     if (!openModelData) return
     const modelUrl = URL.createObjectURL(new Blob(openModelData.previewStlData))
     return (
@@ -156,6 +216,7 @@ export function useModelActions() {
       </Dialog>
     )
   }, [openModelData])
+  */
 
   return {
     generateModel,

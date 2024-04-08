@@ -75,7 +75,7 @@
     "reactflow": "^11.10.2",
     "sonner": "^1.4.3",
     "tailwind-merge": "^2.2.0",
-    "tailwindcss-animate": "^1.0.7",
+    "tailwindcss-animated": "^1.0.1",
     "three": "^0.163.0",
     "ts-key-enum": "^2.0.12",
     "zustand": "^4.5.2"
@@ -89,6 +89,7 @@
     "eslint-config-next": "14.1.0",
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
+    "tailwindcss-animate": "^1.0.7",
     "typescript": "^5"
   }
 }

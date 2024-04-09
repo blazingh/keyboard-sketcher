@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { Select, SelectValue, SelectItem, SelectContent, SelectTrigger } from "@/components/ui/select";
 import { HelpCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { modelOptions } from "@/workers/model-generator";
+import { modelOptions } from "@/workers/model-a-options";
 import { Input } from "@/components/ui/input";
 import { HelperTooltip } from "@/components/helper-tooltip";
 

@@ -3,6 +3,10 @@ import { workSpaceContext } from "@/contexts/workspace-context";
 import { useContext } from "react";
 import { Select, SelectValue, SelectItem, SelectContent, SelectTrigger } from "@/components/ui/select";
 import { HelpCircle } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { modelOptions } from "@/workers/model-generator";
+import { Input } from "@/components/ui/input";
+import { HelperTooltip } from "@/components/helper-tooltip";
 
 export default function KeyboardModelsTab() {
 
@@ -27,6 +31,22 @@ export default function KeyboardModelsTab() {
           </SelectContent>
         </Select>
       </div>
+
+      <Separator />
+
+      {modelOptions.map((option) => {
+        if (option.type === "number")
+          return (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm">{option.label}</label>
+                <HelperTooltip desc={option.description} />
+              </div>
+              <Input type="number" />
+            </div>
+          )
+        return null
+      })}
 
     </div >
   )

@@ -11,12 +11,16 @@ import { Node } from "reactflow"
 import { toast } from "sonner"
 import { BackSide, DirectionalLight, MeshStandardMaterial, PCFSoftShadowMap } from "three"
 import { CSG2Geom } from "@/lib/geometries"
-import { ModelWorkerResult } from "@/workers/model-a-options"
+import { ModelAOptionsTypes, ModelWorkerResult, modelADefaultOptionsValues, modelAOptionsList } from "@/workers/model-a-options"
 import { Switch } from "@/components/ui/switch"
 /* @ts-ignore */
 import stlSerializer from '@jscad/stl-serializer'
 
+type ModelOpitons = { type: "a", options: ModelAOptionsTypes }
+
 type ModelContext = {
+  selectedOptions: ModelOpitons,
+  updateOptionValue: (type: any, key?: string, value?: any) => void,
   generateModel: (nodes: Node[]) => void,
   cancelModelGeneration: (id: number) => void,
   viewModel: (id: number) => void,
@@ -47,6 +51,22 @@ export const workersSigals = signal<WorkersSignal>({});
 export function ModelContextProvider({ children }: any) {
 
   const [openModelData, setOpenModelData] = useState<WorkerSignal | null>(null)
+
+  const [selectedOptions, setSelectedOptions] = useState<ModelOpitons>({
+    type: "a",
+    options: modelADefaultOptionsValues
+  })
+
+  function updateOptionValue(type: any, key?: string, value?: any) {
+    if (!key) {
+      setSelectedOptions({ type, options: {} })
+      return
+    }
+    setSelectedOptions(p => {
+      const options = type === p.type ? { ...p.options, [key]: value } : { [key]: value }
+      return { type, options }
+    })
+  }
 
   function clearWorker(id: number) {
     if (!workersSigals.value[id]) return
@@ -95,7 +115,9 @@ export function ModelContextProvider({ children }: any) {
       }, 1000 * 60 * 2)
     };
 
-    newWorker.postMessage({ nodes: nodes, id: id })
+    newWorker.postMessage({ nodes: nodes, id: id, options: selectedOptions.options })
+
+    console.log(selectedOptions.options)
 
     const toastId = toast.promise(
       new Promise((resolve, reject) =>
@@ -216,6 +238,8 @@ export function ModelContextProvider({ children }: any) {
 
   return (
     <ModelContext.Provider value={{
+      selectedOptions,
+      updateOptionValue,
       generateModel,
       cancelModelGeneration,
       viewModel,

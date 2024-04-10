@@ -3,6 +3,7 @@ import AddNodeButton from "./add-node-button"
 import { EditorContextProvider } from "@/contexts/editor-context"
 import { WorkSpaceContextProvider } from "@/contexts/workspace-context"
 import RightSidebar from "./sidebars/rightSideBar"
+import { ModelContextProvider } from "@/contexts/model-context"
 
 export default function WorkSpace() {
 
@@ -10,12 +11,14 @@ export default function WorkSpace() {
     <WorkSpaceContextProvider>
       <div className="w-svw h-svh">
         <EditorContextProvider>
+          <ModelContextProvider>
 
-          <LeftSidebar />
-          {/*
+            <LeftSidebar />
+            {/*
           <RightSidebar />
           */}
 
+          </ModelContextProvider>
         </EditorContextProvider>
       </div>
     </WorkSpaceContextProvider>

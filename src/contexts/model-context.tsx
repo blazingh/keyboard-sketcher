@@ -1,10 +1,11 @@
+"use client"
 import ToastFinishModel from "@/components/editor/toasts/finished-model"
 import ToastPendingModel from "@/components/editor/toasts/pending-model"
 import { Canvas } from '@react-three/fiber'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { signal } from "@preact/signals-react"
-import { useState } from "react"
+import { createContext, useState } from "react"
 import { OrbitControls } from "@react-three/drei"
 import { Node } from "reactflow"
 import { toast } from "sonner"
@@ -14,6 +15,15 @@ import { ModelWorkerResult } from "@/workers/model-a-options"
 import { Switch } from "@/components/ui/switch"
 /* @ts-ignore */
 import stlSerializer from '@jscad/stl-serializer'
+
+type ModelContext = {
+  generateModel: (nodes: Node[]) => void,
+  cancelModelGeneration: (id: number) => void,
+  viewModel: (id: number) => void,
+  deleteModel: (id: number) => void,
+}
+
+export const ModelContext = createContext<ModelContext | null>(null);
 
 type WorkerSignal = {
   id: number,
@@ -34,7 +44,7 @@ type WorkersSignal = {
 
 export const workersSigals = signal<WorkersSignal>({});
 
-export function useModelActions() {
+export function ModelContextProvider({ children }: any) {
 
   const [openModelData, setOpenModelData] = useState<WorkerSignal | null>(null)
 
@@ -204,11 +214,15 @@ export function useModelActions() {
     )
   }
 
-  return {
-    generateModel,
-    cancelModelGeneration,
-    viewModel,
-    deleteModel,
-    ModelPreviewJsx
-  };
+  return (
+    <ModelContext.Provider value={{
+      generateModel,
+      cancelModelGeneration,
+      viewModel,
+      deleteModel,
+    }}>
+      <ModelPreviewJsx />
+      {children}
+    </ModelContext.Provider>
+  )
 }

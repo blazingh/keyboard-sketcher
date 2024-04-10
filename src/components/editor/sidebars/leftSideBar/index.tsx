@@ -1,18 +1,18 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { Blocks, ChevronLeft, PencilRuler } from "lucide-react"
+import { Blocks, ChevronLeft } from "lucide-react"
 import { useContext, useState } from "react"
 import KeyboardModelsTab from "./keyboardmodels-tab"
 import { Separator } from "@/components/ui/separator"
-import { useModelActions } from "@/hooks/model-actions"
 import { useNodes } from "reactflow"
 import { workSpaceContext } from "@/contexts/workspace-context"
 import PreferanceTab from "./preferance-tab"
+import { ModelContext } from "@/contexts/model-context"
 
 export default function LeftSidebar() {
 
-  const modelActions = useModelActions()
+  const model = useContext(ModelContext)
   const workspace = useContext(workSpaceContext)
 
   const nodes = useNodes()
@@ -100,13 +100,12 @@ export default function LeftSidebar() {
           <Button
             className='w-full'
             onClick={() => {
-              modelActions.generateModel(nodes)
+              model?.generateModel(nodes)
               workspace?.updateOption("openBar", "")
             }}
           >
             Generate Model
           </Button>
-          <modelActions.ModelPreviewJsx />
         </div>
 
 

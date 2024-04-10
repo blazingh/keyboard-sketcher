@@ -117,8 +117,6 @@ export function ModelContextProvider({ children }: any) {
 
     newWorker.postMessage({ nodes: nodes, id: id, options: selectedOptions.options })
 
-    console.log(selectedOptions.options)
-
     const toastId = toast.promise(
       new Promise((resolve, reject) =>
         workersSigals.value[id] = {

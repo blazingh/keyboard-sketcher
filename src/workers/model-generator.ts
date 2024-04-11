@@ -43,6 +43,13 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
 
   const o: typeof defaultOptions = e.data.options ? { ...defaultOptions, ...e.data.options } : defaultOptions
 
+  // make sure all data are floats numbers
+  o.plateThick = parseFloat(o.plateThick as any)
+  o.wallThick = parseFloat(o.wallThick as any)
+  o.caseTopMargin = parseFloat(o.caseTopMargin as any)
+  o.caseBottomMargin = parseFloat(o.caseBottomMargin as any)
+  o.caseTopRadius = parseFloat(o.caseTopRadius as any)
+
   // limit the options values
   o.caseTopMargin = Math.max(o.plateThick + o.caseTopRadius, o.caseTopMargin)
   o.caseBottomMargin = Math.max(o.standoffThick, o.caseBottomMargin)

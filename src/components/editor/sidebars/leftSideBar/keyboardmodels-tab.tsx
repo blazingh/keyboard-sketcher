@@ -1,5 +1,5 @@
 'use client'
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Select, SelectValue, SelectItem, SelectContent, SelectTrigger } from "@/components/ui/select";
 import { HelpCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
@@ -7,6 +7,8 @@ import { modelAOptionsList } from "@/workers/model-a-options";
 import { Input } from "@/components/ui/input";
 import { HelperTooltip } from "@/components/helper-tooltip";
 import { ModelContext } from "@/contexts/model-context";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent } from "@/components/ui/dropdown-menu";
+import NumpadInput from "@/components/numpad-input";
 
 export default function KeyboardModelsTab() {
 
@@ -44,11 +46,10 @@ export default function KeyboardModelsTab() {
                 <label className="text-sm">{option.label}</label>
                 <HelperTooltip desc={option.description} />
               </div>
-              <Input
-                type="number"
-                value={model?.selectedOptions.options[option.key]}
-                onChange={(e) => {
-                  model?.updateOptionValue(modelType, option.key, parseFloat(e.target.value))
+              <NumpadInput
+                value={String(model?.selectedOptions.options[option.key] || 0)}
+                onValueChange={(v) => {
+                  model?.updateOptionValue(modelType, option.key, v)
                 }}
               />
             </div>

@@ -1,0 +1,10 @@
+  .react-flow__node, .react-flow__node-toolbar  {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+    will-change: transform,
+  }
+
+  .react-flow__node.dragging , .react-flow__pane.dragging ~ .react-flow__node-toolbar {
+    transition-duration: 0ms;
+  }

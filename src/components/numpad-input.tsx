@@ -46,11 +46,11 @@ export default function NumpadInput({
         <Input
           readOnly
           value={value}
-          className={open ? "outline outline-primary" : ""}
+          className={open ? "border-2 border-primary" : ""}
         />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className='p-0 border-none my-1 shadow'>
-        <div className='animate-jump-in animate-duration-200 animate-ease-in-out'>
+      <DropdownMenuContent align="end" className='p-0 border-none my-0 shadow'>
+        <div className='animate-pop-in'>
           <Keyboard
             keyboardRef={r => ref.current = r}
             onInit={k => k.setInput(value)}
@@ -58,24 +58,33 @@ export default function NumpadInput({
             onKeyPress={onKeyPress}
             theme='bg-secondary w-fit rounded-md border p-2'
             useButtonTag
+            display={{
+              "p": "+/-",
+              "{bksp}": "<",
+              "d": "✓",
+              "e": "X",
+            }}
             buttonTheme={[
               {
-                class: buttonVariants({ variant: "white" }) + " rounded-[4px] m-1 w-10 h-10",
-                buttons: "1 2 3 4 5 6 7 8 9 0 - ."
+                class: buttonVariants({ variant: "white" }) + " rounded-[2px] m-0.5 w-8 h-8 md:w-10 md:h-10",
+                buttons: "1 2 3 4 5 6 7 8 9 0 - . p C {bksp}"
               },
               {
-                class: buttonVariants({ variant: "white" }) + " rounded-[4px] m-1 w-[138px] h-10",
-                buttons: "{bksp}"
+                class: buttonVariants({ variant: "default" }) + " rounded-[2px] m-0.5 w-8 h-8 md:w-10 md:h-10",
+                buttons: "d"
+              },
+              {
+                class: buttonVariants({ variant: "destructive" }) + " rounded-[2px] m-0.5 w-8 h-8 md:w-10 md:h-10",
+                buttons: "e"
               },
             ]}
             layoutName='default'
             layout={{
               default: [
-                "7 8 9 ",
-                "4 5 6",
-                "1 2 3",
-                "- 0 .",
-                "{bksp}"
+                "7 8 9 {bksp}",
+                "4 5 6 d",
+                "1 2 3 e",
+                ". 0 p C",
               ]
             }}
           />

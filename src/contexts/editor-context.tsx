@@ -3,7 +3,7 @@ import { Mcu } from "@/components/editor/nodes/mcu";
 import { Outline } from "@/components/editor/nodes/outline";
 import { Switch } from "@/components/editor/nodes/switch";
 import { buttonVariants } from "@/components/ui/button";
-import { initialNodes } from "@/constants/temp";
+import { initialNodes, initialOutlineNode } from "@/constants/temp";
 import { cn } from "@/lib/utils";
 import { PlusIcon } from 'lucide-react';
 import { ReactNode, createContext, useContext, useMemo, useState } from "react";
@@ -55,6 +55,10 @@ export function FlowEditorContextProvider({ children }: any) {
   const [store, setStore] = useState<EditorContext["store"]>({
     basePos: { x: 0, y: 0 }
   })
+
+  function handleInit() {
+    onNodesChange([{ type: "add", item: initialOutlineNode }])
+  }
 
   function handleNodeChange(changes: NodeChange[]) {
     const modChanges = changes.map((node: NodeChange) => {
@@ -160,7 +164,7 @@ export function FlowEditorContextProvider({ children }: any) {
         nodeTypes={nodeTypes}
         onNodesChange={handleNodeChange}
         className="relative"
-      //        onNodeDoubleClick={(_, node) => onNodesChange([{ type: "select", id: node.id, selected: false }])}
+        onInit={handleInit}
       >
         <Background gap={10} variant={BackgroundVariant.Dots} />
 

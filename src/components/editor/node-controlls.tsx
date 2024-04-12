@@ -14,24 +14,6 @@ export default function NodesControll() {
   const editor = useContext(EditorContext)
   const workspace = useContext(workSpaceContext)
 
-  const [heldButton, setHeldButton] = useState<string>("");
-
-  const handleMouseDown = (btn: string) => {
-    setHeldButton(btn);
-  };
-
-  const handleMouseUp = () => {
-    setHeldButton("");
-  };
-
-  useEffect(() => {
-    if (heldButton === "") return
-    const id = setInterval(() => {
-      editor?.moveSelectedNodes(heldButton as any)
-    }, 100)
-    return () => clearInterval(id)
-  }, [heldButton, editor])
-
   const centerPos: { x: number, y: number } = function() {
     if (!editor?.nodes) return { x: 0, y: 0 }
     const positons: any = []
@@ -97,47 +79,23 @@ export default function NodesControll() {
           <div className="grid grid-cols-3 gap-2 *:w-10 *:h-10 *:flex-shrink-0 w-fit">
             <div />
             <Button
-              onClick={() => editor.moveSelectedNodes("U")}
-              onMouseDown={() => handleMouseDown("U")}
-              onTouchStart={() => handleMouseDown("U")}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onTouchEnd={handleMouseUp}
-              onTouchCancel={handleMouseUp}
+              onClick={() => editor.moveSelectedNodes("Y", -10)}
             >
               <ArrowUp className="flex-shrink-0 w-5" />
             </Button>
             <div />
             <Button
-              onClick={() => editor.moveSelectedNodes("L")}
-              onMouseDown={() => handleMouseDown("L")}
-              onTouchStart={() => handleMouseDown("L")}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onTouchEnd={handleMouseUp}
-              onTouchCancel={handleMouseUp}
+              onClick={() => editor.moveSelectedNodes("X", -10)}
             >
               <ArrowLeft className="flex-shrink-0 w-5" />
             </Button>
             <Button
-              onClick={() => editor.moveSelectedNodes("D")}
-              onMouseDown={() => handleMouseDown("D")}
-              onTouchStart={() => handleMouseDown("D")}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onTouchEnd={handleMouseUp}
-              onTouchCancel={handleMouseUp}
+              onClick={() => editor.moveSelectedNodes("Y", 10)}
             >
               <ArrowDown className="flex-shrink-0 w-5" />
             </Button>
             <Button
-              onClick={() => editor.moveSelectedNodes("R")}
-              onMouseDown={() => handleMouseDown("R")}
-              onTouchStart={() => handleMouseDown("R")}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onTouchEnd={handleMouseUp}
-              onTouchCancel={handleMouseUp}
+              onClick={() => editor.moveSelectedNodes("X", 10)}
             >
               <ArrowRight className="flex-shrink-0 w-5" />
             </Button>

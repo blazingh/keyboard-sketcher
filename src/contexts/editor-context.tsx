@@ -15,11 +15,12 @@ import 'reactflow/dist/style.css';
 import { workSpaceContext } from "./workspace-context";
 import { calculateCenterPosition } from "@/lib/positions";
 import NodesControll from "@/components/editor/node-controlls";
+import "../components/editor/reactflow.css"
 
 type EditorContext = {
   nodes: Node[]
   selectedNodes: string[]
-  moveSelectedNodes: (dir: "U" | "D" | "L" | "R") => void
+  moveSelectedNodes: (dir: "X" | "Y", dis?: number) => void
   duplicateSelectedNodes: (sid: Position) => void
   store: {
     basePos: {
@@ -105,13 +106,11 @@ export function FlowEditorContextProvider({ children }: any) {
     onNodesChange(changes)
   }
 
-  function moveSelectedNodes(dir: "U" | "D" | "L" | "R") {
+  function moveSelectedNodes(dir: "X" | "Y", dis: number = 10) {
     const changes: NodeChange[] = []
     let deltas = [0, 0]
-    if (dir === 'L') deltas = [-10, 0]
-    if (dir === 'R') deltas = [10, 0]
-    if (dir === 'U') deltas = [0, -10]
-    if (dir === 'D') deltas = [0, 10]
+    if (dir === 'X') deltas = [dis, 0]
+    if (dir === 'Y') deltas = [0, dis]
 
     const isMcu = nodes.find((node) => node.selected && node.type === 'mcu')
     if (isMcu && selectedNodes.length === 1) deltas = [deltas[0] * 0.5, deltas[1] * 0.5]
@@ -128,10 +127,10 @@ export function FlowEditorContextProvider({ children }: any) {
     onNodesChange(changes)
   }
 
-  useHotkeys(Key.ArrowUp, () => moveSelectedNodes('U'))
-  useHotkeys(Key.ArrowDown, () => moveSelectedNodes('D'))
-  useHotkeys(Key.ArrowLeft, () => moveSelectedNodes('L'))
-  useHotkeys(Key.ArrowRight, () => moveSelectedNodes('R'))
+  useHotkeys(Key.ArrowUp, () => moveSelectedNodes('Y', -10))
+  useHotkeys(Key.ArrowDown, () => moveSelectedNodes('Y'))
+  useHotkeys(Key.ArrowLeft, () => moveSelectedNodes('X', -10))
+  useHotkeys(Key.ArrowRight, () => moveSelectedNodes('X'))
 
   return (
     <EditorContext.Provider

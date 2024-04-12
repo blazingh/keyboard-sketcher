@@ -9,6 +9,7 @@ import { useNodes } from "reactflow"
 import { workSpaceContext } from "@/contexts/workspace-context"
 import PreferanceTab from "./preferance-tab"
 import { ModelContext } from "@/contexts/model-context"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 export default function LeftSidebar() {
 
@@ -27,11 +28,8 @@ export default function LeftSidebar() {
 
   return (
     <div className={cn(
-      "fixed bottom-0 left-0 transition-all ease-in-out w-svw md:w-[282px] h-[282px] md:h-svh z-20",
-      "translate-y-[calc(100%-280px)] md:translate-y-0 md:-translate-x-[2px]",
-      open && "z-30",
-      !open && "md:-translate-x-[280px]",
-      !open && "translate-y-[calc(100%-2px)]"
+      "fixed bottom-0 left-0 transition-all ease-in-out w-[282px] h-svh z-20",
+      !open && "-translate-x-[280px]",
     )}
     >
       {/* side bar toggle button */}
@@ -39,10 +37,10 @@ export default function LeftSidebar() {
         variant={open ? "default" : "secondary"}
         onClick={() => workspace?.updateOption("openBar", open ? "" : "left")}
         className={cn(
-          'absolute transition-all ease-in-out py-6 z-20 rounded-b-none md:rounded-l-none md:rounded-r-md',
-          "top-0 md:top-5 left-5 md:right-0 md:left-[unset] -translate-y-full md:translate-y-0 md:translate-x-full",
-          'flex items-center justify-center p-3 md:px-2 border border-primary',
-          !open && workspace?.options.openBar !== "" && "-translate-y-[calc(100%+278px)] md:translate-x-[calc(100%+278px)] md:translate-y-0"
+          'absolute transition-all ease-in-out py-6 z-20 rounded-l-none',
+          "top-5 right-0 translate-x-full",
+          'flex items-center justify-center p-3 md:px-2 border border-primary border-l-0',
+          !open && workspace?.options.openBar !== "" && "translate-x-[calc(100%+278px)]"
         )}
       >
         <Blocks className='w-5 h-5 md:w-6 md:h-6' />
@@ -52,13 +50,14 @@ export default function LeftSidebar() {
       {/* tabs content */}
       <div
         className={cn(
-          "w-full h-full overflow-hidden flex flex-col p-4 gap-4 relative border-2 border-primary bg-background",
-          open && "rounded-t-2xl md:rounded-r-2xl md:rounded-l-none"
+          "w-full h-full overflow-hidden flex flex-col p-4 gap-4 relative border-r-2 border-primary bg-background",
+          open && "rounded-r-2xl"
         )}
       >
+
         <div
           className={cn(
-            "w-full h-full bg-background absolute top-0 left-0 transition-transform z-10 p-4 flex flex-col gap-4",
+            "w-full h-full bg-background absolute top-0 left-0 transition-transform z-10 p-4 pr-0 flex flex-col gap-4",
             selectedTab.visible ? 'translate-x-0' : 'translate-x-full'
           )}
         >
@@ -75,7 +74,9 @@ export default function LeftSidebar() {
             </span>
           </div>
 
-          {<selectedTab.content />}
+          <ScrollArea className="h-[calc(100%-8rem)] w-full p-0 pr-4">
+            {<selectedTab.content />}
+          </ScrollArea>
 
         </div>
 
@@ -95,7 +96,7 @@ export default function LeftSidebar() {
           Editor Performance
         </Button>
 
-        <div className="absolute bottom-0 left-0 w-full flex flex-col gap-4 p-4">
+        <div className="absolute bottom-0 left-0 w-full flex flex-col gap-4 p-4 z-10">
           <Separator />
           <Button
             className='w-full'

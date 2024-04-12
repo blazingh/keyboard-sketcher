@@ -8,20 +8,14 @@ import { ModelContext } from "@/contexts/model-context";
 
 export function Outline() {
   const nodes = useNodes();
-  const ref = useRef<any>(!null)
 
   const model = useContext(ModelContext)
+  const wsc = useContext(workSpaceContext)
+
+  const polyInnerRef = useRef<any>()
+  const polyOuterRef = useRef<any>()
 
   const [cleared, setCleared] = useState(false)
-  const [size, setSize] = useState(750)
-
-  useEffect(() => {
-    setTimeout(function() {
-      setSize(5000)
-    }, 500);
-  }, [setSize])
-
-  const wsc = useContext(workSpaceContext)
 
   const points = useMemo(() => {
     if (wsc?.options.renderOuline === false) return { inner: [], outer: [] }
@@ -35,43 +29,28 @@ export function Outline() {
     }
   }, [nodes, wsc?.options.renderOuline, model])
 
+
   useEffect(() => {
-    if (wsc?.options.renderOuline === false && cleared) return
-    const canvas = ref.current;
-    const ctx = canvas.getContext('2d');
-    if (wsc?.options.renderOuline === false && !cleared) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (!wsc?.options.renderOuline) {
+      if (cleared) return
+      polyInnerRef?.current?.setAttribute("points", [])
+      polyOuterRef?.current?.setAttribute("points", [])
       setCleared(true)
       return
-    }
-    if (wsc?.options.renderOuline && cleared) {
+    } else if (cleared)
       setCleared(false)
-    }
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 1; // Set line width (adjust as needed)
-    ctx.beginPath(); // Start a new path for lines
-    points.inner.forEach(([x1, y1]: any, index: number) => {
-      if (index > 0) {
-        const [x2, y2] = points.inner[index - 1] as any; // Get previous point coordinates
-        ctx.moveTo(x2 + canvas.width * 0.5, y2 + canvas.width * 0.5); // Move to previous point
-        ctx.lineTo(x1 + canvas.width * 0.5, y1 + canvas.width * 0.5); // Draw line to current point
-      }
-    });
-    points.outer.forEach(([x1, y1]: any, index: number) => {
-      if (index > 0) { // Skip the first point to avoid starting without a previous point
-        const [x2, y2] = points.outer[index - 1] as any; // Get previous point coordinates
-        ctx.moveTo(x2 + canvas.width * 0.5, y2 + canvas.width * 0.5); // Move to previous point
-        ctx.lineTo(x1 + canvas.width * 0.5, y1 + canvas.width * 0.5); // Draw line to current point
-      }
-    });
-    ctx.stroke();
+
+    polyInnerRef?.current?.setAttribute("points", points.inner.map((c) => [c[0] + 2500, c[1] + 2500].join(" ")).join(" "));
+    polyOuterRef?.current?.setAttribute("points", points.outer.map((c: any) => [c[0] + 2500, c[1] + 2500].join(" ")).join(" "));
+
   }, [points, cleared, wsc?.options.renderOuline]);
 
   return (
-    <div style={{ width: size, height: size }}>
-      <canvas className='w-full h-full' ref={ref} width={5000} height={5000}>
-      </canvas>
+    <div style={{ width: 5000, height: 5000 }}>
+      <svg width={5000} height={5000} viewBox="0 0 5000 5000">
+        <polygon className="stroke-white stroke-2 fill-transparent" width={5000} height={5000} ref={polyInnerRef} />
+        <polygon className="stroke-white stroke-2 fill-transparent" width={5000} height={5000} ref={polyOuterRef} />
+      </svg>
     </div>
   )
 }

@@ -17,28 +17,37 @@ export default function NumpadInput({
 
   const [open, setOpen] = useState(false)
 
+  const [originalValue, setOriginalValue] = useState(value)
+
   const ref = useRef<any>()
 
-  const onChange = (input: string) => {
-    let newValue = input || "0"
-    if (newValue.slice(-1) === "-") newValue = newValue.slice(0, -1)
-    if (newValue.slice(0, 1) === "0" && newValue.slice(0, 2) !== "0." && newValue.length > 1) newValue = newValue.slice(1, newValue.length)
-    onValueChange(newValue)
-    // console.log("Input changed", ref.current);
-    if (!ref.current) return
-    ref.current.setInput(newValue)
-  }
-
   const onKeyPress = (button: any) => {
-    if (button === "-")
-      onValueChange(String(parseFloat(value) * -1))
-    //  console.log("Button pressed", button);
+    switch (button) {
+      case "{bksp}": // backspace
+        onValueChange(value.slice(0, -1))
+        break;
+      case "d": // done
+        setOriginalValue(value)
+        setOpen(false)
+        break;
+      case "e": // exit
+        onValueChange(originalValue)
+        setOpen(false)
+        break;
+      case "C": // clear
+        onValueChange("0")
+        break;
+      case "p": // positive negative
+        onValueChange(String(parseFloat(value) * -1))
+        break;
+      case ".": // dot
+        onValueChange(value.includes(".") ? value : value + button)
+        break;
+      default:
+        onValueChange(value === "0" ? button : value + button)
+        break;
+    }
   }
-
-  useEffect(() => {
-    if (!ref.current) return
-    ref.current.setInput(value)
-  }, [value, ref])
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -54,8 +63,8 @@ export default function NumpadInput({
           <Keyboard
             keyboardRef={r => ref.current = r}
             onInit={k => k.setInput(value)}
-            onChange={onChange}
-            onKeyPress={onKeyPress}
+            //         onChange={onChange}
+            onKeyReleased={onKeyPress}
             theme='bg-secondary w-fit rounded-md border p-2'
             useButtonTag
             display={{

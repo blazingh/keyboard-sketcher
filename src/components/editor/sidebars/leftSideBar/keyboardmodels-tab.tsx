@@ -30,8 +30,7 @@ export default function KeyboardModelsTab() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="a">Model A</SelectItem>
-            <SelectItem value="b" disabled>Model B</SelectItem>
-            <SelectItem value="c" disabled>Model C</SelectItem>
+            <SelectItem value="soon" disabled>coming soon...</SelectItem>
           </SelectContent>
         </Select>
       </div>

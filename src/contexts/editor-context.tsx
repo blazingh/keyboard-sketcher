@@ -7,7 +7,7 @@ import { initialNodes, initialOutlineNode } from "@/constants/temp";
 import { cn } from "@/lib/utils";
 import { PlusIcon } from 'lucide-react';
 import { ReactNode, createContext, useContext, useMemo, useState } from "react";
-import { isMobile } from 'react-device-detect';
+import { isMobile, isTablet } from 'react-device-detect';
 import { useHotkeys } from "react-hotkeys-hook";
 import ReactFlow, { Background, BackgroundVariant, Node, NodeChange, NodeToolbar, Position, ReactFlowProvider, useNodesState, useOnSelectionChange } from "reactflow";
 import { Key } from "ts-key-enum";
@@ -148,22 +148,18 @@ export function FlowEditorContextProvider({ children }: any) {
       <NodesControll />
       {children}
       <ReactFlow
-        snapToGrid
         fitView
+        snapToGrid
         disableKeyboardA11y
-        preventScrolling
-        zoomOnScroll
         zoomOnDoubleClick={false}
         nodeOrigin={[0.5, 0.5]}
         minZoom={0.2}
         maxZoom={5}
         snapGrid={[10, 10]}
         translateExtent={[[-2000, -2000], [2000, 2000]]}
-        nodesDraggable={!isMobile}
         nodes={nodes}
         nodeTypes={nodeTypes}
         onNodesChange={handleNodeChange}
-        className="relative"
         onInit={handleInit}
       >
         <Background gap={10} variant={BackgroundVariant.Dots} />

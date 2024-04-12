@@ -57,11 +57,11 @@ export default function LeftSidebar() {
 
         <div
           className={cn(
-            "w-full h-full bg-background absolute top-0 left-0 transition-transform z-10 p-4 pr-0 flex flex-col gap-4",
+            "w-full h-full bg-background absolute top-0 left-0 transition-transform z-10 p-2 md:p-4 pr-0 flex flex-col gap-2 md:pag-4",
             selectedTab.visible ? 'translate-x-0' : 'translate-x-full'
           )}
         >
-          <div className="flex gap-2 border-b border-primary pb-2">
+          <div className="flex gap-2 border-b border-secondary pb-1 md:pb-2">
             <Button
               variant="outline"
               className=" border-0 border-white w-8 h-8 p-0"

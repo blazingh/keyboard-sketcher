@@ -8,7 +8,7 @@ function mirrorPointsHorizontally(points: number[][]) {
   return points.map(point => [point[0] * -1, point[1]]);
 }
 
-export function getNodesBorderPoints(nodes: Node[], padding: number = 65): outlinePoints {
+export function getNodesBorderPoints(nodes: Node[], padding: number = 65, wallThick: number = 40): outlinePoints {
   let switch_nodes = nodes.filter((node: any) => node.type === "switch")
   let mcu_nodes = nodes.filter((node: any) => node.type === "mcu")
 
@@ -30,11 +30,11 @@ export function getNodesBorderPoints(nodes: Node[], padding: number = 65): outli
     initPoints.push([x + 105, y]);
     initPoints.push([x - 105, y]);
     initPoints.push([x, y + 260]);
-    initPoints.push([x, y - 220]);
+    initPoints.push([x, y - 260 + wallThick]);
     initPoints.push([x + 105, y + 260]);
     initPoints.push([x - 105, y + 260]);
-    initPoints.push([x + 105, y - 220]);
-    initPoints.push([x - 105, y - 220]);
+    initPoints.push([x + 105, y - 260 + wallThick]);
+    initPoints.push([x - 105, y - 260 + wallThick]);
   });
 
   /*

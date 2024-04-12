@@ -10,16 +10,16 @@ export default function WorkSpace() {
   return (
     <WorkSpaceContextProvider>
       <div className="w-svw h-svh">
-        <EditorContextProvider>
-          <ModelContextProvider>
+        <ModelContextProvider>
+          <EditorContextProvider>
 
             <LeftSidebar />
             {/*
           <RightSidebar />
           */}
 
-          </ModelContextProvider>
-        </EditorContextProvider>
+          </EditorContextProvider>
+        </ModelContextProvider>
       </div>
     </WorkSpaceContextProvider>
   )

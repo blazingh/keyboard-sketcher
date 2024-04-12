@@ -4,10 +4,13 @@ import { useNodes } from "reactflow";
 /* @ts-ignore */
 import Offset from "polygon-offset";
 import { workSpaceContext } from "@/contexts/workspace-context";
+import { ModelContext } from "@/contexts/model-context";
 
 export function Outline() {
   const nodes = useNodes();
   const ref = useRef<any>(!null)
+
+  const model = useContext(ModelContext)
 
   const [cleared, setCleared] = useState(false)
   const [size, setSize] = useState(750)
@@ -22,13 +25,15 @@ export function Outline() {
 
   const points = useMemo(() => {
     if (wsc?.options.renderOuline === false) return { inner: [], outer: [] }
-    const basePoints = getNodesBorderPoints(nodes, 140 / 2)
+    const basePoints = getNodesBorderPoints(nodes, 140 / 2, (model?.selectedOptions.options.wallThick || 3.5) * 10)
     const offset = new Offset()
     return {
       inner: basePoints,
-      outer: offset.data(basePoints).margin(35)[0]
+      outer: (model?.selectedOptions.options.wallThick || 0) > 0
+        ? offset.data(basePoints).margin((model?.selectedOptions.options.wallThick || 3.5) * 10)[0]
+        : []
     }
-  }, [nodes, wsc?.options.renderOuline])
+  }, [nodes, wsc?.options.renderOuline, model])
 
   useEffect(() => {
     if (wsc?.options.renderOuline === false && cleared) return

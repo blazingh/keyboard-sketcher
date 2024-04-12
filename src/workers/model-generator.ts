@@ -66,7 +66,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   const switch_nodes = nodes.filter((node: any) => node.type === "switch")
   const mcu_nodes = nodes.filter((node: any) => node.type === "mcu")
 
-  const borderPoints = getNodesBorderPoints(e.data.nodes as any)
+  const borderPoints = getNodesBorderPoints(e.data.nodes as any, 140 / 2, o.wallThick * 10)
   const sides: number[][][] = []
 
   borderPoints.map((point, index) => {

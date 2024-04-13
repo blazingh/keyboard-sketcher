@@ -43,7 +43,11 @@ export default function LeftSidebar() {
           !open && workspace?.options.openBar !== "" && "translate-x-[calc(100%+278px)]"
         )}
       >
-        <PencilRuler className='w-5 h-5 md:w-6 md:h-6 animate-wiggle-more animate-infinite animate-duration-[1800ms] animate-delay-0 animate-ease-in-out animate-normal' />
+        <PencilRuler className={cn(
+          'w-5 h-5 md:w-6 md:h-6',
+          !open && 'animate-wiggle-more animate-infinite animate-duration-[1800ms] animate-delay-0 animate-ease-in-out animate-normal'
+        )}
+        />
       </Button>
 
       {/* tabs content */}

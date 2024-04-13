@@ -1,12 +1,11 @@
 "use client"
-import Draggable from 'react-draggable';
 import { Button } from "@/components/ui/button"
 import { EditorContext } from "@/contexts/editor-context"
 import { workSpaceContext } from "@/contexts/workspace-context"
 import { calculateCenterPosition } from "@/lib/positions"
 import { cn } from "@/lib/utils"
-import { ArrowUp, ArrowRight, ArrowDown, ArrowLeft, MoveHorizontal, MoveVertical, GripHorizontal } from "lucide-react"
-import { useContext, useEffect, useState } from "react"
+import { ArrowUp, ArrowRight, ArrowDown, ArrowLeft, MoveHorizontal, MoveVertical, RefreshCw, History, Trash2 } from "lucide-react"
+import { useContext } from "react"
 
 
 export default function NodesControll() {
@@ -38,71 +37,45 @@ export default function NodesControll() {
   if (!editor) return null
 
   return (
-    <Draggable
-      handle='.handle'
+    <div
+      className={cn(
+        "absolute z-20 top-0 left-1/2 -translate-x-1/2",
+      )}
     >
       <div
         className={cn(
-          "absolute z-10 bottom-5 right-5",
+          "w-fit h-fit overflow-hidden",
+          "bg-background p-2 md:px-4 rounded-b-lg border-2 border-primary border-t-0",
+          "flex flex-col gap-2",
+          visible ? "animate-pop-in" : "hidden"
         )}
       >
-        <div
-          className={cn(
-            'handle absolute -top-2 left-1/2 -translate-x-1/2 bg-secondary rounded px-1 opacity-50 hover:opacity-100 cursor-pointer z-10',
-            visible ? "" : "hidden"
-          )}
-        >
-          <GripHorizontal className='w-4 h-4' />
-        </div>
-        <div
-          className={cn(
-            "w-[160px] h-[160px] overflow-hidden",
-            "bg-background p-4 rounded-lg border",
-            "flex flex-col gap-2 animate-duration-200 animate-ease-in-out",
-            visible ? "animate-jump-in " : "animate-jump-out "
-          )}
-        >
-          <div className="col-span-3 flex items-end justify-between w-full gap-2">
-            <span className="flex gap-1 line-clamp-1 whitespace-nowrap">
-              {diffPos.x > 0 && <ArrowRight className="w-4" />}
-              {diffPos.x < 0 && <ArrowLeft className="w-4" />}
-              {diffPos.x === 0 && <MoveHorizontal className="w-4" />}
-              {`: ${diffPos.x / 10}`}
-            </span>
-            <span className="text-right flex gap-1 line-clamp-1 whitespace-nowrap font-medium">
-              {diffPos.y > 0 && <ArrowDown className="w-4" />}
-              {diffPos.y < 0 && <ArrowUp className="w-4" />}
-              {diffPos.y === 0 && <MoveVertical className="w-4" />}
-              {`: ${diffPos.y / -10}`}
-            </span>
-          </div>
-          <div className="grid grid-cols-3 gap-2 *:w-10 *:h-10 *:flex-shrink-0 w-fit">
-            <div />
-            <Button
-              onClick={() => editor.moveSelectedNodes("Y", -10)}
-            >
-              <ArrowUp className="flex-shrink-0 w-5" />
-            </Button>
-            <div />
-            <Button
-              onClick={() => editor.moveSelectedNodes("X", -10)}
-            >
-              <ArrowLeft className="flex-shrink-0 w-5" />
-            </Button>
-            <Button
-              onClick={() => editor.moveSelectedNodes("Y", 10)}
-            >
-              <ArrowDown className="flex-shrink-0 w-5" />
-            </Button>
-            <Button
-              onClick={() => editor.moveSelectedNodes("X", 10)}
-            >
-              <ArrowRight className="flex-shrink-0 w-5" />
-            </Button>
-          </div>
+        <div className="col-span-3 flex items-center justify-between w-full gap-4">
+          <span className="flex gap-1 line-clamp-1 whitespace-nowrap">
+            {diffPos.x > 0 && <ArrowRight className="w-4" />}
+            {diffPos.x < 0 && <ArrowLeft className="w-4" />}
+            {diffPos.x === 0 && <MoveHorizontal className="w-4" />}
+            {`: ${Math.max(diffPos.x / -10, diffPos.x)}`}
+          </span>
+          <span className="flex gap-1 line-clamp-1 whitespace-nowrap font-medium">
+            {diffPos.y > 0 && <ArrowDown className="w-4" />}
+            {diffPos.y < 0 && <ArrowUp className="w-4" />}
+            {diffPos.y === 0 && <MoveVertical className="w-4" />}
+            {`: ${Math.max(diffPos.y / -10, diffPos.y)}`}
+          </span>
+          <span className="flex gap-1 line-clamp-1 whitespace-nowrap font-medium">
+            <RefreshCw className='w-4' />
+            {": 0"}
+          </span>
+          <Button variant="white" className='w-8 h-8 rounded-[4px]' >
+            <History className='w-5 flex-shrink-0' />
+          </Button>
+          <Button variant="destructive" className='w-8 h-8 rounded-[4px]' >
+            <Trash2 className='w-5 flex-shrink-0' />
+          </Button>
         </div>
       </div>
-    </Draggable>
+    </div>
   )
 }
 

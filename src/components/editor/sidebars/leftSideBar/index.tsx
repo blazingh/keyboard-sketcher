@@ -1,7 +1,7 @@
 "use client"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { Blocks, ChevronLeft } from "lucide-react"
+import { Blocks, ChevronLeft, PencilRuler } from "lucide-react"
 import { useContext, useState } from "react"
 import KeyboardModelsTab from "./keyboardmodels-tab"
 import { Separator } from "@/components/ui/separator"
@@ -20,7 +20,7 @@ export default function LeftSidebar() {
 
   const [selectedTab, setSelectedTab] = useState({
     visible: true as Boolean,
-    title: 'Keyboard Model' as string,
+    title: 'Keyboard Parameters' as string,
     content: KeyboardModelsTab as any
   })
 
@@ -28,7 +28,7 @@ export default function LeftSidebar() {
 
   return (
     <div className={cn(
-      "fixed bottom-0 left-0 transition-all ease-in-out w-[282px] h-svh z-20",
+      "fixed bottom-0 left-0 transition-all ease-in-out w-[282px] h-svh z-30",
       !open && "-translate-x-[280px]",
     )}
     >
@@ -38,14 +38,13 @@ export default function LeftSidebar() {
         onClick={() => workspace?.updateOption("openBar", open ? "" : "left")}
         className={cn(
           'absolute transition-all ease-in-out py-6 z-20 rounded-l-none',
-          "top-5 right-0 translate-x-full",
+          "bottom-5 right-0 translate-x-full ",
           'flex items-center justify-center p-3 md:px-2 border border-primary border-l-0',
           !open && workspace?.options.openBar !== "" && "translate-x-[calc(100%+278px)]"
         )}
       >
-        <Blocks className='w-5 h-5 md:w-6 md:h-6' />
+        <PencilRuler className='w-5 h-5 md:w-6 md:h-6 animate-wiggle-more animate-infinite animate-duration-[1800ms] animate-delay-0 animate-ease-in-out animate-normal' />
       </Button>
-
 
       {/* tabs content */}
       <div

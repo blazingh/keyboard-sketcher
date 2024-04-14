@@ -55,13 +55,13 @@ export default function NodesControll() {
             {diffPos.x > 0 && <ArrowRight className="w-4" />}
             {diffPos.x < 0 && <ArrowLeft className="w-4" />}
             {diffPos.x === 0 && <MoveHorizontal className="w-4" />}
-            {`: ${Math.max(diffPos.x / -10, diffPos.x)}`}
+            {`: ${Math.max(diffPos.x / -10, diffPos.x / 10)}`}
           </span>
           <span className="flex gap-1 line-clamp-1 whitespace-nowrap font-medium">
             {diffPos.y > 0 && <ArrowDown className="w-4" />}
             {diffPos.y < 0 && <ArrowUp className="w-4" />}
             {diffPos.y === 0 && <MoveVertical className="w-4" />}
-            {`: ${Math.max(diffPos.y / -10, diffPos.y)}`}
+            {`: ${Math.max(diffPos.y / -10, diffPos.y / 10)}`}
           </span>
           <span className="flex gap-1 line-clamp-1 whitespace-nowrap font-medium">
             <RefreshCw className='w-4' />

@@ -5,7 +5,7 @@ import { Switch } from "@/components/editor/nodes/switch";
 import { buttonVariants } from "@/components/ui/button";
 import { initialNodes, initialOutlineNode } from "@/constants/temp";
 import { cn } from "@/lib/utils";
-import { PlusIcon } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, PlusIcon } from 'lucide-react';
 import { ReactNode, createContext, useContext, useMemo, useState } from "react";
 import { isMobile, isTablet } from 'react-device-detect';
 import { useHotkeys } from "react-hotkeys-hook";
@@ -156,6 +156,7 @@ export function FlowEditorContextProvider({ children }: any) {
         minZoom={0.2}
         maxZoom={5}
         snapGrid={[10, 10]}
+        panOnDrag={isMobile || isTablet ? true : [1, 2, 3, 4]}
         translateExtent={[[-2000, -2000], [2000, 2000]]}
         nodes={nodes}
         nodeTypes={nodeTypes}
@@ -176,18 +177,23 @@ export function FlowEditorContextProvider({ children }: any) {
             key={position}
             nodeId={selectedNodes}
             position={position}
-            onClick={() => duplicateSelectedNodes(position)}
+            onClick={() => {
+              position === Position.Top && moveSelectedNodes("Y", -10)
+              position === Position.Bottom && moveSelectedNodes("Y", 10)
+              position === Position.Left && moveSelectedNodes("X", -10)
+              position === Position.Right && moveSelectedNodes("X", 10)
+
+            }}
             className={cn(
               buttonVariants(),
               'p-0 h-6 w-6 lg:h-8 lg:w-8 flex items-center justify-center opacity-50 hover:opacity-100',
-              position === Position.Top && "mt-2",
-              position === Position.Bottom && "-mt-2",
-              position === Position.Left && "ml-2",
-              position === Position.Right && "-ml-2",
-
+              '*:w-4 *:h-4 *:flex-shrink-0',
             )}
           >
-            <PlusIcon className='w-4 h-4 flex-shrink-0' />
+            {position === Position.Top && <ChevronUp />}
+            {position === Position.Bottom && <ChevronDown />}
+            {position === Position.Left && <ChevronLeft />}
+            {position === Position.Right && <ChevronRight />}
           </NodeToolbar>
         ))}
       </ReactFlow>

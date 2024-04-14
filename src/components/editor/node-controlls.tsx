@@ -70,7 +70,11 @@ export default function NodesControll() {
           <Button variant="white" className='w-8 h-8 rounded-[4px]' >
             <History className='w-5 flex-shrink-0' />
           </Button>
-          <Button variant="destructive" className='w-8 h-8 rounded-[4px]' >
+          <Button
+            variant="destructive"
+            className='w-8 h-8 rounded-[4px]'
+            onClick={editor.deleteSelectedNodes}
+          >
             <Trash2 className='w-5 flex-shrink-0' />
           </Button>
         </div>

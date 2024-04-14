@@ -22,6 +22,7 @@ type EditorContext = {
   selectedNodes: string[]
   moveSelectedNodes: (dir: "X" | "Y", dis?: number) => void
   duplicateSelectedNodes: (sid: Position) => void
+  deleteSelectedNodes: () => void
   store: {
     basePos: {
       x: number
@@ -83,6 +84,14 @@ export function FlowEditorContextProvider({ children }: any) {
     },
   });
 
+  function deleteSelectedNodes() {
+    const changes: NodeChange[] = []
+    selectedNodes.forEach((nodeId) => {
+      changes.push({ type: "remove", id: nodeId })
+    })
+    onNodesChange(changes)
+  }
+
   function duplicateSelectedNodes(side: Position) {
     const changes: NodeChange[] = []
     let deltas = [0, 0]
@@ -143,6 +152,7 @@ export function FlowEditorContextProvider({ children }: any) {
         selectedNodes,
         moveSelectedNodes,
         duplicateSelectedNodes,
+        deleteSelectedNodes,
         store
       }}>
       <NodesControll />

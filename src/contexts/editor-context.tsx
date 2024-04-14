@@ -20,9 +20,10 @@ import "../components/editor/reactflow.css"
 type EditorContext = {
   nodes: Node[]
   selectedNodes: string[]
-  moveSelectedNodes: (dir: "X" | "Y", dis?: number) => void
+  moveSelectedNodes: (dir: "X" | "Y" | "XY", dis?: number | number[]) => void
   duplicateSelectedNodes: (sid: Position) => void
   deleteSelectedNodes: () => void
+  unselectAllNodes: () => void
   store: {
     basePos: {
       x: number
@@ -92,6 +93,14 @@ export function FlowEditorContextProvider({ children }: any) {
     onNodesChange(changes)
   }
 
+  function unselectAllNodes() {
+    const changes: NodeChange[] = []
+    selectedNodes.forEach((nodeId) => {
+      changes.push({ type: "select", id: nodeId, selected: false })
+    })
+    onNodesChange(changes)
+  }
+
   function duplicateSelectedNodes(side: Position) {
     const changes: NodeChange[] = []
     let deltas = [0, 0]
@@ -119,11 +128,12 @@ export function FlowEditorContextProvider({ children }: any) {
     onNodesChange(changes)
   }
 
-  function moveSelectedNodes(dir: "X" | "Y", dis: number = 10) {
+  function moveSelectedNodes(dir: "X" | "Y" | "XY", dis: number | number[] = 10) {
     const changes: NodeChange[] = []
     let deltas = [0, 0]
-    if (dir === 'X') deltas = [dis, 0]
-    if (dir === 'Y') deltas = [0, dis]
+    if (dir === 'X' && typeof dis === "number") deltas = [dis, 0]
+    if (dir === 'Y' && typeof dis === "number") deltas = [0, dis]
+    if (dir === 'XY' && Array.isArray(dis)) deltas = [dis[0], dis[1]]
 
     const isMcu = nodes.find((node) => node.selected && node.type === 'mcu')
     if (isMcu && selectedNodes.length === 1) deltas = [deltas[0] * 0.5, deltas[1] * 0.5]
@@ -153,6 +163,7 @@ export function FlowEditorContextProvider({ children }: any) {
         moveSelectedNodes,
         duplicateSelectedNodes,
         deleteSelectedNodes,
+        unselectAllNodes,
         store
       }}>
       <NodesControll />

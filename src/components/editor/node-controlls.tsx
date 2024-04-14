@@ -32,6 +32,16 @@ export default function NodesControll() {
     }
   }()
 
+  function handleRollBack() {
+    editor?.unselectAllNodes()
+    if (diffPos.x !== 0 && diffPos.y !== 0) {
+      editor?.moveSelectedNodes("XY", [-diffPos.x, -diffPos.y])
+      return
+    }
+    if (diffPos.x !== 0) editor?.moveSelectedNodes("X", -diffPos.x)
+    if (diffPos.y !== 0) editor?.moveSelectedNodes("Y", -diffPos.y)
+  }
+
   const visible = editor && editor.selectedNodes.length > 0 && workspace?.options.showNodeController
 
   if (!editor) return null
@@ -67,7 +77,11 @@ export default function NodesControll() {
             <RefreshCw className='w-4' />
             {": 0"}
           </span>
-          <Button variant="white" className='w-8 h-8 rounded-[4px]' >
+          <Button
+            variant="white"
+            className='w-8 h-8 rounded-[4px]'
+            onClick={handleRollBack}
+          >
             <History className='w-5 flex-shrink-0' />
           </Button>
           <Button

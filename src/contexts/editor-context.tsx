@@ -5,7 +5,7 @@ import { Switch } from "@/components/editor/nodes/switch";
 import { buttonVariants } from "@/components/ui/button";
 import { initialNodes, initialOutlineNode } from "@/constants/temp";
 import { cn } from "@/lib/utils";
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, PlusIcon } from 'lucide-react';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react';
 import { ReactNode, createContext, useContext, useMemo, useState } from "react";
 import { isMobile, isTablet } from 'react-device-detect';
 import { useHotkeys } from "react-hotkeys-hook";
@@ -63,27 +63,31 @@ export function FlowEditorContextProvider({ children }: any) {
   }
 
   function handleNodeChange(changes: NodeChange[]) {
-    const modChanges = changes.map((node: NodeChange) => {
-      if (
-        node.type === "select"
-        && workspace?.options.selectActive
-        && selectedNodes.length !== changes.length
-      ) {
-        return { ...node, selected: true }
+    const modChanges: NodeChange[] = []
+    changes.forEach((change: NodeChange) => {
+      switch (change.type) {
+        case "select":
+          if (selectedNodes.length !== changes.length)
+            modChanges.push({ ...change, selected: true })
+          else
+            modChanges.push(change)
+          break;
+        default:
+          modChanges.push(change)
+          break;
       }
-      return node
     })
     onNodesChange(modChanges)
   }
 
-  useOnSelectionChange({
-    onChange: ({ nodes }: { nodes: Node[] }) => {
-      setSelectedNodes(nodes.map((node) => node.id));
-      const positions = nodes.map((node) => node.position)
-      const center = calculateCenterPosition(positions)
-      setStore(p => ({ ...p, basePos: center || { x: 0, y: 0 } }))
-    },
-  });
+  function handleSelectionChange({ nodes }: { nodes: Node[] }) {
+    setSelectedNodes(nodes.map((node) => node.id));
+    const positions = nodes.map((node) => node.position)
+    const center = calculateCenterPosition(positions)
+    setStore(p => ({ ...p, basePos: center || { x: 0, y: 0 } }))
+  }
+
+  useOnSelectionChange({ onChange: handleSelectionChange })
 
   function deleteSelectedNodes() {
     const changes: NodeChange[] = []
@@ -208,7 +212,7 @@ export function FlowEditorContextProvider({ children }: any) {
             className={cn(
               buttonVariants(),
               'p-0 h-6 w-6 lg:h-8 lg:w-8 flex items-center justify-center opacity-50 hover:opacity-100',
-              '*:w-4 *:h-4 *:flex-shrink-0',
+              '*:w-5 *:h-5 *:flex-shrink-0',
             )}
           >
             {position === Position.Top && <ChevronUp />}

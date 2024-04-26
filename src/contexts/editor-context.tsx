@@ -6,16 +6,17 @@ import { buttonVariants } from "@/components/ui/button";
 import { initialNodes, initialOutlineNode } from "@/constants/temp";
 import { cn } from "@/lib/utils";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react';
-import { ReactNode, createContext, useContext, useMemo, useState } from "react";
+import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from "react";
 import { isMobile, isTablet } from 'react-device-detect';
 import { useHotkeys } from "react-hotkeys-hook";
-import ReactFlow, { Background, BackgroundVariant, Node, NodeChange, NodeToolbar, Position, ReactFlowProvider, useNodesState, useOnSelectionChange } from "reactflow";
+import ReactFlow, { Background, BackgroundVariant, Node, NodeChange, NodeSelectionChange, NodeToolbar, Position, ReactFlowProvider, useNodesState, useOnSelectionChange } from "reactflow";
 import { Key } from "ts-key-enum";
 import 'reactflow/dist/style.css';
 import { workSpaceContext } from "./workspace-context";
 import { calculateCenterPosition } from "@/lib/positions";
 import NodesControll from "@/components/editor/node-controlls";
 import "../components/editor/reactflow.css"
+import { without, xor } from "lodash"
 
 type EditorContext = {
   nodes: Node[]
@@ -63,14 +64,16 @@ export function FlowEditorContextProvider({ children }: any) {
   }
 
   function handleNodeChange(changes: NodeChange[]) {
+    console.log(changes)
     const modChanges: NodeChange[] = []
     changes.forEach((change: NodeChange) => {
       switch (change.type) {
         case "select":
-          if (selectedNodes.length !== changes.length)
-            modChanges.push({ ...change, selected: true })
-          else
-            modChanges.push(change)
+          if (change.selected && !selectedNodes.includes(change.id))
+            setSelectedNodes(p => [...p, change.id])
+          if (!change.selected && selectedNodes.includes(change.id))
+            setSelectedNodes(p => without(p, change.id))
+          modChanges.push(change)
           break;
         default:
           modChanges.push(change)
@@ -80,14 +83,18 @@ export function FlowEditorContextProvider({ children }: any) {
     onNodesChange(modChanges)
   }
 
-  function handleSelectionChange({ nodes }: { nodes: Node[] }) {
-    setSelectedNodes(nodes.map((node) => node.id));
-    const positions = nodes.map((node) => node.position)
+  function handleSelectionChange(nodesIds: string[]) {
+    const newNodes = nodes.filter(node => nodesIds.includes(node.id))
+    const positions = newNodes.map((node) => node.position)
     const center = calculateCenterPosition(positions)
     setStore(p => ({ ...p, basePos: center || { x: 0, y: 0 } }))
   }
 
-  useOnSelectionChange({ onChange: handleSelectionChange })
+  useEffect(() => {
+    handleSelectionChange(selectedNodes)
+  }, [selectedNodes])
+
+  //  useOnSelectionChange({ onChange: handleSelectionChange })
 
   function deleteSelectedNodes() {
     const changes: NodeChange[] = []
@@ -102,7 +109,7 @@ export function FlowEditorContextProvider({ children }: any) {
     selectedNodes.forEach((nodeId) => {
       changes.push({ type: "select", id: nodeId, selected: false })
     })
-    onNodesChange(changes)
+    handleNodeChange(changes)
   }
 
   function duplicateSelectedNodes(side: Position) {
@@ -176,6 +183,7 @@ export function FlowEditorContextProvider({ children }: any) {
         fitView
         snapToGrid
         disableKeyboardA11y
+        selectionOnDrag
         zoomOnDoubleClick={false}
         nodeOrigin={[0.5, 0.5]}
         minZoom={0.2}

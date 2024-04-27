@@ -17,6 +17,8 @@ import { calculateCenterPosition } from "@/lib/positions";
 import NodesControll from "@/components/editor/node-controlls";
 import "../components/editor/reactflow.css"
 import { without, xor } from "lodash"
+import { getHelperLines } from "@/lib/helpers-lines";
+import { HelperLinesRenderer } from "@/components/editor/helper-lines";
 
 type EditorContext = {
   nodes: Node[]
@@ -55,30 +57,60 @@ export function FlowEditorContextProvider({ children }: any) {
 
   const workspace = useContext(workSpaceContext)
 
+  const [helperLineHorizontal, setHelperLineHorizontal] = useState<
+    number | undefined
+  >(undefined);
+  const [helperLineVertical, setHelperLineVertical] = useState<
+    number | undefined
+  >(undefined);
+
   const [store, setStore] = useState<EditorContext["store"]>({
-    basePos: { x: 0, y: 0 }
+    basePos: { x: 0, y: 0 },
   })
 
   function handleInit() {
     onNodesChange([{ type: "add", item: initialOutlineNode }])
   }
 
+  function resetHelperLines() {
+    setHelperLineHorizontal(undefined);
+    setHelperLineVertical(undefined);
+  }
+
+  function setHelperLines(pos: any) {
+    setHelperLineHorizontal(pos.horizontal);
+    setHelperLineVertical(pos.vertical);
+  }
+
   function handleNodeChange(changes: NodeChange[]) {
-    console.log(changes)
     const modChanges: NodeChange[] = []
+    const selectionChanges: NodeSelectionChange[] = []
+    resetHelperLines()
     changes.forEach((change: NodeChange) => {
       switch (change.type) {
         case "select":
-          if (change.selected && !selectedNodes.includes(change.id))
-            setSelectedNodes(p => [...p, change.id])
-          if (!change.selected && selectedNodes.includes(change.id))
-            setSelectedNodes(p => without(p, change.id))
-          modChanges.push(change)
+          const modChange = change
+          if (workspace?.options.multiselection && changes.length !== selectedNodes.length)
+            modChange.selected = true
+          modChanges.push(modChange)
+          selectionChanges.push(modChange)
           break;
+        case "position":
+          if (changes.length === 1 && change.dragging) {
+            setHelperLines(getHelperLines(change, nodes))
+          }
+          modChanges.push(change)
+          break
         default:
           modChanges.push(change)
           break;
       }
+    })
+    selectionChanges.forEach((change: NodeSelectionChange) => {
+      if (change.selected && !selectedNodes.includes(change.id))
+        setSelectedNodes(p => [...p, change.id])
+      if (!change.selected && selectedNodes.includes(change.id))
+        setSelectedNodes(p => without(p, change.id))
     })
     onNodesChange(modChanges)
   }
@@ -183,13 +215,15 @@ export function FlowEditorContextProvider({ children }: any) {
         fitView
         snapToGrid
         disableKeyboardA11y
-        selectionOnDrag
-        zoomOnDoubleClick={false}
         nodeOrigin={[0.5, 0.5]}
         minZoom={0.2}
         maxZoom={5}
         snapGrid={[10, 10]}
+
+        selectionOnDrag
+        zoomOnDoubleClick={false}
         panOnDrag={isMobile || isTablet ? true : [1, 2, 3, 4]}
+
         translateExtent={[[-2000, -2000], [2000, 2000]]}
         nodes={nodes}
         nodeTypes={nodeTypes}
@@ -197,6 +231,11 @@ export function FlowEditorContextProvider({ children }: any) {
         onInit={handleInit}
       >
         <Background gap={10} variant={BackgroundVariant.Dots} />
+
+        <HelperLinesRenderer
+          horizontal={helperLineHorizontal}
+          vertical={helperLineVertical}
+        />
 
         {/* switch add buttons */}
         {[

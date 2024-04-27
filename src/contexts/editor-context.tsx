@@ -1,24 +1,24 @@
 "use client";
+import { HelperLinesRenderer } from "@/components/editor/helper-lines";
+import NodesControll from "@/components/editor/node-controlls";
 import { Mcu } from "@/components/editor/nodes/mcu";
 import { Outline } from "@/components/editor/nodes/outline";
 import { Switch } from "@/components/editor/nodes/switch";
 import { buttonVariants } from "@/components/ui/button";
 import { initialNodes, initialOutlineNode } from "@/constants/temp";
+import { getHelperLines } from "@/lib/helpers-lines";
+import { calculateCenterPosition } from "@/lib/positions";
 import { cn } from "@/lib/utils";
+import { without } from "lodash";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react';
 import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from "react";
 import { isMobile, isTablet } from 'react-device-detect';
 import { useHotkeys } from "react-hotkeys-hook";
-import ReactFlow, { Background, BackgroundVariant, Node, NodeChange, NodeSelectionChange, NodeToolbar, Position, ReactFlowProvider, useNodesState, useOnSelectionChange } from "reactflow";
-import { Key } from "ts-key-enum";
+import ReactFlow, { Background, BackgroundVariant, Node, NodeChange, NodeSelectionChange, NodeToolbar, Position, ReactFlowProvider, useNodesState } from "reactflow";
 import 'reactflow/dist/style.css';
+import { Key } from "ts-key-enum";
+import "../components/editor/reactflow.css";
 import { workSpaceContext } from "./workspace-context";
-import { calculateCenterPosition } from "@/lib/positions";
-import NodesControll from "@/components/editor/node-controlls";
-import "../components/editor/reactflow.css"
-import { without, xor } from "lodash"
-import { getHelperLines } from "@/lib/helpers-lines";
-import { HelperLinesRenderer } from "@/components/editor/helper-lines";
 
 type EditorContext = {
   nodes: Node[]
@@ -57,12 +57,8 @@ export function FlowEditorContextProvider({ children }: any) {
 
   const workspace = useContext(workSpaceContext)
 
-  const [helperLineHorizontal, setHelperLineHorizontal] = useState<
-    number | undefined
-  >(undefined);
-  const [helperLineVertical, setHelperLineVertical] = useState<
-    number | undefined
-  >(undefined);
+  const [helperLineHorizontal, setHelperLineHorizontal] = useState<number | undefined>(undefined);
+  const [helperLineVertical, setHelperLineVertical] = useState<number | undefined>(undefined);
 
   const [store, setStore] = useState<EditorContext["store"]>({
     basePos: { x: 0, y: 0 },
@@ -125,8 +121,6 @@ export function FlowEditorContextProvider({ children }: any) {
   useEffect(() => {
     handleSelectionChange(selectedNodes)
   }, [selectedNodes])
-
-  //  useOnSelectionChange({ onChange: handleSelectionChange })
 
   function deleteSelectedNodes() {
     const changes: NodeChange[] = []
@@ -254,7 +248,6 @@ export function FlowEditorContextProvider({ children }: any) {
               position === Position.Bottom && moveSelectedNodes("Y", 10)
               position === Position.Left && moveSelectedNodes("X", -10)
               position === Position.Right && moveSelectedNodes("X", 10)
-
             }}
             className={cn(
               buttonVariants(),

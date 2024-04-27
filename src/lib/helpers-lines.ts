@@ -26,7 +26,6 @@ export function getHelperLines(
 
   const VWA = (nodeA.width ?? 0) / 2
   const VHA = (nodeA.height ?? 0) / 2
-
   const nodeABounds = {
     left: change.position.x - VWA,
     right: change.position.x + (nodeA.width ?? 0) - VWA,
@@ -40,10 +39,10 @@ export function getHelperLines(
   let verticalDistance = distance;
 
   return nodes
-    .filter((node) => node.id !== nodeA.id)
+    .filter((node) => node.id !== nodeA.id && node.type === nodeA.type)
     .reduce<GetHelperLinesResult>((result, nodeB) => {
-      const VWB = (nodeA.width ?? 0) / 2
-      const VHB = (nodeA.height ?? 0) / 2
+      const VWB = (nodeB.width ?? 0) / 2
+      const VHB = (nodeB.height ?? 0) / 2
       const nodeBBounds = {
         left: nodeB.position.x - VWB,
         right: nodeB.position.x + (nodeB.width ?? 0) - VWB,

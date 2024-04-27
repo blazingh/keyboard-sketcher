@@ -6,15 +6,15 @@ export function Mcu(props: NodeProps) {
   return (
     <div
       className={cn(
-        'w-[140px] h-[140px] border-2 border-foreground rounded-md bg-green-500 relative opacity-50',
+        'border-2 border-foreground rounded-md bg-green-500 relative opacity-50',
         props.selected && 'border-primary',
         props.data.overlaped && 'bg-destructive',
         props.data.overlaped && props.selected && 'border-destructive-foreground',
       )}
       style={{
         transform: `rotate(${props.data.rotation}deg)`,
-        width: `${props.data.width || 140}px`,
-        height: `${props.data.height || 280}px`,
+        width: `${props.data.width}px`,
+        height: `${props.data.height}px`,
         zIndex: 1
       }}
     >

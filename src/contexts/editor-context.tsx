@@ -14,7 +14,7 @@ import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react'
 import { ReactNode, createContext, useContext, useEffect, useMemo, useState } from "react";
 import { isMobile, isTablet } from 'react-device-detect';
 import { useHotkeys } from "react-hotkeys-hook";
-import ReactFlow, { Background, BackgroundVariant, Node, NodeChange, NodeSelectionChange, NodeToolbar, Position, ReactFlowProvider, useNodesState } from "reactflow";
+import ReactFlow, { Background, BackgroundVariant, Node, NodeChange, NodeSelectionChange, NodeToolbar, Position, ReactFlowProvider, useNodesState, useStoreApi } from "reactflow";
 import 'reactflow/dist/style.css';
 import { Key } from "ts-key-enum";
 import "../components/editor/reactflow.css";
@@ -53,6 +53,8 @@ export function FlowEditorContextProvider({ children }: any) {
 
   const [nodes, _, onNodesChange] = useNodesState(initialNodes);
 
+  const flowStore = useStoreApi()
+
   const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
 
   const workspace = useContext(workSpaceContext)
@@ -65,6 +67,7 @@ export function FlowEditorContextProvider({ children }: any) {
   })
 
   function handleInit() {
+    flowStore.setState({ multiSelectionActive: true })
     onNodesChange([{ type: "add", item: initialOutlineNode }])
   }
 
@@ -86,8 +89,6 @@ export function FlowEditorContextProvider({ children }: any) {
       switch (change.type) {
         case "select":
           const modChange = change
-          if (workspace?.options.multiselection && changes.length !== selectedNodes.length)
-            modChange.selected = true
           modChanges.push(modChange)
           selectionChanges.push(modChange)
           break;
@@ -223,6 +224,7 @@ export function FlowEditorContextProvider({ children }: any) {
         nodeTypes={nodeTypes}
         onNodesChange={handleNodeChange}
         onInit={handleInit}
+
       >
         <Background gap={10} variant={BackgroundVariant.Dots} />
 

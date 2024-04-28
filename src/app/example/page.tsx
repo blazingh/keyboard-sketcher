@@ -5,6 +5,7 @@ import { TransformMatrix } from "@visx/zoom/lib/types";
 import 'react-json-view-lite/dist/index.css';
 import { useDrag } from '@/components/utils/drag';
 import { EditorStoreType, useEditorStore } from '@/contexts/editor-store';
+import { getSnapLines } from "@/lib/snap-lines";
 
 export type Node = {
   id: string,
@@ -39,8 +40,12 @@ export default function DragI() {
                     <path id="background" d="M500 0H0V750H750V0Z" fill="#222222" />
                   </g>
                   <g id="gym" transform={zoom.toString()}>
-                    <path id="background" d={`M 0 ${store.snapLines.horizontal} H 750`} fill="blue" strokeWidth={2} stroke='red' />
-                    <path id="background" d={`M ${store.snapLines.vertical} 0 V 750`} fill="blue" strokeWidth={2} stroke="red" />
+                    {store.snapLines?.horizontal &&
+                      <path id="background" d={`M 0 ${store.snapLines.horizontal} H 750`} strokeWidth={1} stroke='blue' />
+                    }
+                    {store.snapLines?.vertical &&
+                      <path id="background" d={`M ${store.snapLines.vertical} 0 V 750`} strokeWidth={1} stroke="blue" />
+                    }
                   </g>
                   <rect
                     width={width}
@@ -75,11 +80,13 @@ export default function DragI() {
 }
 
 const selector = (state: EditorStoreType) => ({
+  snapLines: state.snapLines,
   updateSnapLines: state.updateSnapLines,
   updateNodes: state.updateNodes,
   addActiveNodes: state.addActiveNodes,
   removeActiveNodes: state.removeActiveNodes,
-  resetSnapLines: state.resetSnapLines
+  resetSnapLines: state.resetSnapLines,
+  nodes: state.nodes
 })
 
 const Point = ({
@@ -90,7 +97,7 @@ const Point = ({
   zoomTransformMatrix?: TransformMatrix;
 }) => {
 
-  const { updateSnapLines, updateNodes, addActiveNodes, removeActiveNodes, resetSnapLines } = useEditorStore(selector)
+  const { updateSnapLines, nodes, updateNodes, resetSnapLines, snapLines } = useEditorStore(selector)
 
   const {
     x,
@@ -113,13 +120,12 @@ const Point = ({
       const modNode = JSON.parse(JSON.stringify(node));
       modNode.pos.x = (args.x || 0) + args.dx
       modNode.pos.y = (args.y || 0) + args.dy
-      console.log(modNode.pos)
-      updateSnapLines(modNode)
+      updateSnapLines(getSnapLines(modNode, nodes))
     },
     onDragEnd: (args) => {
       const modNode = JSON.parse(JSON.stringify(node));
-      modNode.pos.x = ((args.x || 0) + args.dx)
-      modNode.pos.y = ((args.y || 0) + args.dy)
+      modNode.pos.x = snapLines?.snapPosition.x ?? ((args.x || 0) + args.dx)
+      modNode.pos.y = snapLines?.snapPosition.y ?? ((args.y || 0) + args.dy)
       updateNodes(node.id, modNode)
       resetSnapLines()
     }

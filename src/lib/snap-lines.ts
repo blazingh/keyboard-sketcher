@@ -1,4 +1,4 @@
-import { Node } from "@/app/example/page";
+import { Node } from "@/contexts/editor-store";
 
 export type GetSnapLinesResult = {
   horizontal?: number;
@@ -17,8 +17,13 @@ export const defaultSnapLinesResult = {
 export function getSnapLines(
   target: Node,
   nodes: Node[],
-  distance = 1
+  distance = 5
 ): GetSnapLinesResult {
+  const defaultResult = {
+    horizontal: undefined,
+    vertical: undefined,
+    snapPosition: { x: undefined, y: undefined },
+  };
 
   const nodeA = target
 
@@ -164,8 +169,8 @@ export function getSnapLines(
         horizontalDistance = distanceTopBottom;
       }
 
-      console.log(result)
 
+      //      console.log(nodeA.pos, nodeB.pos, result)
       return result;
-    }, defaultSnapLinesResult);
+    }, defaultResult);
 }

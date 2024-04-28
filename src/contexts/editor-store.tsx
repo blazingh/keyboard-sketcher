@@ -20,14 +20,15 @@ export type EditorStoreType = {
   activeNodes: Node["id"][],
   addActiveNodes: (id: Node["id"]) => void
   removeActiveNodes: (id: Node["id"]) => void
-  snapLines: GetSnapLinesResult
-  updateSnapLines: (target: Node) => void
+  snapLines?: GetSnapLinesResult
+  updateSnapLines: (value: GetSnapLinesResult) => void
   resetSnapLines: () => void
 }
 
 const initialNodes: Node[] = [
-  { id: "1", size: { w: 70, h: 70 }, pos: { x: 250, y: 250 } },
-  { id: "2", size: { w: 70, h: 70 }, pos: { x: 30, y: 30 } }
+  { id: "1", size: { w: 70, h: 70 }, pos: { x: 375, y: 375 } },
+  { id: "2", size: { w: 70, h: 70 }, pos: { x: 30, y: 30 } },
+  { id: "3", size: { w: 70, h: 70 }, pos: { x: 550, y: 50 } }
 ]
 
 export const useEditorStore = create<EditorStoreType>((set, get) => ({
@@ -52,16 +53,10 @@ export const useEditorStore = create<EditorStoreType>((set, get) => ({
     if (!get().activeNodes.includes(id)) return
     set((p) => ({ activeNodes: p.activeNodes.filter(a => a !== id) }))
   },
-  updateSnapLines: (target: Node) => {
-    set({ snapLines: getSnapLines(target, get().nodes) })
+  updateSnapLines: (value: GetSnapLinesResult) => {
+    set({ snapLines: value })
   },
   resetSnapLines: () => {
-    set({
-      snapLines: {
-        horizontal: undefined,
-        vertical: undefined,
-        snapPosition: { x: undefined, y: undefined },
-      }
-    })
+    set({ snapLines: undefined })
   }
 }))

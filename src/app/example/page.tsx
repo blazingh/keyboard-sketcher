@@ -3,9 +3,10 @@
 import { Zoom } from "@visx/zoom";
 import { TransformMatrix } from "@visx/zoom/lib/types";
 import 'react-json-view-lite/dist/index.css';
-import { useDrag } from '@/components/utils/drag';
+import { useDrag as useZoomableDrag } from '@/components/utils/drag';
 import { EditorStoreType, useEditorStore } from '@/contexts/editor-store';
 import { getSnapLines } from "@/lib/snap-lines";
+import { useGesture } from "@use-gesture/react";
 
 export type Node = {
   id: string,
@@ -23,7 +24,7 @@ export default function DragI() {
   const width = 750
   const height = 750
 
-  const store = useEditorStore()
+
 
   return (
     <div className="" style={{ touchAction: 'none' }}>
@@ -32,41 +33,7 @@ export default function DragI() {
           width={width}
           height={height}
         >
-          {(zoom) => {
-            return (
-              <>
-                <svg width={width} height={height} className='border'>
-                  <g id="gym" transform={zoom.toString()}>
-                    <path id="background" d="M500 0H0V750H750V0Z" fill="#222222" />
-                  </g>
-                  <g id="gym" transform={zoom.toString()}>
-                    {store.snapLines?.horizontal &&
-                      <path id="background" d={`M 0 ${store.snapLines.horizontal} H 750`} strokeWidth={1} stroke='blue' />
-                    }
-                    {store.snapLines?.vertical &&
-                      <path id="background" d={`M ${store.snapLines.vertical} 0 V 750`} strokeWidth={1} stroke="blue" />
-                    }
-                  </g>
-                  <rect
-                    width={width}
-                    height={height}
-                    ref={zoom.containerRef}
-                    fill="transparent"
-                    style={{ touchAction: "none" }}
-                  />
-                  <g id="points" transform={zoom.toString()}>
-                    {store.nodes.map((node, i) => (
-                      <Point
-                        key={node.id}
-                        node={node}
-                        zoomTransformMatrix={zoom.transformMatrix}
-                      />
-                    ))}
-                  </g>
-                </svg>
-              </>
-            )
-          }}
+          {(zoom) => Editor({ zoom })}
         </Zoom>
       </div>
 
@@ -77,6 +44,66 @@ export default function DragI() {
 
     </div>
   );
+}
+
+function Editor({ zoom }: { zoom: any }) {
+  const width = 750
+  const height = 750
+  const store = useEditorStore()
+
+  const bind = useGesture({
+    onPinch: (e) => {
+    },
+    onDrag: (e) => {
+      if (e.first)
+        zoom.dragStart(e.event as TouchEvent)
+      if (e.touches === 2) {
+        if (!e.first && !e.last)
+          zoom.dragMove(e.event as TouchEvent)
+      }
+      if (e.last)
+        zoom.dragEnd()
+    }
+  })
+  return (
+    <>
+      <svg width={width} height={height} className='border'>
+        <g id="gym" transform={zoom.toString()}>
+          <path id="background" d="M500 0H0V750H750V0Z" fill="#222222" />
+        </g>
+        <g id="gym" transform={zoom.toString()}>
+          {store.snapLines?.horizontal &&
+            <path id="background" d={`M 0 ${store.snapLines.horizontal} H 750`} strokeWidth={1} stroke='blue' />
+          }
+          {store.snapLines?.vertical &&
+            <path id="background" d={`M ${store.snapLines.vertical} 0 V 750`} strokeWidth={1} stroke="blue" />
+          }
+        </g>
+        <rect
+          width={width}
+          height={height}
+          fill="transparent"
+
+          onMouseDown={zoom.dragStart}
+          onMouseMove={zoom.dragMove}
+          onMouseUp={zoom.dragEnd}
+          {...bind()}
+          onMouseLeave={() => {
+            if (zoom.isDragging) zoom.dragEnd();
+          }}
+        />
+        <g id="points" transform={zoom.toString()}>
+          {store.nodes.map((node, i) => (
+            <Point
+              key={node.id}
+              node={node}
+              zoomTransformMatrix={zoom.transformMatrix}
+            />
+          ))}
+        </g>
+      </svg>
+    </>
+  )
 }
 
 const selector = (state: EditorStoreType) => ({
@@ -108,7 +135,7 @@ const Point = ({
     dragStart,
     dragMove,
     dragEnd
-  } = useDrag({
+  } = useZoomableDrag({
     x: node.pos.x,
     y: node.pos.y,
     snapToPointer: false,

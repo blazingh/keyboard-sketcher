@@ -1,4 +1,4 @@
-import { GetSnapLinesResult, defaultSnapLinesResult, getSnapLines } from '@/lib/snap-lines'
+import { GetSnapLinesResult, defaultSnapLinesResult } from '@/lib/snap-lines'
 import { create } from 'zustand'
 
 export type Node = {
@@ -34,7 +34,7 @@ const initialNodes: Node[] = [
 export const useEditorStore = create<EditorStoreType>((set, get) => ({
   nodes: initialNodes,
   activeNodes: [],
-  snapLines: defaultSnapLinesResult,
+  snapLines: { ...defaultSnapLinesResult },
   updateNodes: (id: Node["id"], newNode: Node) => {
     const newNodes = [...get().nodes];
     const modNode = newNodes.find(a => a.id === id)

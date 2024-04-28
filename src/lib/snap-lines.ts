@@ -12,12 +12,10 @@ export const defaultSnapLinesResult = {
   snapPosition: { x: undefined, y: undefined },
 };
 
-// this utility function can be called with a position change (inside onNodesChange)
-// it checks all other nodes and calculated the helper line positions and the position where the current node should snap to
 export function getSnapLines(
   target: Node,
   nodes: Node[],
-  distance = 5
+  distance = 10
 ): GetSnapLinesResult {
   const defaultResult = {
     horizontal: undefined,

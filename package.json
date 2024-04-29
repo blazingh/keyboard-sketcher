@@ -91,6 +91,7 @@
     "tailwindcss-animated": "^1.0.1",
     "three": "^0.163.0",
     "ts-key-enum": "^2.0.12",
+    "zundo": "^2.1.0",
     "zustand": "^4.5.2"
   },
   "devDependencies": {

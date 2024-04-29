@@ -3,8 +3,7 @@
 import { TransformMatrix } from "@visx/zoom/lib/types";
 import 'react-json-view-lite/dist/index.css';
 import { useDrag as useZoomableDrag } from '@/components/utils/drag';
-import { EditorStoreType, useEditorStore } from '@/contexts/editor-store';
-import { Node } from "@/app/example/page";
+import { EditorStoreType, Node, useEditorStore } from '@/contexts/editor-store';
 
 const selector = (state: EditorStoreType) => ({
   snapLines: state.snapLines,

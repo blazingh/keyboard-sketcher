@@ -13,38 +13,42 @@ export type Node = {
   }
 }
 
-export type EditorStoreType = {
-  nodes: Node[],
-  setNodes: (newNodes: Node[]) => void
-  updateNodes: (id: Node["id"], newNode: Node) => void
+type States = {
+  nodes: { [key: Node["id"]]: Node },
+  snapLines?: GetSnapLinesResult,
+  nodesArray: () => Node[],
   activeNodes: Node["id"][],
+}
+
+type Actions = {
+  updateNodes: (id: Node["id"], newNode: Node) => void
+
   addActiveNodes: (id: Node["id"]) => void
   removeActiveNodes: (id: Node["id"]) => void
-  snapLines?: GetSnapLinesResult
+  clearActiveNodes: () => void
+
   updateSnapLines: (value: GetSnapLinesResult) => void
   resetSnapLines: () => void
 }
 
-const initialNodes: Node[] = [
-  { id: "1", size: { w: 70, h: 70 }, pos: { x: 375, y: 375 } },
-  { id: "2", size: { w: 70, h: 70 }, pos: { x: 30, y: 30 } },
-  { id: "3", size: { w: 70, h: 70 }, pos: { x: 550, y: 50 } }
-]
+export type EditorStoreType = States & Actions
+
+const initialNodes: { [key: Node["id"]]: Node } = {
+  "1": { id: "1", size: { w: 70, h: 70 }, pos: { x: 375, y: 375 } },
+  "2": { id: "2", size: { w: 70, h: 70 }, pos: { x: 30, y: 30 } },
+  "3": { id: "3", size: { w: 70, h: 70 }, pos: { x: 550, y: 50 } }
+}
 
 export const useEditorStore = create<EditorStoreType>((set, get) => ({
   nodes: initialNodes,
+  nodesArray: () => Object.values(get().nodes),
   activeNodes: [],
   snapLines: { ...defaultSnapLinesResult },
+
   updateNodes: (id: Node["id"], newNode: Node) => {
-    const newNodes = [...get().nodes];
-    const modNode = newNodes.find(a => a.id === id)
-    if (!modNode) return
-    modNode.pos = newNode.pos
-    set({ nodes: newNodes })
+    set(p => ({ nodes: { ...p.nodes, [id]: newNode } }))
   },
-  setNodes: (newNodes: Node[]) => {
-    set({ nodes: newNodes })
-  },
+
   addActiveNodes: (id: Node["id"]) => {
     if (get().activeNodes.includes(id)) return
     set((p) => ({ activeNodes: [...p.activeNodes, id] }))
@@ -53,6 +57,10 @@ export const useEditorStore = create<EditorStoreType>((set, get) => ({
     if (!get().activeNodes.includes(id)) return
     set((p) => ({ activeNodes: p.activeNodes.filter(a => a !== id) }))
   },
+  clearActiveNodes: () => {
+    set({ activeNodes: [] })
+  },
+
   updateSnapLines: (value: GetSnapLinesResult) => {
     set({ snapLines: value })
   },

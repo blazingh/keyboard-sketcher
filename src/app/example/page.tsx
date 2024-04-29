@@ -36,12 +36,6 @@ export default function DragI() {
           {(zoom) => Editor({ zoom })}
         </Zoom>
       </div>
-
-
-      {/*
-      <JsonView data={draggingItems} shouldExpandNode={allExpanded} style={defaultStyles} />
-      */}
-
     </div>
   );
 }
@@ -93,7 +87,7 @@ function Editor({ zoom }: { zoom: any }) {
           }}
         />
         <g id="points" transform={zoom.toString()}>
-          {store.nodes.map((node, i) => (
+          {store.nodesArray().map((node) => (
             <Point
               key={node.id}
               node={node}
@@ -113,7 +107,7 @@ const selector = (state: EditorStoreType) => ({
   addActiveNodes: state.addActiveNodes,
   removeActiveNodes: state.removeActiveNodes,
   resetSnapLines: state.resetSnapLines,
-  nodes: state.nodes
+  nodesArray: state.nodesArray
 })
 
 const Point = ({
@@ -124,7 +118,13 @@ const Point = ({
   zoomTransformMatrix?: TransformMatrix;
 }) => {
 
-  const { updateSnapLines, nodes, updateNodes, resetSnapLines, snapLines } = useEditorStore(selector)
+  const {
+    updateSnapLines,
+    nodesArray,
+    updateNodes,
+    resetSnapLines,
+    snapLines
+  } = useEditorStore(selector)
 
   const {
     x,
@@ -147,7 +147,7 @@ const Point = ({
       const modNode = JSON.parse(JSON.stringify(node));
       modNode.pos.x = (args.x || 0) + args.dx
       modNode.pos.y = (args.y || 0) + args.dy
-      updateSnapLines(getSnapLines(modNode, nodes))
+      updateSnapLines(getSnapLines(modNode, nodesArray()))
     },
     onDragEnd: (args) => {
       const modNode = JSON.parse(JSON.stringify(node));

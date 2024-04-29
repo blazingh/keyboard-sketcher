@@ -1,3 +1,4 @@
+"use client"
 
 import { useEditorStore } from '@/contexts/editor-store';
 import { useGesture } from "@use-gesture/react";

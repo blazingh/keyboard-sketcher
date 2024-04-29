@@ -1,5 +1,7 @@
 import { GetSnapLinesResult, defaultSnapLinesResult } from '@/lib/snap-lines'
 import { create } from 'zustand'
+import { produce } from 'immer'
+import crypto from 'crypto';
 
 export type Node = {
   id: string,
@@ -29,6 +31,8 @@ type Actions = {
 
   updateSnapLines: (value: GetSnapLinesResult) => void
   resetSnapLines: () => void
+
+  moveActiveNodes: (xy: [number, number]) => void
 }
 
 export type EditorStoreType = States & Actions
@@ -66,5 +70,15 @@ export const useEditorStore = create<EditorStoreType>((set, get) => ({
   },
   resetSnapLines: () => {
     set({ snapLines: undefined })
+  },
+
+  moveActiveNodes: (xy: [number, number]) => {
+    get().activeNodes.forEach(id => {
+      set(produce((state: States) => {
+        state.nodes[id].pos.x += xy[0]
+        state.nodes[id].pos.x += xy[1]
+      }))
+    })
   }
+
 }))

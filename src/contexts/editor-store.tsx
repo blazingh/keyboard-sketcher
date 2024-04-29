@@ -50,16 +50,22 @@ export const useEditorStore = create<EditorStoreType>((set, get) => ({
   snapLines: { ...defaultSnapLinesResult },
 
   updateNodes: (id: Node["id"], newNode: Node) => {
-    set(p => ({ nodes: { ...p.nodes, [id]: newNode } }))
+    set(produce((state: States) => {
+      state.nodes[id] = newNode
+    }))
   },
 
   addActiveNodes: (id: Node["id"]) => {
-    if (get().activeNodes.includes(id)) return
-    set((p) => ({ activeNodes: [...p.activeNodes, id] }))
+    set(produce((state: States) => {
+      const index = state.activeNodes.findIndex(a => a === id)
+      if (index === -1) state.activeNodes.push(id)
+    }))
   },
   removeActiveNodes: (id: Node["id"]) => {
-    if (!get().activeNodes.includes(id)) return
-    set((p) => ({ activeNodes: p.activeNodes.filter(a => a !== id) }))
+    set(produce((state: States) => {
+      const index = state.activeNodes.findIndex(a => a === id)
+      if (index !== -1) state.activeNodes.splice(index, 1)
+    }))
   },
   clearActiveNodes: () => {
     set({ activeNodes: [] })
@@ -73,12 +79,12 @@ export const useEditorStore = create<EditorStoreType>((set, get) => ({
   },
 
   moveActiveNodes: (xy: [number, number]) => {
-    get().activeNodes.forEach(id => {
-      set(produce((state: States) => {
+    set(produce((state: States) => {
+      get().activeNodes.forEach(id => {
         state.nodes[id].pos.x += xy[0]
         state.nodes[id].pos.x += xy[1]
-      }))
-    })
+      })
+    }))
   }
 
 }))

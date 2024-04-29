@@ -4,6 +4,7 @@ import { TransformMatrix } from "@visx/zoom/lib/types";
 import 'react-json-view-lite/dist/index.css';
 import { useDrag as useZoomableDrag } from '@/components/utils/drag';
 import { EditorStoreType, Node, useEditorStore } from '@/contexts/editor-store';
+import { produce } from "immer";
 
 const selector = (state: EditorStoreType) => ({
   snapLines: state.snapLines,
@@ -47,15 +48,17 @@ export function BasicNode({
     onDragStart: () => {
     },
     onDragMove: (args) => {
-      const modNode = JSON.parse(JSON.stringify(node));
-      modNode.pos.x = (args.x || 0) + args.dx
-      modNode.pos.y = (args.y || 0) + args.dy
+      const modNode = produce(node, draft => {
+        draft.pos.x = (args.x || 0) + args.dx
+        draft.pos.y = (args.y || 0) + args.dy
+      })
       updateSnapLines(modNode)
     },
     onDragEnd: (args) => {
-      const modNode = JSON.parse(JSON.stringify(node));
-      modNode.pos.x = snapLines?.snapPosition.x ?? ((args.x || 0) + args.dx)
-      modNode.pos.y = snapLines?.snapPosition.y ?? ((args.y || 0) + args.dy)
+      const modNode = produce(node, draft => {
+        draft.pos.x = snapLines?.snapPosition.x ?? ((args.x || 0) + args.dx)
+        draft.pos.y = snapLines?.snapPosition.y ?? ((args.y || 0) + args.dy)
+      })
       updateNodes(node.id, modNode)
       resetSnapLines()
     }

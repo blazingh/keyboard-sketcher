@@ -32,14 +32,10 @@ function Editor({ zoom }: { zoom: any }) {
     onPinch: (e) => {
     },
     onDrag: (e) => {
-      if (e.first)
-        zoom.dragStart(e.event as TouchEvent)
-      if (e.touches === 2) {
-        if (!e.first && !e.last)
-          zoom.dragMove(e.event as TouchEvent)
-      }
-      if (e.last)
-        zoom.dragEnd()
+      if (e.first) zoom.dragStart(e.event as any)
+      if (e.last) zoom.dragEnd()
+      if (e.touches === 2 && !e.first && !e.last)
+        zoom.dragMove(e.event as any)
     }
   })
 
@@ -53,13 +49,9 @@ function Editor({ zoom }: { zoom: any }) {
         </g>
 
         {/* snap lines */}
-        <g id="snapliens-groups" transform={zoom.toString()}>
-          {store.snapLines?.horizontal &&
-            <path id="snapLineH" d={`M 0 ${store.snapLines.horizontal} H 750`} strokeWidth={1} stroke='blue' />
-          }
-          {store.snapLines?.vertical &&
-            <path id="snapLineV" d={`M ${store.snapLines.vertical} 0 V 750`} strokeWidth={1} stroke="blue" />
-          }
+        <g id="snapliens-groups" transform={zoom.toString()} strokeWidth={1} stroke='blue'>
+          {store.snapLines?.horizontal && <path id="snapLineH" d={`M 0 ${store.snapLines.horizontal} H 750`} />}
+          {store.snapLines?.vertical && <path id="snapLineV" d={`M ${store.snapLines.vertical} 0 V 750`} />}
         </g>
 
         {/* zoom controlles */}

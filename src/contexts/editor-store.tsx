@@ -25,11 +25,12 @@ type States = {
 }
 
 type Actions = {
-  updateNodes: (id: Node["id"], newNode: Node) => void
+  updateNode: (id: Node["id"], newNode: Node) => void
   nodesInit: () => void,
 
-  addActiveNodes: (id: Node["id"]) => void
-  removeActiveNodes: (id: Node["id"]) => void
+  addActiveNode: (id: Node["id"]) => void
+  removeActiveNode: (id: Node["id"]) => void
+  toggleActiveNode: (id: Node["id"]) => void
   clearActiveNodes: () => void
 
   updateSnapLines: (target: Node) => void
@@ -57,22 +58,29 @@ export const useEditorStore = create<EditorStoreType>()(
       nodesInit: () => {
         set({ nodes: initialNodes })
       },
-      updateNodes: (id: Node["id"], newNode: Node) => {
+      updateNode: (id: Node["id"], newNode: Node) => {
         set(produce((state: States) => {
           state.nodes[id] = newNode
         }))
       },
 
-      addActiveNodes: (id: Node["id"]) => {
+      addActiveNode: (id: Node["id"]) => {
         set(produce((state: States) => {
           const index = state.activeNodes.findIndex(a => a === id)
           if (index === -1) state.activeNodes.push(id)
         }))
       },
-      removeActiveNodes: (id: Node["id"]) => {
+      removeActiveNode: (id: Node["id"]) => {
         set(produce((state: States) => {
           const index = state.activeNodes.findIndex(a => a === id)
           if (index !== -1) state.activeNodes.splice(index, 1)
+        }))
+      },
+      toggleActiveNode: (id: Node["id"]) => {
+        set(produce((state: States) => {
+          const index = state.activeNodes.findIndex(a => a === id)
+          if (index !== -1) state.activeNodes.splice(index, 1)
+          else state.activeNodes.push(id)
         }))
       },
       clearActiveNodes: () => {

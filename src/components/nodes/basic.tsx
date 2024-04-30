@@ -5,14 +5,14 @@ import 'react-json-view-lite/dist/index.css';
 import { useDrag as useZoomableDrag } from '@/components/utils/drag';
 import { EditorStoreType, Node, useEditorStore } from '@/contexts/editor-store';
 import { produce } from "immer";
+import { useGesture } from "@use-gesture/react";
 
 const selector = (state: EditorStoreType) => ({
   activeNodes: state.activeNodes,
   snapLines: state.snapLines,
   updateSnapLines: state.updateSnapLines,
-  updateNodes: state.updateNodes,
-  addActiveNodes: state.addActiveNodes,
-  removeActiveNodes: state.removeActiveNodes,
+  updateNode: state.updateNode,
+  toggleActiveNode: state.toggleActiveNode,
   resetSnapLines: state.resetSnapLines,
 })
 
@@ -26,10 +26,9 @@ export function BasicNode({
 
   const {
     activeNodes,
-    addActiveNodes,
-    removeActiveNodes,
+    toggleActiveNode,
     updateSnapLines,
-    updateNodes,
+    updateNode,
     resetSnapLines,
     snapLines
   } = useEditorStore(selector)
@@ -50,9 +49,6 @@ export function BasicNode({
     resetOnStart: true,
     zoomTransformMatrix,
     onDragStart: () => {
-
-      addActiveNodes(node.id)
-
     },
     onDragMove: (args) => {
 
@@ -67,20 +63,36 @@ export function BasicNode({
 
     },
     onDragEnd: (args) => {
+      // check if the node has bean moved
+      if (args.dx === 0 && args.dy === 0) return
 
       // updated the node position
-      updateNodes(node.id,
+      updateNode(node.id,
         produce(node, draft => {
           draft.pos.x = snapLines?.snapPosition.x ?? ((args.x || 0) + args.dx)
           draft.pos.y = snapLines?.snapPosition.y ?? ((args.y || 0) + args.dy)
         })
       )
 
-      removeActiveNodes(node.id)
+      toggleActiveNode(node.id)
       resetSnapLines()
-
     }
   });
+
+  function nodeClick() {
+    toggleActiveNode(node.id)
+  }
+
+  const binds = useGesture({
+    onDragStart: ((event) => dragStart(event.event as any)),
+    onDrag: ((event) => !event.first && dragMove(event.event as any)),
+    onDragEnd: ((event) => dragEnd(event.event as any)),
+    onClick: (event) => nodeClick()
+  },
+    { drag: { delay: true } }
+  )
+
+  const nodeActive = activeNodes.includes(node.id) || isDragging
 
   return (
     <>
@@ -95,18 +107,13 @@ export function BasicNode({
         />
       )}
       <g
-        onMouseDown={dragStart}
-        onMouseMove={dragMove}
-        onMouseUp={dragEnd}
-        onTouchStart={dragStart}
-        onTouchMove={dragMove}
-        onTouchEnd={dragEnd}
         transform={`translate(${dx}, ${dy})`}
+        {...binds()}
       >
         <rect
           x={x}
           y={y}
-          rx={activeNodes.includes(node.id) ? 10 : 0}
+          rx={nodeActive ? 10 : 0}
           width={node.size.w}
           height={node.size.h}
           fill={"red"}

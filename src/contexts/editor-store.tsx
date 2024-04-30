@@ -22,11 +22,14 @@ type States = {
   snapLines?: GetSnapLinesResult,
   nodesArray: () => Node[],
   activeNodes: Node["id"][],
+  activeDxy: { x: number, y: number }
 }
 
 type Actions = {
-  updateNode: (id: Node["id"], newNode: Node) => void
   nodesInit: () => void,
+  updateNodes: (newNodes: Node[]) => void
+
+  setActiveDxy: (xy: { x: number, y: number }) => void
 
   addActiveNode: (id: Node["id"]) => void
   removeActiveNode: (id: Node["id"]) => void
@@ -54,13 +57,22 @@ export const useEditorStore = create<EditorStoreType>()(
       nodesArray: () => Object.values(get().nodes),
       activeNodes: [],
       snapLines: { ...defaultSnapLinesResult },
+      activeDxy: { x: 0, y: 0 },
+
+      setActiveDxy: (xy: { x: number, y: number }) => {
+        set(produce((state: States) => {
+          state.activeDxy = xy
+        }))
+      },
 
       nodesInit: () => {
         set({ nodes: initialNodes })
       },
-      updateNode: (id: Node["id"], newNode: Node) => {
+      updateNodes: (newNodes: Node[]) => {
         set(produce((state: States) => {
-          state.nodes[id] = newNode
+          newNodes.forEach(newNode => {
+            state.nodes[newNode.id] = newNode
+          })
         }))
       },
 
@@ -98,7 +110,7 @@ export const useEditorStore = create<EditorStoreType>()(
         set(produce((state: States) => {
           get().activeNodes.forEach(id => {
             state.nodes[id].pos.x += xy[0]
-            state.nodes[id].pos.x += xy[1]
+            state.nodes[id].pos.y += xy[1]
           })
         }))
       }

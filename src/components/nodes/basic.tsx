@@ -8,10 +8,14 @@ import { produce } from "immer";
 import { useGesture } from "@use-gesture/react";
 
 const selector = (state: EditorStoreType) => ({
+  clearActiveNodes: state.clearActiveNodes,
+  moveActiveNodes: state.moveActiveNodes,
+  addActiveNode: state.addActiveNode,
+  setActiveDxy: state.setActiveDxy,
+  activeDxy: state.activeDxy,
   activeNodes: state.activeNodes,
   snapLines: state.snapLines,
   updateSnapLines: state.updateSnapLines,
-  updateNode: state.updateNode,
   toggleActiveNode: state.toggleActiveNode,
   resetSnapLines: state.resetSnapLines,
 })
@@ -25,13 +29,19 @@ export function BasicNode({
 }) {
 
   const {
+    moveActiveNodes,
+    setActiveDxy,
+    clearActiveNodes,
+    addActiveNode,
+    activeDxy,
     activeNodes,
     toggleActiveNode,
     updateSnapLines,
-    updateNode,
     resetSnapLines,
     snapLines
   } = useEditorStore(selector)
+
+  const nodeActive = activeNodes.includes(node.id)
 
   const {
     x,
@@ -45,11 +55,19 @@ export function BasicNode({
   } = useZoomableDrag({
     x: node.pos.x,
     y: node.pos.y,
+    dx: nodeActive ? activeDxy.x : 0,
+    dy: nodeActive ? activeDxy.y : 0,
     snapToPointer: false,
     resetOnStart: true,
     zoomTransformMatrix,
     onDragStart: () => {
+
+      // if the node is not selected, deselect othere nodes 
+      if (activeNodes.length >= 1 && !nodeActive)
+        clearActiveNodes()
+      addActiveNode(node.id)
     },
+
     onDragMove: (args) => {
 
       // updated the snap lines only if one node is active
@@ -61,21 +79,24 @@ export function BasicNode({
       else
         resetSnapLines()
 
+      // update the actide drag xy
+      if (activeNodes.length > 1)
+        setActiveDxy({ x: args.dx, y: args.dy })
+
     },
     onDragEnd: (args) => {
       // check if the node has bean moved
       if (args.dx === 0 && args.dy === 0) return
 
-      // updated the node position
-      updateNode(node.id,
-        produce(node, draft => {
-          draft.pos.x = snapLines?.snapPosition.x ?? ((args.x || 0) + args.dx)
-          draft.pos.y = snapLines?.snapPosition.y ?? ((args.y || 0) + args.dy)
-        })
-      )
+      // updated the active nodes position
+      moveActiveNodes([
+        snapLines?.snapPosition.x ? snapLines?.snapPosition.x - (args.x || 0) : args.dx,
+        snapLines?.snapPosition.y ? snapLines?.snapPosition.y - (args.y || 0) : args.dy
+      ])
 
-      toggleActiveNode(node.id)
       resetSnapLines()
+      setActiveDxy({ x: 0, y: 0 })
+
     }
   });
 
@@ -87,12 +108,10 @@ export function BasicNode({
     onDragStart: ((event) => dragStart(event.event as any)),
     onDrag: ((event) => !event.first && dragMove(event.event as any)),
     onDragEnd: ((event) => dragEnd(event.event as any)),
-    onClick: (event) => nodeClick()
   },
-    { drag: { delay: true } }
+    { drag: { delay: true, threshold: 10, filterTaps: true } }
   )
 
-  const nodeActive = activeNodes.includes(node.id) || isDragging
 
   return (
     <>
@@ -119,6 +138,14 @@ export function BasicNode({
           fill={"red"}
         >
         </rect>
+        <rect
+          onClick={nodeClick}
+          x={x}
+          y={y}
+          width={20}
+          height={20}
+          fill={nodeActive ? "blue" : "white"}
+        />
       </g>
     </>
   );

@@ -7,6 +7,7 @@ import { EditorStoreType, Node, useEditorStore } from '@/contexts/editor-store';
 import { produce } from "immer";
 
 const selector = (state: EditorStoreType) => ({
+  activeNodes: state.activeNodes,
   snapLines: state.snapLines,
   updateSnapLines: state.updateSnapLines,
   updateNodes: state.updateNodes,
@@ -24,6 +25,9 @@ export function BasicNode({
 }) {
 
   const {
+    activeNodes,
+    addActiveNodes,
+    removeActiveNodes,
     updateSnapLines,
     updateNodes,
     resetSnapLines,
@@ -46,21 +50,35 @@ export function BasicNode({
     resetOnStart: true,
     zoomTransformMatrix,
     onDragStart: () => {
+
+      addActiveNodes(node.id)
+
     },
     onDragMove: (args) => {
-      const modNode = produce(node, draft => {
-        draft.pos.x = (args.x || 0) + args.dx
-        draft.pos.y = (args.y || 0) + args.dy
-      })
-      updateSnapLines(modNode)
+
+      // updated the snap lines only if one node is active
+      if (activeNodes.length === 1)
+        updateSnapLines(produce(node, draft => {
+          draft.pos.x = (args.x || 0) + args.dx
+          draft.pos.y = (args.y || 0) + args.dy
+        }))
+      else
+        resetSnapLines()
+
     },
     onDragEnd: (args) => {
-      const modNode = produce(node, draft => {
-        draft.pos.x = snapLines?.snapPosition.x ?? ((args.x || 0) + args.dx)
-        draft.pos.y = snapLines?.snapPosition.y ?? ((args.y || 0) + args.dy)
-      })
-      updateNodes(node.id, modNode)
+
+      // updated the node position
+      updateNodes(node.id,
+        produce(node, draft => {
+          draft.pos.x = snapLines?.snapPosition.x ?? ((args.x || 0) + args.dx)
+          draft.pos.y = snapLines?.snapPosition.y ?? ((args.y || 0) + args.dy)
+        })
+      )
+
+      removeActiveNodes(node.id)
       resetSnapLines()
+
     }
   });
 
@@ -88,6 +106,7 @@ export function BasicNode({
         <rect
           x={x}
           y={y}
+          rx={activeNodes.includes(node.id) ? 10 : 0}
           width={node.size.w}
           height={node.size.h}
           fill={"red"}

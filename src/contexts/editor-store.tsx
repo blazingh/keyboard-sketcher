@@ -1,5 +1,6 @@
 import { GetSnapLinesResult, defaultSnapLinesResult, getSnapLines } from '@/lib/snap-lines'
 import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
 import { produce } from 'immer'
 import { temporal } from 'zundo';
 import crypto from 'crypto';
@@ -25,6 +26,7 @@ type States = {
 
 type Actions = {
   updateNodes: (id: Node["id"], newNode: Node) => void
+  nodesInit: () => void,
 
   addActiveNodes: (id: Node["id"]) => void
   removeActiveNodes: (id: Node["id"]) => void
@@ -45,55 +47,67 @@ const initialNodes: { [key: Node["id"]]: Node } = {
 }
 
 export const useEditorStore = create<EditorStoreType>()(
-  temporal((set, get) => ({
-    nodes: initialNodes,
-    nodesArray: () => Object.values(get().nodes),
-    activeNodes: [],
-    snapLines: { ...defaultSnapLinesResult },
+  persist(
+    temporal((set, get) => ({
+      nodes: {},
+      nodesArray: () => Object.values(get().nodes),
+      activeNodes: [],
+      snapLines: { ...defaultSnapLinesResult },
 
-    updateNodes: (id: Node["id"], newNode: Node) => {
-      set(produce((state: States) => {
-        state.nodes[id] = newNode
-      }))
-    },
-
-    addActiveNodes: (id: Node["id"]) => {
-      set(produce((state: States) => {
-        const index = state.activeNodes.findIndex(a => a === id)
-        if (index === -1) state.activeNodes.push(id)
-      }))
-    },
-    removeActiveNodes: (id: Node["id"]) => {
-      set(produce((state: States) => {
-        const index = state.activeNodes.findIndex(a => a === id)
-        if (index !== -1) state.activeNodes.splice(index, 1)
-      }))
-    },
-    clearActiveNodes: () => {
-      set({ activeNodes: [] })
-    },
-
-    updateSnapLines: (target: Node) => {
-      set({ snapLines: getSnapLines(target, get().nodesArray()) })
-    },
-    resetSnapLines: () => {
-      set({ snapLines: undefined })
-    },
-
-    moveActiveNodes: (xy: [number, number]) => {
-      set(produce((state: States) => {
-        get().activeNodes.forEach(id => {
-          state.nodes[id].pos.x += xy[0]
-          state.nodes[id].pos.x += xy[1]
-        })
-      }))
-    }
-  }),
-    {
-      partialize: (state) => {
-        const { nodes, ..._ } = state;
-        return { nodes };
+      nodesInit: () => {
+        set({ nodes: initialNodes })
       },
-    },
+      updateNodes: (id: Node["id"], newNode: Node) => {
+        set(produce((state: States) => {
+          state.nodes[id] = newNode
+        }))
+      },
+
+      addActiveNodes: (id: Node["id"]) => {
+        set(produce((state: States) => {
+          const index = state.activeNodes.findIndex(a => a === id)
+          if (index === -1) state.activeNodes.push(id)
+        }))
+      },
+      removeActiveNodes: (id: Node["id"]) => {
+        set(produce((state: States) => {
+          const index = state.activeNodes.findIndex(a => a === id)
+          if (index !== -1) state.activeNodes.splice(index, 1)
+        }))
+      },
+      clearActiveNodes: () => {
+        set({ activeNodes: [] })
+      },
+
+      updateSnapLines: (target: Node) => {
+        set({ snapLines: getSnapLines(target, get().nodesArray()) })
+      },
+      resetSnapLines: () => {
+        set({ snapLines: undefined })
+      },
+
+      moveActiveNodes: (xy: [number, number]) => {
+        set(produce((state: States) => {
+          get().activeNodes.forEach(id => {
+            state.nodes[id].pos.x += xy[0]
+            state.nodes[id].pos.x += xy[1]
+          })
+        }))
+      }
+    }),
+      {
+        partialize: (state) => ({ nodes: state.nodes }),
+      },
+    ),
+    {
+      name: 'sketcher-nodes',
+      skipHydration: true,
+      partialize: (state) => ({ nodes: state.nodes }),
+      onRehydrateStorage: (state) => {
+        if (JSON.stringify(state.nodes) === JSON.stringify({}))
+          state.nodes = initialNodes
+      }
+      //storage: createJSONStorage(() => localStorage),
+    }
   )
 )

@@ -4,6 +4,7 @@ import { useEditorStore } from '@/contexts/editor-store';
 import { useGesture } from "@use-gesture/react";
 import { BasicNode } from "@/components/nodes/basic";
 import { Zoom } from "@visx/zoom";
+import { useEffect } from 'react';
 
 
 const width = 750
@@ -38,6 +39,11 @@ function ZoomContent({ zoom }: { zoom: any }) {
         zoom.dragMove(e.event as any)
     }
   })
+
+  useEffect(() => {
+    useEditorStore.persist.rehydrate()
+  }, [])
+
 
   return (
     <>

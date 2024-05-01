@@ -25,7 +25,7 @@ export default function EditorViewPort() {
   );
 }
 
-function ZoomContent({ zoom }: { zoom: any }) {
+function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["children"]>[0] }) {
 
   const store = useEditorStore()
 
@@ -34,22 +34,25 @@ function ZoomContent({ zoom }: { zoom: any }) {
   }
 
   const bind = useGesture({
+    onContextMenu: (e) => e.event.preventDefault(),
+    onDragStart: (e) => zoom.dragStart(e.event as any),
+    onDragEnd: (e) => zoom.dragEnd(),
+    onDoubleClick: (e) => handleViewPortTap(),
     onPinch: (e) => {
+      zoom.handlePinch(e)
     },
-    onDoubleClick: (e) => {
-      handleViewPortTap()
+    onWheel: (e) => {
+      zoom.handleWheel(e.event)
     },
     onDrag: (e) => {
-      e.first && zoom.dragStart(e.event as any)
-      e.last && zoom.dragEnd()
-      e.touches === 2 && !e.first && !e.last && !e.tap && zoom.dragMove(e.event as any)
-    }
-  }, { drag: {} })
+      if (e.touches === 2 || e.buttons === 2)
+        zoom.dragMove(e.event as any)
+    },
+  }, { drag: { pointer: { buttons: [1, 2, 4] } }, pinch: {} })
 
   useEffect(() => {
     useEditorStore.persist.rehydrate()
   }, [])
-
 
   return (
     <>
@@ -71,10 +74,7 @@ function ZoomContent({ zoom }: { zoom: any }) {
           width={width}
           height={height}
           fill="transparent"
-          onMouseDown={zoom.dragStart}
-          onMouseMove={zoom.dragMove}
-          onMouseUp={zoom.dragEnd}
-          onMouseLeave={() => zoom.isDragging && zoom.dragEnd()}
+          className='touch-none'
           {...bind()}
         />
 

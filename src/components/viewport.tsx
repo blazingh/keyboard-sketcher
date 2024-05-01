@@ -55,18 +55,29 @@ function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["ch
   }, [])
 
   return (
-    <>
-      <svg width={width} height={height} >
+    <div className='relativ'>
+      <svg width={width} height={height} className='border' >
 
         {/* background */}
-        <g id="background-group" transform={zoom.toString()}>
-          <path id="background" d="M500 0H0V750H750V0Z" fill="#222222" />
+        <g transform={zoom.toString()}>
+          <rect fill='#FFFFFF' width='24' height='24' />
+          <defs>
+            <linearGradient id='a' x1='0' x2='0' y1='0' y2='1' gradientTransform='rotate(27,0.5,0.5)'>
+              <stop offset='0' stop-color='#111111' />
+              <stop offset='1' stop-color='#111111' />
+            </linearGradient>
+          </defs>
+          <pattern id='b' width='14' height='14' patternUnits='userSpaceOnUse'>
+            <circle fill='#FFFFFF' cx='7' cy='7' r='7' />
+          </pattern>
+          <rect x={-750} y={-750} width='200%' height='200%' fill='url(#a)' />
+          <rect x={-750} y={-750} width='200%' height='200%' fill='url(#b)' fill-opacity='0.06' />
         </g>
 
         {/* snap lines */}
         <g id="snapliens-groups" transform={zoom.toString()} strokeWidth={1} stroke='blue'>
-          {store.snapLines?.horizontal && <path id="snapLineH" d={`M 0 ${store.snapLines.horizontal} H 750`} />}
-          {store.snapLines?.vertical && <path id="snapLineV" d={`M ${store.snapLines.vertical} 0 V 750`} />}
+          {store.snapLines?.horizontal && <path id="snapLineH" d={`M -750 ${store.snapLines.horizontal} H 1500`} />}
+          {store.snapLines?.vertical && <path id="snapLineV" d={`M ${store.snapLines.vertical} -750 V 1500`} />}
         </g>
 
         {/* zoom controlles */}
@@ -90,6 +101,6 @@ function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["ch
         </g>
 
       </svg>
-    </>
+    </div>
   )
 }

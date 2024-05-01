@@ -4,11 +4,20 @@ import { useEditorStore } from '@/contexts/editor-store';
 import { useGesture } from "@use-gesture/react";
 import { BasicNode } from "@/components/nodes/basic";
 import { Zoom } from "@visx/zoom";
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 
 const width = 750
 const height = 750
+
+const defaultInitialTransformMatrix = {
+  scaleX: 1,
+  scaleY: 1,
+  translateX: width / 2,
+  translateY: height / 2,
+  skewX: 0,
+  skewY: 0,
+}
 
 export default function EditorViewPort() {
   return (
@@ -17,6 +26,7 @@ export default function EditorViewPort() {
         <Zoom<SVGRectElement>
           width={width}
           height={height}
+          initialTransformMatrix={defaultInitialTransformMatrix}
         >
           {(zoom) => ZoomContent({ zoom })}
         </Zoom>
@@ -33,22 +43,51 @@ function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["ch
     store.clearActiveNodes()
   }
 
+  const [initOrigin, setInitOrigin] = useState([0, 0])
+  const [initMatrix, setInitMatrix] = useState(defaultInitialTransformMatrix)
+
   const bind = useGesture({
     onContextMenu: (e) => e.event.preventDefault(),
     onDragStart: (e) => zoom.dragStart(e.event as any),
     onDragEnd: (e) => zoom.dragEnd(),
     onDoubleClick: (e) => handleViewPortTap(),
     onPinch: (e) => {
-      zoom.handlePinch(e)
+
+      e.first && setInitOrigin(e.origin)
+      e.first && setInitMatrix(zoom.transformMatrix)
+      false && zoom.applyToPoint({ x: e.origin[0], y: e.origin[1] })
+      e.last && setInitOrigin([0, 0])
+      e.last && console.log(zoom.transformMatrix)
+
+      false && zoom.setTranslate({
+        translateX: (e.origin[0] - initOrigin[0]) * 1,
+        translateY: (e.origin[1] - initOrigin[1]) * 1
+      })
+      false && zoom.scale({
+        scaleX: e.delta[0] * 0.5 + 1,
+        point: { x: e.origin[0], y: e.origin[1] }
+      })
+
+      const scaleVal = Math.min(Math.max(initMatrix.scaleX + (e.movement[0] - 1) * 0.7, 0.21), 2.1)
+
+      true && zoom.setTransformMatrix({
+        scaleX: scaleVal,
+        scaleY: scaleVal,
+        translateX: (initMatrix.translateX + (e.origin[0] - initOrigin[0]) * 1),
+        translateY: (initMatrix.translateY + (e.origin[1] - initOrigin[1]) * 1),
+        skewY: 0,
+        skewX: 0
+      })
+
     },
     onWheel: (e) => {
       zoom.handleWheel(e.event)
     },
     onDrag: (e) => {
-      if (e.touches === 2 || e.buttons === 2)
-        zoom.dragMove(e.event as any)
+      //if (e.touches === 2 || e.buttons === 2)
+      //   zoom.dragMove(e.event as any)
     },
-  }, { drag: { pointer: { buttons: [1, 2, 4] } }, pinch: {} })
+  }, { drag: { pointer: { buttons: [1, 2, 4] } } })
 
   useEffect(() => {
     useEditorStore.persist.rehydrate()

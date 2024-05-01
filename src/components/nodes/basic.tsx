@@ -106,7 +106,10 @@ export function BasicNode({
 
   const binds = useGesture({
     onDragStart: ((event) => dragStart(event.event as any)),
-    onDrag: ((event) => !event.first && dragMove(event.event as any)),
+    onDrag: ((event) => {
+      !event.first && !event.tap && dragMove(event.event as any)
+      event.tap && nodeClick()
+    }),
     onDragEnd: ((event) => dragEnd(event.event as any)),
   },
     { drag: { delay: true, threshold: 10, filterTaps: true } }
@@ -132,20 +135,14 @@ export function BasicNode({
         <rect
           x={x}
           y={y}
-          rx={nodeActive ? 10 : 0}
+          rx={5}
           width={node.size.w}
           height={node.size.h}
+          strokeWidth={2}
+          stroke={nodeActive ? "white" : "transparent"}
           fill={"red"}
         >
         </rect>
-        <rect
-          onClick={nodeClick}
-          x={x}
-          y={y}
-          width={20}
-          height={20}
-          fill={nodeActive ? "blue" : "white"}
-        />
       </g>
     </>
   );

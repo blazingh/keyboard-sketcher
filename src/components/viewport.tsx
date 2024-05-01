@@ -29,16 +29,22 @@ function ZoomContent({ zoom }: { zoom: any }) {
 
   const store = useEditorStore()
 
+  function handleViewPortTap() {
+    store.clearActiveNodes()
+  }
+
   const bind = useGesture({
     onPinch: (e) => {
     },
+    onDoubleClick: (e) => {
+      handleViewPortTap()
+    },
     onDrag: (e) => {
-      if (e.first) zoom.dragStart(e.event as any)
-      if (e.last) zoom.dragEnd()
-      if (e.touches === 2 && !e.first && !e.last)
-        zoom.dragMove(e.event as any)
+      e.first && zoom.dragStart(e.event as any)
+      e.last && zoom.dragEnd()
+      e.touches === 2 && !e.first && !e.last && !e.tap && zoom.dragMove(e.event as any)
     }
-  })
+  }, { drag: {} })
 
   useEffect(() => {
     useEditorStore.persist.rehydrate()

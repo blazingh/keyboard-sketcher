@@ -51,41 +51,34 @@ function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["ch
     onDragStart: (e) => zoom.dragStart(e.event as any),
     onDragEnd: (e) => zoom.dragEnd(),
     onDoubleClick: (e) => handleViewPortTap(),
-    onPinch: (e) => {
-
-      e.first && setInitOrigin(e.origin)
-      e.first && setInitMatrix(zoom.transformMatrix)
-      false && zoom.applyToPoint({ x: e.origin[0], y: e.origin[1] })
-      e.last && setInitOrigin([0, 0])
-      e.last && console.log(zoom.transformMatrix)
-
-      false && zoom.setTranslate({
-        translateX: (e.origin[0] - initOrigin[0]) * 1,
-        translateY: (e.origin[1] - initOrigin[1]) * 1
-      })
-      false && zoom.scale({
-        scaleX: e.delta[0] * 0.5 + 1,
-        point: { x: e.origin[0], y: e.origin[1] }
-      })
-
-      const scaleVal = Math.min(Math.max(initMatrix.scaleX + (e.movement[0] - 1) * 0.7, 0.21), 2.1)
-
-      true && zoom.setTransformMatrix({
+    onPinch: ({ first, last, movement, origin }) => {
+      if (first) {
+        setInitOrigin(origin)
+        setInitMatrix(zoom.transformMatrix)
+        return
+      }
+      if (last) {
+        setInitOrigin([0, 0])
+        return
+      }
+      const scaleVal = Math.min(Math.max(initMatrix.scaleX + (movement[0] - 1) * 0.7, 0.21), 2.1)
+      const newMatrix = {
         scaleX: scaleVal,
         scaleY: scaleVal,
-        translateX: (initMatrix.translateX + (e.origin[0] - initOrigin[0]) * 1),
-        translateY: (initMatrix.translateY + (e.origin[1] - initOrigin[1]) * 1),
+        translateX: initMatrix.translateX + (origin[0] - initOrigin[0]),
+        translateY: initMatrix.translateY + (origin[1] - initOrigin[1]),
         skewY: 0,
         skewX: 0
-      })
-
+      }
+      zoom.setTransformMatrix(newMatrix)
     },
-    onWheel: (e) => {
-      zoom.handleWheel(e.event)
+    onWheel: ({ first, last, event }) => {
+      if (!last)
+        zoom.handleWheel(event)
     },
     onDrag: (e) => {
-      //if (e.touches === 2 || e.buttons === 2)
-      //   zoom.dragMove(e.event as any)
+      if (e.buttons === 2)
+        zoom.dragMove(e.event as any)
     },
   }, { drag: { pointer: { buttons: [1, 2, 4] } } })
 

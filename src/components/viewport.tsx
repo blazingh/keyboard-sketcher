@@ -144,15 +144,17 @@ function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["ch
           ))}
         </g>
 
-        <rect
-          x={Math.min(0, boxSize[0]) + boxOrigin[0]}
-          y={Math.min(0, boxSize[1]) + boxOrigin[1]}
-          width={Math.max(boxSize[0], -boxSize[0])}
-          height={Math.max(boxSize[1], -boxSize[1])}
-          fill='blue'
-          fillOpacity={0.1}
-          stroke='blue'
-        />
+        {(JSON.stringify(boxSize) !== JSON.stringify([0, 0])) &&
+          <rect
+            x={Math.min(0, boxSize[0]) + boxOrigin[0]}
+            y={Math.min(0, boxSize[1]) + boxOrigin[1]}
+            width={Math.max(boxSize[0], -boxSize[0])}
+            height={Math.max(boxSize[1], -boxSize[1])}
+            fill='blue'
+            fillOpacity={0.1}
+            stroke='blue'
+          />
+        }
 
 
       </svg>

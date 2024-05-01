@@ -5,6 +5,8 @@ import { useGesture } from "@use-gesture/react";
 import { BasicNode } from "@/components/nodes/basic";
 import { Zoom } from "@visx/zoom";
 import { useEffect, useState } from 'react';
+import { useDrag } from './utils/drag';
+import { LinePath } from '@visx/shape';
 
 
 const width = 750
@@ -46,10 +48,16 @@ function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["ch
   const [initOrigin, setInitOrigin] = useState([0, 0])
   const [initMatrix, setInitMatrix] = useState(defaultInitialTransformMatrix)
 
+  const [boxOrigin, setBoxOrigin] = useState([0, 0])
+  const [boxSize, setBoxSize] = useState([0, 0])
+
   const bind = useGesture({
     onContextMenu: (e) => e.event.preventDefault(),
     onDragStart: (e) => zoom.dragStart(e.event as any),
-    onDragEnd: (e) => zoom.dragEnd(),
+    onDragEnd: (e) => {
+      setBoxSize([0, 0])
+      zoom.dragEnd()
+    },
     onDoubleClick: (e) => handleViewPortTap(),
     onPinch: ({ first, last, movement, origin }) => {
       if (first) {
@@ -76,9 +84,13 @@ function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["ch
       if (!last)
         zoom.handleWheel(event)
     },
-    onDrag: (e) => {
-      if (e.buttons === 2)
-        zoom.dragMove(e.event as any)
+    onDrag: ({ first, last, buttons, touches, event, ...e }) => {
+      if (buttons === 2)
+        zoom.dragMove(event as any)
+      if (buttons === 1 && touches === 1) {
+        first && setBoxOrigin(e.xy)
+        !first && setBoxSize(e.movement)
+      }
     },
   }, { drag: { pointer: { buttons: [1, 2, 4] } } })
 
@@ -131,6 +143,17 @@ function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["ch
             />
           ))}
         </g>
+
+        <rect
+          x={Math.min(0, boxSize[0]) + boxOrigin[0]}
+          y={Math.min(0, boxSize[1]) + boxOrigin[1]}
+          width={Math.max(boxSize[0], -boxSize[0])}
+          height={Math.max(boxSize[1], -boxSize[1])}
+          fill='blue'
+          fillOpacity={0.1}
+          stroke='blue'
+        />
+
 
       </svg>
     </div>

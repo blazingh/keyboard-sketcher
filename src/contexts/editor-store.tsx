@@ -45,9 +45,9 @@ type Actions = {
 export type EditorStoreType = States & Actions
 
 const initialNodes: { [key: Node["id"]]: Node } = {
-  "1": { id: "1", size: { w: 70, h: 70 }, pos: { x: 375, y: 375 } },
-  "2": { id: "2", size: { w: 70, h: 70 }, pos: { x: 30, y: 30 } },
-  "3": { id: "3", size: { w: 70, h: 70 }, pos: { x: 550, y: 50 } }
+  "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 375, y: 375 } },
+  "2": { id: "2", size: { w: 140, h: 140 }, pos: { x: 30, y: 30 } },
+  "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: 550, y: 50 } }
 }
 
 export const useEditorStore = create<EditorStoreType>()(

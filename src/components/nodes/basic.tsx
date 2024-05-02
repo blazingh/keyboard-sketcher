@@ -143,6 +143,14 @@ export function BasicNode({
           fill={"red"}
         >
         </rect>
+        {false && (<>
+          <text x={x} y={(y || 0) - 30} font-size="10" fill="white">
+            id: {JSON.stringify(node.id)}
+          </text>
+          <text x={x} y={(y || 0) - 10} font-size="10" fill="white">
+            {JSON.stringify(node.pos)}
+          </text>
+        </>)}
       </g>
     </>
   );

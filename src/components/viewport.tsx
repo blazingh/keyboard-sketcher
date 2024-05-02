@@ -5,30 +5,51 @@ import { useGesture } from "@use-gesture/react";
 import { BasicNode } from "@/components/nodes/basic";
 import { Zoom } from "@visx/zoom";
 import { useEffect, useState } from 'react';
+import ParentSize from '@visx/responsive/lib/components/ParentSize';
 
 
-const width = 750
-const height = 750
+const editorWidth = 1500
+const editorHeight = 1000
 
 const defaultInitialTransformMatrix = {
   scaleX: 1,
   scaleY: 1,
-  translateX: width / 2,
-  translateY: height / 2,
+  translateX: editorWidth / 2,
+  translateY: editorHeight / 2,
   skewX: 0,
   skewY: 0,
 }
 
 export default function EditorViewPort() {
   return (
+    <div className='w-svw h-svh relative'>
+      <ParentSize>
+        {({ width, height }) => <EditorViewPortContent width={width} height={height} />}
+      </ParentSize>
+    </div>
+  )
+}
+
+export function EditorViewPortContent({
+  width,
+  height,
+}: {
+  width: number,
+  height: number,
+}) {
+  return (
     <div className="" style={{ touchAction: 'none' }}>
       <div className='relative' style={{ width, height }}>
         <Zoom<SVGRectElement>
           width={width}
           height={height}
+          scaleXMax={2.1}
+          scaleYMax={2.1}
+          scaleXMin={0.21}
+          scaleYMin={0.21}
           initialTransformMatrix={defaultInitialTransformMatrix}
         >
-          {(zoom) => ZoomContent({ zoom })}
+          {(zoom) => ZoomContent({ zoom, width, height })}
         </Zoom>
       </div>
     </div>
@@ -44,7 +65,15 @@ function isInsideSelectionBox(box: any, node: Node) {
   );
 }
 
-function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["children"]>[0] }) {
+function ZoomContent({
+  zoom,
+  width,
+  height,
+}: {
+  zoom: Parameters<Parameters<typeof Zoom>[0]["children"]>[0]
+  width: number,
+  height: number
+}) {
 
   const store = useEditorStore()
 
@@ -117,64 +146,57 @@ function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["ch
   }, [])
 
   return (
-    <div className='relativ'>
-      <svg width={width} height={height} className='border' >
+    <svg width={width} height={height} >
 
-        {/* background */}
-        <g transform={zoom.toString()}>
-          <rect fill='#FFFFFF' width='24' height='24' />
-          <defs>
-            <linearGradient id='a' x1='0' x2='0' y1='0' y2='1' gradientTransform='rotate(27,0.5,0.5)'>
-              <stop offset='0' stop-color='#111111' />
-              <stop offset='1' stop-color='#111111' />
-            </linearGradient>
-          </defs>
-          <pattern id='b' width='14' height='14' patternUnits='userSpaceOnUse'>
-            <circle fill='#FFFFFF' cx='7' cy='7' r='7' />
-          </pattern>
-          <rect x={-750} y={-750} width='200%' height='200%' fill='url(#a)' />
-          <rect x={-750} y={-750} width='200%' height='200%' fill='url(#b)' fill-opacity='0.06' />
-        </g>
+      {/* background */}
+      <g transform={zoom.toString()}>
+        <pattern id="pattern-circles" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse">
+          <circle id="pattern-circle" cx="0" cy="0" r="0.5" fill="#fff"></circle>
+          <circle id="pattern-circle" cx="10" cy="0" r="0.5" fill="#fff"></circle>
+          <circle id="pattern-circle" cx="0" cy="10" r="0.5" fill="#fff"></circle>
+          <circle id="pattern-circle" cx="10" cy="10" r="0.5" fill="#fff"></circle>
+        </pattern>
+        <rect id="rect" x={-editorWidth} y={-editorHeight} width={editorWidth * 2} height={editorHeight * 2} fill="url(#pattern-circles)" stroke='white' strokeWidth={2}></rect>
+      </g>
 
-        {/* snap lines */}
-        <g id="snapliens-groups" transform={zoom.toString()} strokeWidth={1} stroke='blue'>
-          {store.snapLines?.horizontal && <path id="snapLineH" d={`M -750 ${store.snapLines.horizontal} H 1500`} />}
-          {store.snapLines?.vertical && <path id="snapLineV" d={`M ${store.snapLines.vertical} -750 V 1500`} />}
-        </g>
+      {/* snap lines */}
+      <g id="snapliens-groups" transform={zoom.toString()} strokeWidth={1} stroke='blue'>
+        {store.snapLines?.horizontal && <path id="snapLineH" d={`M -750 ${store.snapLines.horizontal} H 1500`} />}
+        {store.snapLines?.vertical && <path id="snapLineV" d={`M ${store.snapLines.vertical} -750 V 1500`} />}
+      </g>
 
-        {/* zoom controlles */}
-        <rect
-          width={width}
-          height={height}
-          fill="transparent"
-          className='touch-none'
-          {...bind()}
-        />
+      {/* zoom controlles */}
+      <rect
+        width={width}
+        height={height}
+        fill="transparent"
+        className='touch-none'
+        {...bind()}
+      />
 
-        {/* nodes */}
-        <g id="points" transform={zoom.toString()}>
-          {store.nodesArray().map((node) => (
-            <BasicNode
-              key={node.id}
-              node={node}
-              zoomTransformMatrix={zoom.transformMatrix}
-            />
-          ))}
-        </g>
-
-        {(boxSize[0] !== 0 || boxSize[1] !== 0) &&
-          <rect
-            x={Math.min(0, boxSize[0]) + boxOrigin[0]}
-            y={Math.min(0, boxSize[1]) + boxOrigin[1]}
-            width={Math.max(boxSize[0], -boxSize[0])}
-            height={Math.max(boxSize[1], -boxSize[1])}
-            fill='blue'
-            fillOpacity={0.1}
-            stroke='blue'
+      {/* nodes */}
+      <g id="points" transform={zoom.toString()}>
+        {store.nodesArray().map((node) => (
+          <BasicNode
+            key={node.id}
+            node={node}
+            zoomTransformMatrix={zoom.transformMatrix}
           />
-        }
+        ))}
+      </g>
 
-      </svg>
-    </div>
+      {(boxSize[0] !== 0 || boxSize[1] !== 0) &&
+        <rect
+          x={Math.min(0, boxSize[0]) + boxOrigin[0]}
+          y={Math.min(0, boxSize[1]) + boxOrigin[1]}
+          width={Math.max(boxSize[0], -boxSize[0])}
+          height={Math.max(boxSize[1], -boxSize[1])}
+          fill='blue'
+          fillOpacity={0.1}
+          stroke='blue'
+        />
+      }
+
+    </svg>
   )
 }

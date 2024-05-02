@@ -6,6 +6,8 @@ import { BasicNode } from "@/components/nodes/basic";
 import { Zoom } from "@visx/zoom";
 import { useEffect, useState } from 'react';
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
+import { useHotkeys } from 'react-hotkeys-hook';
+import { Key } from 'ts-key-enum';
 
 
 const editorWidth = 1500
@@ -19,6 +21,16 @@ const defaultInitialTransformMatrix = {
   skewX: 0,
   skewY: 0,
 }
+
+function isInsideSelectionBox(box: any, node: Node) {
+  return (
+    node.pos.x >= box.x &&
+    node.pos.y >= box.y &&
+    node.pos.x + node.size.w <= box.x + box.w &&
+    node.pos.y + node.size.h <= box.y + box.h
+  );
+}
+
 
 export default function EditorViewPort() {
   return (
@@ -56,15 +68,6 @@ export function EditorViewPortContent({
   );
 }
 
-function isInsideSelectionBox(box: any, node: Node) {
-  return (
-    node.pos.x >= box.x &&
-    node.pos.y >= box.y &&
-    node.pos.x + node.size.w <= box.x + box.w &&
-    node.pos.y + node.size.h <= box.y + box.h
-  );
-}
-
 function ZoomContent({
   zoom,
   width,
@@ -76,6 +79,11 @@ function ZoomContent({
 }) {
 
   const store = useEditorStore()
+
+  useHotkeys(Key.ArrowUp, () => store.moveActiveNodes([0, -10]))
+  useHotkeys(Key.ArrowDown, () => store.moveActiveNodes([0, 10]))
+  useHotkeys(Key.ArrowLeft, () => store.moveActiveNodes([-10, 0]))
+  useHotkeys(Key.ArrowRight, () => store.moveActiveNodes([10, 0]))
 
   function handleViewPortTap() {
     store.clearActiveNodes()

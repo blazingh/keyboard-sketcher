@@ -1,12 +1,10 @@
 "use client"
 
-import { useEditorStore } from '@/contexts/editor-store';
+import { Node, useEditorStore } from '@/contexts/editor-store';
 import { useGesture } from "@use-gesture/react";
 import { BasicNode } from "@/components/nodes/basic";
 import { Zoom } from "@visx/zoom";
 import { useEffect, useState } from 'react';
-import { useDrag } from './utils/drag';
-import { LinePath } from '@visx/shape';
 
 
 const width = 750
@@ -37,6 +35,15 @@ export default function EditorViewPort() {
   );
 }
 
+function isInsideSelectionBox(box: any, node: Node) {
+  return (
+    node.pos.x >= box.x &&
+    node.pos.y >= box.y &&
+    node.pos.x + node.size.w <= box.x + box.w &&
+    node.pos.y + node.size.h <= box.y + box.h
+  );
+}
+
 function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["children"]>[0] }) {
 
   const store = useEditorStore()
@@ -55,6 +62,17 @@ function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["ch
     onContextMenu: (e) => e.event.preventDefault(),
     onDragStart: (e) => zoom.dragStart(e.event as any),
     onDragEnd: (e) => {
+      const box = {
+        x: (Math.min(0, boxSize[0]) + boxOrigin[0] - zoom.transformMatrix.translateX) / zoom.transformMatrix.scaleX,
+        y: (Math.min(0, boxSize[1]) + boxOrigin[1] - zoom.transformMatrix.translateY) / zoom.transformMatrix.scaleY,
+        w: (Math.max(boxSize[0], -boxSize[0])) / zoom.transformMatrix.scaleX,
+        h: (Math.max(boxSize[1], -boxSize[1])) / zoom.transformMatrix.scaleY,
+      }
+      store.nodesArray().map((node) => {
+        if (isInsideSelectionBox(box, node)) {
+          store.addActiveNode(node.id)
+        }
+      })
       setBoxSize([0, 0])
       zoom.dragEnd()
     },
@@ -144,7 +162,7 @@ function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["ch
           ))}
         </g>
 
-        {(JSON.stringify(boxSize) !== JSON.stringify([0, 0])) &&
+        {(boxSize[0] !== 0 || boxSize[1] !== 0) &&
           <rect
             x={Math.min(0, boxSize[0]) + boxOrigin[0]}
             y={Math.min(0, boxSize[1]) + boxOrigin[1]}
@@ -155,7 +173,6 @@ function ZoomContent({ zoom }: { zoom: Parameters<Parameters<typeof Zoom>[0]["ch
             stroke='blue'
           />
         }
-
 
       </svg>
     </div>

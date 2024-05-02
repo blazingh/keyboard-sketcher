@@ -161,8 +161,8 @@ function ZoomContent({
 
       {/* snap lines */}
       <g id="snapliens-groups" transform={zoom.toString()} strokeWidth={1} stroke='blue'>
-        {store.snapLines?.horizontal && <path id="snapLineH" d={`M -750 ${store.snapLines.horizontal} H 1500`} />}
-        {store.snapLines?.vertical && <path id="snapLineV" d={`M ${store.snapLines.vertical} -750 V 1500`} />}
+        {store.snapLines?.horizontal && <path id="snapLineH" d={`M ${-editorWidth} ${store.snapLines.horizontal} H ${editorWidth * 2}`} />}
+        {store.snapLines?.vertical && <path id="snapLineV" d={`M ${store.snapLines.vertical} ${-editorHeight} V ${editorHeight * 2}`} />}
       </g>
 
       {/* zoom controlles */}

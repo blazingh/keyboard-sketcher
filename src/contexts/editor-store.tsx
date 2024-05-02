@@ -45,8 +45,9 @@ type Actions = {
 export type EditorStoreType = States & Actions
 
 const initialNodes: { [key: Node["id"]]: Node } = {
-  "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 375, y: 375 } },
+  "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 370, y: 370 } },
   "2": { id: "2", size: { w: 140, h: 140 }, pos: { x: 30, y: 30 } },
+  "4": { id: "4", size: { w: 140, h: 140 }, pos: { x: -200, y: -200 } },
   "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: 550, y: 50 } }
 }
 
@@ -122,12 +123,13 @@ export const useEditorStore = create<EditorStoreType>()(
     {
       name: 'sketcher-nodes',
       skipHydration: true,
+      version: 1,
+      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ nodes: state.nodes }),
       onRehydrateStorage: (state) => {
         if (JSON.stringify(state.nodes) === JSON.stringify({}))
           state.nodes = initialNodes
       }
-      //storage: createJSONStorage(() => localStorage),
     }
   )
 )

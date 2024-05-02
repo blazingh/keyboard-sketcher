@@ -90,8 +90,8 @@ export function BasicNode({
 
       // updated the active nodes position
       moveActiveNodes([
-        snapLines?.snapPosition.x ? snapLines?.snapPosition.x - (args.x || 0) : args.dx,
-        snapLines?.snapPosition.y ? snapLines?.snapPosition.y - (args.y || 0) : args.dy
+        Math.round((snapLines?.snapPosition.x ? snapLines?.snapPosition.x - (args.x || 0) : args.dx) / 10) * 10,
+        Math.round((snapLines?.snapPosition.y ? snapLines?.snapPosition.y - (args.y || 0) : args.dy) / 10) * 10
       ])
 
       resetSnapLines()
@@ -134,17 +134,17 @@ export function BasicNode({
         {...binds()}
       >
         <rect
-          x={x}
-          y={y}
+          x={(x || 0) + 1}
+          y={(y || 0) + 1}
           rx={5}
-          width={node.size.w}
-          height={node.size.h}
+          width={node.size.w - 2}
+          height={node.size.h - 2}
           strokeWidth={2}
-          stroke={nodeActive ? "white" : "transparent"}
+          stroke={nodeActive ? "white" : "red"}
           fill={"red"}
         >
         </rect>
-        {false && (<>
+        {true && (<>
           <text x={x} y={(y || 0) - 30} font-size="10" fill="white">
             id: {JSON.stringify(node.id)}
           </text>

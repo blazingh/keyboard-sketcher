@@ -6,6 +6,7 @@ import { useDrag as useZoomableDrag } from '@/components/utils/drag';
 import { EditorStoreType, Node, useEditorStore } from '@/contexts/editor-store';
 import { produce } from "immer";
 import { useGesture } from "@use-gesture/react";
+import { cn } from "@/lib/utils";
 
 const selector = (state: EditorStoreType) => ({
   clearActiveNodes: state.clearActiveNodes,
@@ -136,16 +137,17 @@ export function BasicNode({
         <rect
           x={(x || 0) + 1}
           y={(y || 0) + 1}
-          rx={5}
+          rx={10}
           width={node.size.w - 2}
           height={node.size.h - 2}
-          strokeWidth={2}
-          stroke={nodeActive ? "white" : "red"}
-          fill={"red"}
+          className={cn(
+            "fill-secondary stroke-2",
+            nodeActive ? "stroke-primary" : "stroke-white"
+          )}
         >
         </rect>
-        {true && (<>
-          <text x={x} y={(y || 0) - 30} font-size="10" fill="white">
+        {false && (<>
+          <text x={x} y={(y || 0) - 25} font-size="10" fill="white">
             id: {JSON.stringify(node.id)}
           </text>
           <text x={x} y={(y || 0) - 10} font-size="10" fill="white">

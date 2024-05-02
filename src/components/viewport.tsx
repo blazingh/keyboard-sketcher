@@ -159,10 +159,10 @@ function ZoomContent({
       {/* background */}
       <g transform={zoom.toString()}>
         <pattern id="pattern-circles" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse">
-          <circle id="pattern-circle" cx="0" cy="0" r="0.5" fill="#fff"></circle>
-          <circle id="pattern-circle" cx="10" cy="0" r="0.5" fill="#fff"></circle>
-          <circle id="pattern-circle" cx="0" cy="10" r="0.5" fill="#fff"></circle>
-          <circle id="pattern-circle" cx="10" cy="10" r="0.5" fill="#fff"></circle>
+          <circle id="pattern-circle" cx="0" cy="0" r="0.5" fill="#fff" fillOpacity={0.5}></circle>
+          <circle id="pattern-circle" cx="10" cy="0" r="0.5" fill="#fff" fillOpacity={0.5}></circle>
+          <circle id="pattern-circle" cx="0" cy="10" r="0.5" fill="#fff" fillOpacity={0.5}></circle>
+          <circle id="pattern-circle" cx="10" cy="10" r="0.5" fill="#fff" fillOpacity={0.5}></circle>
         </pattern>
         <rect id="rect" x={-editorWidth} y={-editorHeight} width={editorWidth * 2} height={editorHeight * 2} fill="url(#pattern-circles)" stroke='white' strokeWidth={2}></rect>
       </g>
@@ -199,9 +199,9 @@ function ZoomContent({
           y={Math.min(0, boxSize[1]) + boxOrigin[1]}
           width={Math.max(boxSize[0], -boxSize[0])}
           height={Math.max(boxSize[1], -boxSize[1])}
-          fill='blue'
+          fill='#E0FFFF'
           fillOpacity={0.1}
-          stroke='blue'
+          stroke='#E0FFFF'
         />
       }
 

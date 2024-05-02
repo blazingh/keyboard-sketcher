@@ -130,6 +130,7 @@ export function BasicNode({
       )}
       <g
         transform={`translate(${dx}, ${dy})`}
+        className="touch-none"
         {...binds()}
       >
         <rect

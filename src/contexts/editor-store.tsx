@@ -5,6 +5,7 @@ import { produce } from 'immer'
 import { temporal } from 'zundo';
 import crypto from 'crypto';
 import isDeepEqual from 'fast-deep-equal';
+import { TransformMatrix } from '@/components/viewport';
 
 export type Node = {
   id: string,
@@ -24,6 +25,7 @@ type States = {
   nodesArray: () => Node[],
   activeNodes: Node["id"][],
   activeDxy: { x: number, y: number }
+  transformMatrix: TransformMatrix | null
 }
 
 type Actions = {
@@ -41,6 +43,8 @@ type Actions = {
   resetSnapLines: () => void
 
   moveActiveNodes: (xy: [number, number]) => void
+
+  setTransformMatrix: (matrix: TransformMatrix) => void
 }
 
 export type EditorStoreType = States & Actions
@@ -55,11 +59,12 @@ const initialNodes: { [key: Node["id"]]: Node } = {
 export const useEditorStore = create<EditorStoreType>()(
   persist(
     temporal((set, get) => ({
-      nodes: {},
+      nodes: initialNodes,
       nodesArray: () => Object.values(get().nodes),
       activeNodes: [],
       snapLines: { ...defaultSnapLinesResult },
       activeDxy: { x: 0, y: 0 },
+      transformMatrix: null,
 
       setActiveDxy: (xy: { x: number, y: number }) => {
         set(produce((state: States) => {
@@ -115,12 +120,16 @@ export const useEditorStore = create<EditorStoreType>()(
             state.nodes[id].pos.y += xy[1]
           })
         }))
-      }
+      },
+
+      setTransformMatrix(matrix) {
+        set(produce((state: States) => {
+          state.transformMatrix = matrix
+        }))
+      },
     }),
       {
         partialize: (state) => ({ nodes: state.nodes }),
-        onSave: (_, state) => {
-        },
         equality: (pastState, currentState) =>
           isDeepEqual(pastState, currentState),
       },
@@ -128,13 +137,8 @@ export const useEditorStore = create<EditorStoreType>()(
     {
       name: 'sketcher-nodes',
       skipHydration: true,
-      version: 1,
-      partialize: (state) => ({ nodes: state.nodes }),
-      onRehydrateStorage: (state) => {
-        if (JSON.stringify(state.nodes) === JSON.stringify({}))
-          state.nodes = initialNodes
-      }
-      //storage: createJSONStorage(() => localStorage),
+      version: 2,
+      partialize: (state) => ({ nodes: state.nodes, transformMatrix: state.transformMatrix }),
     }
   )
 )

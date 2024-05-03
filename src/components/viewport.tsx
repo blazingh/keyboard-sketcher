@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Key } from 'ts-key-enum';
+import { NodesOutline } from './nodes-outline';
+import { produce } from 'immer';
 
 
 const editorWidth = 1500
@@ -30,7 +32,6 @@ function isInsideSelectionBox(box: any, node: Node) {
     node.pos.y + node.size.h <= box.y + box.h
   );
 }
-
 
 export default function EditorViewPort() {
   return (
@@ -171,6 +172,27 @@ function ZoomContent({
       <g id="snapliens-groups" transform={zoom.toString()} strokeWidth={1} stroke='blue'>
         {store.snapLines?.horizontal && <path id="snapLineH" d={`M ${-editorWidth} ${store.snapLines.horizontal} H ${editorWidth * 2}`} />}
         {store.snapLines?.vertical && <path id="snapLineV" d={`M ${store.snapLines.vertical} ${-editorHeight} V ${editorHeight * 2}`} />}
+      </g>
+
+      {/* nodes outline */}
+      <g transform={zoom.toString()}>
+        <defs>
+          <NodesOutline nodes={function(nodes) {
+            return nodes.map(node => {
+              if (!store.activeNodes.includes(node.id))
+                return node
+              return {
+                ...node,
+                pos: {
+                  x: node.pos.x + store.activeDxy.x,
+                  y: node.pos.y + store.activeDxy.y,
+                }
+              }
+            })
+          }(store.nodesArray())} />
+        </defs>
+        <use x="0" y="0" xlinkHref="#Nodes-Ouline-Inner" />
+        <use x="0" y="0" xlinkHref="#Nodes-Ouline-Outer" />
       </g>
 
       {/* zoom controlles */}

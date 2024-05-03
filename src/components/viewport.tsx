@@ -26,6 +26,8 @@ const defaultInitialTransformMatrix = {
   skewY: 0,
 }
 
+export type TransformMatrix = typeof defaultInitialTransformMatrix
+
 function isInsideSelectionBox(box: any, node: Node) {
   return (
     node.pos.x >= box.x &&
@@ -68,6 +70,14 @@ export function EditorViewPortContent({
   width: number,
   height: number,
 }) {
+  const { transformMatrix } = useEditorStore((state) => ({ transformMatrix: state.transformMatrix }))
+
+  useEffect(() => {
+    useEditorStore.persist.rehydrate()
+  }, [])
+
+  if (!useEditorStore.persist.hasHydrated()) return null
+
   return (
     <div className="" style={{ touchAction: 'none' }}>
       <div className='relative' style={{ width, height }}>
@@ -78,7 +88,7 @@ export function EditorViewPortContent({
           scaleYMax={2.1}
           scaleXMin={0.21}
           scaleYMin={0.21}
-          initialTransformMatrix={defaultInitialTransformMatrix}
+          initialTransformMatrix={transformMatrix ?? defaultInitialTransformMatrix}
         >
           {(zoom) => ZoomContent({ zoom, width, height })}
         </Zoom>
@@ -113,6 +123,10 @@ function ZoomContent({
 
   const [boxOrigin, setBoxOrigin] = useState([0, 0])
   const [boxSize, setBoxSize] = useState([0, 0])
+
+  useEffect(() => {
+    store.setTransformMatrix(zoom.transformMatrix)
+  }, [zoom.transformMatrix])
 
   const bind = useGesture({
     onContextMenu: (e) => e.event.preventDefault(),
@@ -167,10 +181,6 @@ function ZoomContent({
       }
     },
   }, { drag: { pointer: { buttons: [1, 2, 4] } } })
-
-  useEffect(() => {
-    useEditorStore.persist.rehydrate()
-  }, [])
 
   return (
     <svg width={width} height={height} >

@@ -80,9 +80,7 @@ export function BasicNode({
       else
         resetSnapLines()
 
-      // update the actide drag xy
-      if (activeNodes.length > 1)
-        setActiveDxy({ x: args.dx, y: args.dy })
+      setActiveDxy({ x: args.dx, y: args.dy })
 
     },
     onDragEnd: (args) => {

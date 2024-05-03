@@ -120,7 +120,6 @@ export const useEditorStore = create<EditorStoreType>()(
       {
         partialize: (state) => ({ nodes: state.nodes }),
         onSave: (_, state) => {
-          console.log("updated", state)
         },
         equality: (pastState, currentState) =>
           isDeepEqual(pastState, currentState),

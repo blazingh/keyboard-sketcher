@@ -49,7 +49,6 @@ export default function EditorViewPort() {
 function EditorToolBar() {
   const store = useEditorStore()
   const { undo, redo, pastStates, futureStates } = useEditorStore.temporal.getState();
-  console.log("past", pastStates)
   return (
     <div className='absolute w-full shadow bg-background border-b border-primary z-20 px-2'>
       <Button variant={"ghost"} className='w-10 h-10' onClick={() => undo()} disabled={!pastStates.length}>

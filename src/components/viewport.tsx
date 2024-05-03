@@ -76,7 +76,7 @@ export function EditorViewPortContent({
     useEditorStore.persist.rehydrate()
   }, [])
 
-  if (!useEditorStore.persist.hasHydrated()) return null
+  if (!useEditorStore.persist?.hasHydrated()) return null
 
   return (
     <div className="" style={{ touchAction: 'none' }}>

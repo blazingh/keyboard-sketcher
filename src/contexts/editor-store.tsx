@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import { produce } from 'immer'
 import { temporal } from 'zundo';
 import crypto from 'crypto';
+import isDeepEqual from 'fast-deep-equal';
 
 export type Node = {
   id: string,
@@ -118,18 +119,23 @@ export const useEditorStore = create<EditorStoreType>()(
     }),
       {
         partialize: (state) => ({ nodes: state.nodes }),
+        onSave: (_, state) => {
+          console.log("updated", state)
+        },
+        equality: (pastState, currentState) =>
+          isDeepEqual(pastState, currentState),
       },
     ),
     {
       name: 'sketcher-nodes',
       skipHydration: true,
       version: 1,
-      storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({ nodes: state.nodes }),
       onRehydrateStorage: (state) => {
         if (JSON.stringify(state.nodes) === JSON.stringify({}))
           state.nodes = initialNodes
       }
+      //storage: createJSONStorage(() => localStorage),
     }
   )
 )

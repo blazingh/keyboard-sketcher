@@ -10,6 +10,8 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { Key } from 'ts-key-enum';
 import { NodesOutline } from './nodes-outline';
 import { produce } from 'immer';
+import { Button } from './ui/button';
+import { Redo2, Undo, Undo2 } from 'lucide-react';
 
 
 const editorWidth = 1500
@@ -36,9 +38,26 @@ function isInsideSelectionBox(box: any, node: Node) {
 export default function EditorViewPort() {
   return (
     <div className='w-svw h-svh relative'>
+      <EditorToolBar />
       <ParentSize>
         {({ width, height }) => <EditorViewPortContent width={width} height={height} />}
       </ParentSize>
+    </div>
+  )
+}
+
+function EditorToolBar() {
+  const store = useEditorStore()
+  const { undo, redo, pastStates, futureStates } = useEditorStore.temporal.getState();
+  console.log("past", pastStates)
+  return (
+    <div className='absolute w-full shadow bg-background border-b border-primary z-20 px-2'>
+      <Button variant={"ghost"} className='w-10 h-10' onClick={() => undo()} disabled={!pastStates.length}>
+        <Undo2 className='shrink-0' />
+      </Button>
+      <Button variant={"ghost"} className='w-10 h-10' onClick={() => redo()} disabled={!futureStates.length}>
+        <Redo2 className='shrink-0' />
+      </Button>
     </div>
   )
 }

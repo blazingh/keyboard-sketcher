@@ -45,14 +45,17 @@ export default function EditorToolbar() {
             >
               switch
             </DropdownMenuItem>
-            <DropdownMenuItem>constroller</DropdownMenuItem>
+            <DropdownMenuItem disabled>constroller</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
       </div>
       <div className='flex items-center [&>button]:w-10 [&>button]:h-10'>
+
         <Button variant={"ghost"} onClick={() => store.deleteActiveNodes()} disabled={!store.activeNodes.length}>
           <Trash2 className='shrink-0 text-red-500' />
         </Button>
+
       </div>
     </div>
   )

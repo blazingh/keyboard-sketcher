@@ -79,7 +79,10 @@ export function BasicNode({
       else
         resetSnapLines()
 
-      setActiveDxy({ x: args.dx, y: args.dy })
+      setActiveDxy({
+        x: args.dx,
+        y: args.dy
+      })
 
     },
     onDragEnd: (args) => {

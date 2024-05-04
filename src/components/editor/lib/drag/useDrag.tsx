@@ -199,7 +199,7 @@ export default function useDrag({
           return {
             ...currState,
             dx: (dragPoint.x - x) / (zoomTransformMatrix?.scaleX || 1),
-            dy: (dragPoint.y - y) / (zoomTransformMatrix?.scaleY || 1)
+            dy: (dragPoint.y - y) / (zoomTransformMatrix?.scaleY || 1),
           };
         },
         onDragMove &&

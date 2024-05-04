@@ -4,7 +4,7 @@ import { persist } from 'zustand/middleware'
 import { produce } from 'immer'
 import { temporal } from 'zundo';
 import isDeepEqual from 'fast-deep-equal';
-import { TransformMatrix } from '@/components/viewport';
+import { TransformMatrix } from './editor-viewport';
 
 export type Node = {
   id: string,

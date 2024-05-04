@@ -1,6 +1,6 @@
 "use client"
-import ToastFinishModel from "@/components/editor/toasts/finished-model"
-import ToastPendingModel from "@/components/editor/toasts/pending-model"
+import ToastFinishModel from "@/components/old_editor/toasts/finished-model"
+import ToastPendingModel from "@/components/old_editor/toasts/pending-model"
 import { Canvas } from '@react-three/fiber'
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
@@ -11,7 +11,7 @@ import { Node } from "reactflow"
 import { toast } from "sonner"
 import { BackSide, DirectionalLight, MeshStandardMaterial, PCFSoftShadowMap } from "three"
 import { CSG2Geom } from "@/lib/geometries"
-import { ModelAOptionsTypes, ModelWorkerResult, modelADefaultOptionsValues, modelAOptionsList } from "@/workers/model-a-options"
+import { ModelAOptionsTypes, ModelWorkerResult, modelADefaultOptionsValues } from "@/workers/model-a-options"
 import { Switch } from "@/components/ui/switch"
 /* @ts-ignore */
 import stlSerializer from '@jscad/stl-serializer'

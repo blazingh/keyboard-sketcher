@@ -1,4 +1,4 @@
-import { useEditorStore } from "@/contexts/editor-store";
+import { useEditorStore } from "./editor-store";
 import { useGesture } from "@use-gesture/react";
 import { useEffect, useRef } from "react";
 

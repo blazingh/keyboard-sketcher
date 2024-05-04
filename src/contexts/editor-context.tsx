@@ -1,9 +1,9 @@
 "use client";
-import { HelperLinesRenderer } from "@/components/editor/helper-lines";
-import NodesControll from "@/components/editor/node-controlls";
-import { Mcu } from "@/components/editor/nodes/mcu";
-import { Outline } from "@/components/editor/nodes/outline";
-import { Switch } from "@/components/editor/nodes/switch";
+import { HelperLinesRenderer } from "@/components/old_editor/helper-lines";
+import NodesControll from "@/components/old_editor/node-controlls";
+import { Mcu } from "@/components/old_editor/nodes/mcu";
+import { Outline } from "@/components/old_editor/nodes/outline";
+import { Switch } from "@/components/old_editor/nodes/switch";
 import { buttonVariants } from "@/components/ui/button";
 import { initialNodes, initialOutlineNode } from "@/constants/temp";
 import { getHelperLines } from "@/lib/helpers-lines";

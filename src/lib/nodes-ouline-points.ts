@@ -1,4 +1,4 @@
-import { Node } from '@/contexts/editor-store';
+import { Node } from '@/components/editor/editor-store';
 import hull from 'hull.js'
 import polygonClipping, { Polygon } from "polygon-clipping"
 

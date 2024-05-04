@@ -1,17 +1,17 @@
 "use client"
 
-import { Node, baseNodeState, useEditorStore } from '@/contexts/editor-store';
+import { Node, baseNodeState, useEditorStore } from './editor-store';
 import { useGesture } from "@use-gesture/react";
-import { BasicNode } from "@/components/nodes/basic";
+import { BasicNode } from "./nodes/basic-node";
 import { Zoom } from "@visx/zoom";
 import { useEffect, useState } from 'react';
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Key } from 'ts-key-enum';
 import { NodesOutline } from './nodes-outline';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import { PlusIcon, Redo2, Undo2 } from 'lucide-react';
-import { Separator } from './ui/separator';
+import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,

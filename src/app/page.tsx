@@ -1,7 +1,7 @@
-import WorkSpace from "@/components/editor/workspace";
+import EditorViewPort from "@/components/editor/editor-viewport";
 
 export default function Home() {
   return (
-    <WorkSpace />
+    <EditorViewPort />
   );
 }

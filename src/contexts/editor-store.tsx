@@ -1,9 +1,8 @@
 import { GetSnapLinesResult, defaultSnapLinesResult, getSnapLines } from '@/lib/snap-lines'
 import { create } from 'zustand'
-import { createJSONStorage, persist } from 'zustand/middleware'
+import { persist } from 'zustand/middleware'
 import { produce } from 'immer'
 import { temporal } from 'zundo';
-import crypto from 'crypto';
 import isDeepEqual from 'fast-deep-equal';
 import { TransformMatrix } from '@/components/viewport';
 
@@ -19,18 +18,22 @@ export type Node = {
   }
 }
 
-type States = {
+type State = {
   nodes: { [key: Node["id"]]: Node },
   snapLines?: GetSnapLinesResult,
   nodesArray: () => Node[],
   activeNodes: Node["id"][],
   activeDxy: { x: number, y: number }
   transformMatrix: TransformMatrix | null
+  activeNodeAddition: null | Node
 }
 
-type Actions = {
-  nodesInit: () => void,
+type Action = {
   updateNodes: (newNodes: Node[]) => void
+  addNode: (node: Node) => Node["id"]
+  deleteNode: (id: Node["id"]) => void
+
+  activateNodeForAddition: (node: State["activeNodeAddition"], pos: Node["pos"] | null) => void
 
   setActiveDxy: (xy: { x: number, y: number }) => void
 
@@ -43,11 +46,16 @@ type Actions = {
   resetSnapLines: () => void
 
   moveActiveNodes: (xy: [number, number]) => void
+  deleteActiveNodes: () => void
 
   setTransformMatrix: (matrix: TransformMatrix) => void
 }
 
-export type EditorStoreType = States & Actions
+export type EditorStoreType = State & Action
+
+export const baseNodeState: Node = {
+  id: "1", size: { w: 140, h: 140 }, pos: { x: 0, y: 0 }
+}
 
 const initialNodes: { [key: Node["id"]]: Node } = {
   "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 370, y: 370 } },
@@ -60,44 +68,69 @@ export const useEditorStore = create<EditorStoreType>()(
   persist(
     temporal((set, get) => ({
       nodes: initialNodes,
+      activeNodeAddition: null,
+
+      addNode: (node) => {
+        const randId = crypto.randomUUID()
+        set(produce((state: State) => {
+          state.nodes[randId] = { ...node, id: randId }
+        }))
+        return randId
+      },
+      deleteNode: (id) => {
+        set(produce((state: State) => {
+          delete state.nodes[id]
+        }))
+      },
+
+      activateNodeForAddition: (node, pos) => {
+        if (!pos && node) {
+          set({ activeNodeAddition: node })
+          return
+        }
+        const activeNode = get().activeNodeAddition
+        if (pos && !node && activeNode) {
+          get().addNode({ ...activeNode, pos: pos })
+          set({ activeNodeAddition: null })
+        }
+
+      },
+
       nodesArray: () => Object.values(get().nodes),
       activeNodes: [],
       snapLines: { ...defaultSnapLinesResult },
       activeDxy: { x: 0, y: 0 },
       transformMatrix: null,
 
-      setActiveDxy: (xy: { x: number, y: number }) => {
-        set(produce((state: States) => {
+      setActiveDxy: (xy) => {
+        set(produce((state) => {
           state.activeDxy = xy
         }))
       },
 
-      nodesInit: () => {
-        set({ nodes: initialNodes })
-      },
-      updateNodes: (newNodes: Node[]) => {
-        set(produce((state: States) => {
+      updateNodes: (newNodes) => {
+        set(produce((state: State) => {
           newNodes.forEach(newNode => {
             state.nodes[newNode.id] = newNode
           })
         }))
       },
 
-      addActiveNode: (id: Node["id"]) => {
-        set(produce((state: States) => {
-          const index = state.activeNodes.findIndex(a => a === id)
+      addActiveNode: (id) => {
+        set(produce((state: State) => {
+          const index = state.activeNodes.findIndex((a: string) => a === id)
           if (index === -1) state.activeNodes.push(id)
         }))
       },
-      removeActiveNode: (id: Node["id"]) => {
-        set(produce((state: States) => {
-          const index = state.activeNodes.findIndex(a => a === id)
+      removeActiveNode: (id) => {
+        set(produce((state: State) => {
+          const index = state.activeNodes.findIndex((a: string) => a === id)
           if (index !== -1) state.activeNodes.splice(index, 1)
         }))
       },
-      toggleActiveNode: (id: Node["id"]) => {
-        set(produce((state: States) => {
-          const index = state.activeNodes.findIndex(a => a === id)
+      toggleActiveNode: (id) => {
+        set(produce((state: State) => {
+          const index = state.activeNodes.findIndex((a: string) => a === id)
           if (index !== -1) state.activeNodes.splice(index, 1)
           else state.activeNodes.push(id)
         }))
@@ -106,7 +139,7 @@ export const useEditorStore = create<EditorStoreType>()(
         set({ activeNodes: [] })
       },
 
-      updateSnapLines: (target: Node) => {
+      updateSnapLines: (target) => {
         set({ snapLines: getSnapLines(target, get().nodesArray()) })
       },
       resetSnapLines: () => {
@@ -114,16 +147,23 @@ export const useEditorStore = create<EditorStoreType>()(
       },
 
       moveActiveNodes: (xy: [number, number]) => {
-        set(produce((state: States) => {
+        set(produce((state: State) => {
           get().activeNodes.forEach(id => {
             state.nodes[id].pos.x += xy[0]
             state.nodes[id].pos.y += xy[1]
           })
         }))
       },
+      deleteActiveNodes: () => {
+        set(produce((state: State) => {
+          get().activeNodes.forEach(id => {
+            delete state.nodes[id]
+          })
+        }))
+      },
 
       setTransformMatrix(matrix) {
-        set(produce((state: States) => {
+        set(produce((state: State) => {
           state.transformMatrix = matrix
         }))
       },

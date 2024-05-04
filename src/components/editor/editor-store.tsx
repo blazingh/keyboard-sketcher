@@ -1,4 +1,4 @@
-import { GetSnapLinesResult, defaultSnapLinesResult, getSnapLines } from '@/lib/snap-lines'
+import { GetSnapLinesResult, defaultSnapLinesResult, getSnapLines } from './lib/snap-lines'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { produce } from 'immer'

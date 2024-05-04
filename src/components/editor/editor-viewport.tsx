@@ -41,6 +41,7 @@ function findEnclosingBox(nodes: Node[]) {
   if (nodes.length === 0) return null
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   nodes.forEach(node => {
+    if (!node) return
     minX = Math.min(minX, node.pos.x);
     minY = Math.min(minY, node.pos.y);
     maxX = Math.max(maxX, node.pos.x + node.size.w);
@@ -193,7 +194,7 @@ function ZoomContent({
       {/* nodes toolbar */}
       {!!store.activeNodes && function(nodes: Node[]) {
         const toolbarBox = findEnclosingBox(nodes)
-        if (!toolbarBox) return null
+        if (!toolbarBox || zoom.isDragging || (store.activeDxy.x !== 0 && store.activeDxy.y !== 0)) return null
         const { x, y, width: w, height: h } = toolbarBox
         return (
           <div
@@ -231,7 +232,7 @@ function ZoomContent({
             </div>
           </div>
         )
-      }(store.nodesArray().filter(node => store.activeNodes.includes(node.id)))}
+      }(store.activeNodes.map(id => ({ ...store.nodes[id] })))}
       <svg width={width} height={height} >
 
         {/* background */}

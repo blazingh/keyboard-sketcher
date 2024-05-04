@@ -1,7 +1,6 @@
 "use client"
 
 import { TransformMatrix } from "@visx/zoom/lib/types";
-import 'react-json-view-lite/dist/index.css';
 import { useDrag as useZoomableDrag } from '@/components/utils/drag';
 import { EditorStoreType, Node, useEditorStore } from '@/contexts/editor-store';
 import { produce } from "immer";
@@ -144,7 +143,7 @@ export function BasicNode({
           )}
         >
         </rect>
-        {false && (<>
+        {true && (<>
           <text x={x} y={(y || 0) - 25} fontSize="10" fill="white">
             id: {JSON.stringify(node.id)}
           </text>

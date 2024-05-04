@@ -1,6 +1,6 @@
 "use client"
 
-import { Node, baseNodeState, useEditorStore } from './editor-store';
+import { Node, useEditorStore } from './editor-store';
 import { useGesture } from "@use-gesture/react";
 import { BasicNode } from "./nodes/basic-node";
 import { Zoom } from "@visx/zoom";
@@ -9,17 +9,8 @@ import ParentSize from '@visx/responsive/lib/components/ParentSize';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Key } from 'ts-key-enum';
 import { NodesOutline } from './nodes-outline';
-import { Button } from '@/components/ui/button';
-import { PlusIcon, Redo2, Undo2 } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
-import { cn } from '@/lib/utils';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import NodesAdditionOverlay from './nodes-addition-overlay';
+import EditorToolbar from './editor-toolbar';
 
 
 const editorWidth = 1500
@@ -48,51 +39,10 @@ function isInsideSelectionBox(box: any, node: Node) {
 export default function EditorViewPort() {
   return (
     <div className='w-svw h-svh relative'>
-      <EditorToolBar />
+      <EditorToolbar />
       <ParentSize>
         {({ width, height }) => <EditorViewPortContent width={width} height={height} />}
       </ParentSize>
-    </div>
-  )
-}
-
-function EditorToolBar() {
-  const store = useEditorStore()
-  const { undo, redo, pastStates, futureStates } = useEditorStore.temporal.getState();
-  return (
-    <div className={cn(
-      'absolute w-full shadow bg-background border-b border-primary z-20 px-2 flex items-center rounded-lg',
-      "[&>button]:w-10 [&>button]:h-10"
-    )}
-    >
-      <Button variant={"ghost"} onClick={() => undo()} disabled={!pastStates.length}>
-        <Undo2 className='shrink-0' />
-      </Button>
-
-      <Button variant={"ghost"} onClick={() => redo()} disabled={!futureStates.length}>
-        <Redo2 className='shrink-0' />
-      </Button>
-
-      <Separator orientation='vertical' className='h-6 mx-2' />
-
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant={"ghost"}>
-            <PlusIcon className='shrink-0' />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem
-            onClick={() => {
-              store.activateNodeForAddition(baseNodeState, null)
-            }}
-          >
-            switch
-          </DropdownMenuItem>
-          <DropdownMenuItem>constroller</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
     </div>
   )
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { Node, useEditorStore } from '@/contexts/editor-store';
+import { Node, baseNodeState, useEditorStore } from '@/contexts/editor-store';
 import { useGesture } from "@use-gesture/react";
 import { BasicNode } from "@/components/nodes/basic";
 import { Zoom } from "@visx/zoom";
@@ -9,9 +9,17 @@ import ParentSize from '@visx/responsive/lib/components/ParentSize';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Key } from 'ts-key-enum';
 import { NodesOutline } from './nodes-outline';
-import { produce } from 'immer';
 import { Button } from './ui/button';
-import { Redo2, Undo, Undo2 } from 'lucide-react';
+import { PlusIcon, Redo2, Undo2 } from 'lucide-react';
+import { Separator } from './ui/separator';
+import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import NodesAdditionOverlay from './nodes-addition-overlay';
 
 
 const editorWidth = 1500
@@ -52,13 +60,39 @@ function EditorToolBar() {
   const store = useEditorStore()
   const { undo, redo, pastStates, futureStates } = useEditorStore.temporal.getState();
   return (
-    <div className='absolute w-full shadow bg-background border-b border-primary z-20 px-2'>
-      <Button variant={"ghost"} className='w-10 h-10' onClick={() => undo()} disabled={!pastStates.length}>
+    <div className={cn(
+      'absolute w-full shadow bg-background border-b border-primary z-20 px-2 flex items-center rounded-lg',
+      "[&>button]:w-10 [&>button]:h-10"
+    )}
+    >
+      <Button variant={"ghost"} onClick={() => undo()} disabled={!pastStates.length}>
         <Undo2 className='shrink-0' />
       </Button>
-      <Button variant={"ghost"} className='w-10 h-10' onClick={() => redo()} disabled={!futureStates.length}>
+
+      <Button variant={"ghost"} onClick={() => redo()} disabled={!futureStates.length}>
         <Redo2 className='shrink-0' />
       </Button>
+
+      <Separator orientation='vertical' className='h-6 mx-2' />
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant={"ghost"}>
+            <PlusIcon className='shrink-0' />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem
+            onClick={() => {
+              store.activateNodeForAddition(baseNodeState, null)
+            }}
+          >
+            switch
+          </DropdownMenuItem>
+          <DropdownMenuItem>constroller</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
     </div>
   )
 }
@@ -113,6 +147,7 @@ function ZoomContent({
   useHotkeys(Key.ArrowDown, () => store.moveActiveNodes([0, 10]))
   useHotkeys(Key.ArrowLeft, () => store.moveActiveNodes([-10, 0]))
   useHotkeys(Key.ArrowRight, () => store.moveActiveNodes([10, 0]))
+  useHotkeys(Key.Delete, () => store.deleteActiveNodes())
 
   function handleViewPortTap() {
     store.clearActiveNodes()
@@ -128,10 +163,11 @@ function ZoomContent({
     store.setTransformMatrix(zoom.transformMatrix)
   }, [zoom.transformMatrix])
 
+
   const bind = useGesture({
     onContextMenu: (e) => e.event.preventDefault(),
     onDragStart: (e) => zoom.dragStart(e.event as any),
-    onDragEnd: (e) => {
+    onDragEnd: () => {
       const box = {
         x: (Math.min(0, boxSize[0]) + boxOrigin[0] - zoom.transformMatrix.translateX) / zoom.transformMatrix.scaleX,
         y: (Math.min(0, boxSize[1]) + boxOrigin[1] - zoom.transformMatrix.translateY) / zoom.transformMatrix.scaleY,
@@ -146,7 +182,7 @@ function ZoomContent({
       setBoxSize([0, 0])
       zoom.dragEnd()
     },
-    onDoubleClick: (e) => handleViewPortTap(),
+    onDoubleClick: () => handleViewPortTap(),
     onPinch: ({ first, last, movement, origin }) => {
       if (first) {
         setInitOrigin(origin)
@@ -168,7 +204,7 @@ function ZoomContent({
       }
       zoom.setTransformMatrix(newMatrix)
     },
-    onWheel: ({ first, last, event }) => {
+    onWheel: ({ last, event }) => {
       if (!last)
         zoom.handleWheel(event)
     },
@@ -243,6 +279,7 @@ function ZoomContent({
         ))}
       </g>
 
+      {/* selection box */}
       {(boxSize[0] !== 0 || boxSize[1] !== 0) &&
         <rect
           x={Math.min(0, boxSize[0]) + boxOrigin[0]}
@@ -254,6 +291,11 @@ function ZoomContent({
           stroke='#E0FFFF'
         />
       }
+
+      {/* node addition overlay */}
+      {store.activeNodeAddition && (
+        <NodesAdditionOverlay width={width} height={height} />
+      )}
 
     </svg>
   )

@@ -135,7 +135,7 @@ export function BasicNode({
         <rect
           x={(x || 0) + 1}
           y={(y || 0) + 1}
-          rx={10}
+          rx={5}
           width={node.size.w - 2}
           height={node.size.h - 2}
           className={cn(

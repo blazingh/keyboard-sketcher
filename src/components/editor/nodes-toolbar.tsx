@@ -13,7 +13,11 @@ export default function NodesToolbar({
   transformMatrix: TransformMatrix
 }) {
   const store = useEditorStore()
-  if (!store.activeNodes || !isDeepEqual(store.activeDxy, { x: 0, y: 0 })) return null
+  if (false
+    || !store.activeNodes
+    || !isDeepEqual(store.activeDxy, { x: 0, y: 0 })
+    || transformMatrix.scaleX < 0.3
+  ) return null
 
   const nodes: Node[] = store.activeNodes.map((nodeId) => {
     return produce(store.nodes[nodeId], draft => {
@@ -31,7 +35,7 @@ export default function NodesToolbar({
   return (
     <div
       className={cn(
-        'absolute pointer-events-none transition-all animate-pop-in',
+        'absolute pointer-events-none',
       )}
       style={{
         left: x * transformMatrix.scaleX + transformMatrix.translateX,

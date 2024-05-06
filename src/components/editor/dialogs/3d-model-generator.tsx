@@ -13,7 +13,7 @@ export default function ThreeDModelGeneratorDialog({ children, ...props }: Dialo
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-[90svw]">
 
         <ThreeDModelGenerator />
 

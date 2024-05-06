@@ -1,6 +1,6 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Select, SelectValue, SelectItem, SelectContent, SelectTrigger } from "@/components/ui/select";
-import { HelpCircle } from "lucide-react";
+import { HelpCircle, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { modelAOptionsList } from "@/workers/model-a-options";
 import { HelperTooltip } from "@/components/helper-tooltip";
@@ -9,10 +9,11 @@ import { Input } from "@/components/ui/input";
 export default function ThreeDModelGenerator() {
   return (
     <div className="w-full h-[90svh] flex flex-col-reverse lg:flex-row gap-2">
-      <div className="w-full lg:w-[350px] h-1/2 lg:h-full border rounded">
+      <div className="w-full lg:w-[350px] h-full lg:h-full border rounded relative overflow-hidden">
         <ModelGeneratorOptions />
       </div>
-      <div className="w-full h-full bg-slate-300 rounded">
+      <div className="w-full h-full rounded relative overflow-hidden">
+        <ModelGeneratorPreview />
       </div>
     </div>
   )
@@ -57,5 +58,18 @@ function ModelGeneratorOptions() {
       </div>
       <ScrollBar />
     </ScrollArea>
+  )
+}
+
+function ModelGeneratorPreview() {
+  return (
+    <div className="w-full h-full">
+      {/* loader overlay */}
+      {true && (
+        <div className="absolute top-0 left-0 w-full h-full bg-white/10 flex items-center justify-center pointer-events-none">
+          <Loader2 className="w-10 lg:w-16 h-10 lg:h-16 animate-spin" />
+        </div>
+      )}
+    </div>
   )
 }

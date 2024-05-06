@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils"
-import { Node, useEditorStore } from "./editor-store"
+import { Node, useEditorStore } from "./stores/editor-store"
 import { findEnclosingBox } from "./lib/nodes-utils"
 import { Button } from "../ui/button"
 import { Plus } from "lucide-react"

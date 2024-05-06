@@ -1,4 +1,4 @@
-import { Node } from "../editor-store";
+import { Node } from "../stores/editor-store";
 
 export function findEnclosingBox(nodes: Node[]) {
   if (nodes.length === 0) return null

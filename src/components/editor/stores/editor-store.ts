@@ -1,10 +1,10 @@
-import { GetSnapLinesResult, defaultSnapLinesResult, getSnapLines } from './lib/snap-lines'
+import { GetSnapLinesResult, defaultSnapLinesResult, getSnapLines } from '../lib/snap-lines'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { produce } from 'immer'
 import { temporal } from 'zundo';
 import isDeepEqual from 'fast-deep-equal';
-import { TransformMatrix } from './editor-viewport';
+import { TransformMatrix } from '../editor-viewport';
 import { v4 as v4uuid } from "uuid";
 
 export type Node = {

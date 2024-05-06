@@ -1,4 +1,4 @@
-import { Node } from "@/components/editor/editor-store";
+import { Node } from "@/components/editor/stores/editor-store";
 
 export type GetSnapLinesResult = {
   horizontal?: number;

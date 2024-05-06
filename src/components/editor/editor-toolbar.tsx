@@ -1,6 +1,6 @@
 "use client"
 
-import { baseNodeState, useEditorStore } from './editor-store';
+import { baseNodeState, useEditorStore } from './stores/editor-store';
 import { Button } from '@/components/ui/button';
 import { PlusIcon, Redo2, Ruler, Trash, Trash2, Undo2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';

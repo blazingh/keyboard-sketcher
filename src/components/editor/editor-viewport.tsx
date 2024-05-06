@@ -1,6 +1,6 @@
 "use client"
 
-import { Node, useEditorStore } from './editor-store';
+import { Node, useEditorStore } from './stores/editor-store';
 import { useGesture } from "@use-gesture/react";
 import { BasicNode } from "./nodes/basic-node";
 import { Zoom } from "@visx/zoom";
@@ -11,9 +11,6 @@ import { Key } from 'ts-key-enum';
 import { NodesOutline } from './nodes-outline';
 import NodesAdditionOverlay from './nodes-addition-overlay';
 import EditorToolbar from './editor-toolbar';
-import { Button } from '../ui/button';
-import { Plus, PlusSquare, Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import NodesToolbar from './nodes-toolbar';
 import { EditorFloatButtons } from './editor-float-buttons';
 

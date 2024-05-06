@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 /* @ts-ignore */
 import Offset from "polygon-offset";
-import { Node } from "./editor-store";
+import { Node } from "./stores/editor-store";
 import { getNodesOutinePoints } from "./lib/nodes-ouline-points";
 
 export function NodesOutline({

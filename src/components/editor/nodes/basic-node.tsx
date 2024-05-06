@@ -2,7 +2,7 @@
 
 import { TransformMatrix } from "@visx/zoom/lib/types";
 import { useDrag as useZoomableDrag } from '@/components/editor/lib/drag';
-import { EditorStoreType, Node, useEditorStore } from '../editor-store';
+import { EditorStoreType, Node, useEditorStore } from '../stores/editor-store';
 import { produce } from "immer";
 import { useGesture } from "@use-gesture/react";
 import { cn } from "@/lib/utils";

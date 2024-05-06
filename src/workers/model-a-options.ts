@@ -9,19 +9,19 @@ export type ModelWorkerResult = {
 }
 
 export type ModelAOptionsTypes = {
-  plateThick?: number,
-  wallThick?: number,
-  caseTopMargin?: number,
-  caseBottomMargin?: number,
-  caseTopRadius?: number,
+  plateThick: string,
+  wallThick: string,
+  caseTopMargin: string,
+  caseBottomMargin: string,
+  caseTopRadius: string,
 }
 
 export const modelADefaultOptionsValues: ModelAOptionsTypes = {
-  plateThick: 3,
-  wallThick: 4,
-  caseTopMargin: 0,
-  caseBottomMargin: 10,
-  caseTopRadius: 0,
+  plateThick: "3",
+  wallThick: "4",
+  caseTopMargin: "0",
+  caseBottomMargin: "10",
+  caseTopRadius: "0",
 }
 
 export const modelAOptionsList: {

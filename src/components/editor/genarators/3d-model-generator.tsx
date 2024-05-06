@@ -5,6 +5,8 @@ import { Separator } from "@/components/ui/separator";
 import { modelAOptionsList } from "@/workers/model-a-options";
 import { HelperTooltip } from "@/components/helper-tooltip";
 import { Input } from "@/components/ui/input";
+import { useThreeDModelGeneratorStore } from "../stores/3d-model-generator-store";
+import { Button } from "@/components/ui/button";
 
 export default function ThreeDModelGenerator() {
   return (
@@ -20,6 +22,7 @@ export default function ThreeDModelGenerator() {
 }
 
 function ModelGeneratorOptions() {
+  const store = useThreeDModelGeneratorStore()
   return (
     <ScrollArea className="w-full h-full">
       <div className="w-full flex flex-col gap-4 p-4">
@@ -46,11 +49,16 @@ function ModelGeneratorOptions() {
           if (option.type === "number")
             return (
               <div key={option.id} className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
+                <div className="flex items-end justify-between">
                   <label className="text-sm">{option.label}</label>
                   <HelperTooltip desc={option.description} />
                 </div>
-                <Input />
+                <Input
+                  defaultValue={String(store.params[option.key])}
+                  onChange={(e) => {
+                    console.log(e.target.value)
+                    store.updateParam(option.key, e.target.value)
+                  }} />
               </div>
             )
           return null

@@ -7,6 +7,7 @@ import { HelperTooltip } from "@/components/helper-tooltip";
 import { Input } from "@/components/ui/input";
 import { useThreeDModelGeneratorStore } from "../stores/3d-model-generator-store";
 import { Button } from "@/components/ui/button";
+import InputWithKeypad from "@/components/virtual-numpad-input";
 
 export default function ThreeDModelGenerator() {
   return (
@@ -26,6 +27,7 @@ function ModelGeneratorOptions() {
   return (
     <ScrollArea className="w-full h-full">
       <div className="w-full flex flex-col gap-4 p-4">
+
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
@@ -53,11 +55,10 @@ function ModelGeneratorOptions() {
                   <label className="text-sm">{option.label}</label>
                   <HelperTooltip desc={option.description} />
                 </div>
-                <Input
+                <InputWithKeypad
                   defaultValue={String(store.params[option.key])}
-                  onChange={(e) => {
-                    console.log(e.target.value)
-                    store.updateParam(option.key, e.target.value)
+                  onValueChange={(v) => {
+                    store.updateParam(option.key, v)
                   }} />
               </div>
             )

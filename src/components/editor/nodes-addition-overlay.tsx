@@ -14,10 +14,10 @@ export default function NodesAdditionOverlay({ width, height }: { width: number,
 
   const bind = useGesture({
     onDragEnd: (e) => {
-      if (!store.transformMatrix) return
+      if (!store.transformMatrix || !store.activeNodeAddition) return
       const pos = {
-        x: Math.round((e.xy[0] - store.transformMatrix.translateX) / store.transformMatrix.scaleX / 10) * 10,
-        y: Math.round((e.xy[1] - store.transformMatrix.translateY) / store.transformMatrix.scaleY / 10) * 10,
+        x: Math.round((e.xy[0] - store.transformMatrix.translateX) / store.transformMatrix.scaleX / 10) * 10 - store.activeNodeAddition?.size.w / 2,
+        y: Math.round((e.xy[1] - store.transformMatrix.translateY) / store.transformMatrix.scaleY / 10) * 10 - store.activeNodeAddition?.size.h / 2,
       }
       store.activateNodeForAddition(null, pos)
     },

@@ -30,7 +30,7 @@ export default function NodesAdditionOverlay({ width, height }: { width: number,
         y={height / 2}
         dominantBaseline="middle"
         textAnchor="middle"
-        fontSize={"3rem"}
+        fontSize={"2rem"}
         fill='white'
         className='select-none touch-none'
       >
@@ -43,7 +43,7 @@ export default function NodesAdditionOverlay({ width, height }: { width: number,
         width={width}
         height={height}
         fill='black'
-        fillOpacity={0.5}
+        fillOpacity={0.4}
         className='touch-none'
         {...bind()}
       />

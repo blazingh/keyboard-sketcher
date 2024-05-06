@@ -2,7 +2,7 @@
 
 import { baseNodeState, useEditorStore } from './editor-store';
 import { Button } from '@/components/ui/button';
-import { PlusIcon, Redo2, Trash, Trash2, Undo2 } from 'lucide-react';
+import { PlusIcon, Redo2, Ruler, Trash, Trash2, Undo2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import {
@@ -48,6 +48,10 @@ export default function EditorToolbar() {
             <DropdownMenuItem disabled>constroller</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <Button variant={"ghost"} disabled>
+          <Ruler className='shrink-0' />
+        </Button>
 
       </div>
       <div className='flex items-center [&>button]:w-10 [&>button]:h-10'>

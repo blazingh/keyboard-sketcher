@@ -5,6 +5,7 @@ import { produce } from 'immer'
 import { temporal } from 'zundo';
 import isDeepEqual from 'fast-deep-equal';
 import { TransformMatrix } from './editor-viewport';
+import { v4 as v4uuid } from "uuid";
 
 export type Node = {
   id: string,
@@ -71,7 +72,7 @@ export const useEditorStore = create<EditorStoreType>()(
       activeNodeAddition: null,
 
       addNode: (node) => {
-        const randId = crypto.randomUUID()
+        const randId = v4uuid()
         set(produce((state: State) => {
           state.nodes[randId] = { ...node, id: randId }
         }))

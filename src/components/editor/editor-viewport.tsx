@@ -12,9 +12,10 @@ import { NodesOutline } from './nodes-outline';
 import NodesAdditionOverlay from './nodes-addition-overlay';
 import EditorToolbar from './editor-toolbar';
 import { Button } from '../ui/button';
-import { Plus, PlusSquare } from 'lucide-react';
+import { Plus, PlusSquare, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import NodesToolbar from './nodes-toolbar';
+import { EditorFloatButtons } from './editor-float-buttons';
 
 
 const editorWidth = 1500
@@ -69,6 +70,7 @@ export function EditorViewPortContent({
   return (
     <div className="" style={{ touchAction: 'none' }}>
       <div className='relative' style={{ width, height }}>
+        <EditorFloatButtons />
         <Zoom<SVGRectElement>
           width={width}
           height={height}

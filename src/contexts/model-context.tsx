@@ -19,7 +19,7 @@ import stlSerializer from '@jscad/stl-serializer'
 type ModelOpitons = { type: "a", options: ModelAOptionsTypes }
 
 type ModelContext = {
-  selectedOptions: ModelOpitons,
+  selectedOptions: any,//ModelOpitons,
   updateOptionValue: (type: any, key?: string, value?: any) => void,
   generateModel: (nodes: Node[]) => void,
   cancelModelGeneration: (id: number) => void,
@@ -58,6 +58,7 @@ export function ModelContextProvider({ children }: any) {
   })
 
   function updateOptionValue(type: any, key?: string, value?: any) {
+    /*
     if (!key) {
       setSelectedOptions({ type, options: {} })
       return
@@ -66,6 +67,7 @@ export function ModelContextProvider({ children }: any) {
       const options = type === p.type ? { ...p.options, [key]: value } : { [key]: value }
       return { type, options }
     })
+    */
   }
 
   function clearWorker(id: number) {

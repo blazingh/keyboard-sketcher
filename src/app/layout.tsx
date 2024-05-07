@@ -17,8 +17,8 @@ const poppins = Poppins({
 const typoDraft = localFont({ src: '../Typo-Draft.otf', variable: "--font-typo-draft" })
 
 export const metadata: Metadata = {
-  title: "Keyboard Sketcher",
-  description: "generate custom keyboard 3d models",
+  title: "Sketcher",
+  description: "turn your 2d keyboard sketchs into 3d models and circuit boards",
 };
 
 export default function RootLayout({

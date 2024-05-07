@@ -1,3 +1,4 @@
+import IconLogo from '@/icons/logo'
 import { ImageResponse } from 'next/og'
 
 // Image metadata
@@ -14,8 +15,7 @@ export default function Icon() {
       // ImageResponse JSX element
       <div
         style={{
-          fontSize: 24,
-          background: 'black',
+          background: 'transparent',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -23,9 +23,9 @@ export default function Icon() {
           justifyContent: 'center',
           color: 'white',
         }}
-        className='font-draft'
+        className='font-'
       >
-        S
+        <IconLogo className="text-white" width={"32px"} height={"38px"} />
       </div>
     ),
     // ImageResponse options

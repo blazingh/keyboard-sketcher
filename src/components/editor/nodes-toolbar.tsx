@@ -35,7 +35,7 @@ export default function NodesToolbar({
   return (
     <div
       className={cn(
-        'absolute pointer-events-none',
+        'absolute pointer-events-none *:pointer-events-auto ',
       )}
       style={{
         left: x * transformMatrix.scaleX + transformMatrix.translateX,

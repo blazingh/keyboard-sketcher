@@ -2,7 +2,7 @@
 
 import { baseNodeState, useEditorStore } from './stores/editor-store';
 import { Button } from '@/components/ui/button';
-import { PlusIcon, Redo2, Ruler, Trash, Trash2, Undo2 } from 'lucide-react';
+import { Copy, PlusIcon, Redo2, Ruler, Trash, Trash2, Undo2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import {
@@ -21,6 +21,16 @@ export default function EditorToolbar() {
     )}
     >
       <div className='flex items-center [&>button]:w-10 [&>button]:h-10'>
+
+        <span className='font-draft text-2xl hidden lg:block'>
+          SKETCHER
+        </span>
+        <span className='font-draft text-2xl lg:hidden '>
+          K
+        </span>
+
+        <Separator orientation='vertical' className='h-6 mx-2' />
+
         <Button variant={"ghost"} onClick={() => undo()} disabled={!pastStates.length}>
           <Undo2 className='shrink-0' />
         </Button>
@@ -56,8 +66,12 @@ export default function EditorToolbar() {
       </div>
       <div className='flex items-center [&>button]:w-10 [&>button]:h-10'>
 
+        <Button variant={"ghost"} disabled={!store.activeNodes.length}>
+          <Copy className='shrink-0 cursor-copy' />
+        </Button>
+
         <Button variant={"ghost"} onClick={() => store.deleteActiveNodes()} disabled={!store.activeNodes.length}>
-          <Trash2 className='shrink-0 text-red-500' />
+          <Trash2 className='shrink-0 text-red-500 ' />
         </Button>
 
       </div>

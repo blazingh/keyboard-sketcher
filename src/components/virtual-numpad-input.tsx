@@ -1,7 +1,7 @@
 "use client"
 import { ReactNode, useEffect, useState } from "react";
 import { Button, ButtonProps } from "./ui/button";
-import { Check, Delete, X } from "lucide-react";
+import { Check, Delete, Trash, Trash2, X } from "lucide-react";
 import { Input, InputProps } from "./ui/input";
 import {
   Popover,
@@ -48,6 +48,10 @@ export default function InputWithKeypad(props: { onValueChange?: (v: string) => 
           setValue("0")
         else
           setValue(p => p.slice(0, -1))
+        break;
+
+      case "null":
+        setValue("0")
         break;
 
       case "X":
@@ -116,7 +120,7 @@ const buttons: {
     { id: "4", char: "4", variant: "white" },
     { id: "5", char: "5", variant: "white" },
     { id: "6", char: "6", variant: "white" },
-    { id: "null", char: "", variant: "ghost" },
+    { id: "null", char: <Trash2 className="text-destructive" />, variant: "secondary" },
 
     { id: "1", char: "1", variant: "white" },
     { id: "2", char: "2", variant: "white" },

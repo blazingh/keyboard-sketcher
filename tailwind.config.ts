@@ -22,6 +22,7 @@ const config = {
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
         poppins: ["var(--font-sans)", ...fontFamily.sans],
+        draft: ["var(--font-typo-draft)"],
       },
       colors: {
         border: "hsl(var(--border))",

@@ -59,10 +59,10 @@ export const baseNodeState: Node = {
 }
 
 const initialNodes: { [key: Node["id"]]: Node } = {
-  "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 370, y: 370 } },
-  "2": { id: "2", size: { w: 140, h: 140 }, pos: { x: 30, y: 30 } },
-  "4": { id: "4", size: { w: 140, h: 140 }, pos: { x: -200, y: -200 } },
-  "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: 550, y: 50 } }
+  "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 30, y: 30 } },
+  "2": { id: "2", size: { w: 140, h: 140 }, pos: { x: -160, y: -160 } },
+  "4": { id: "4", size: { w: 140, h: 140 }, pos: { x: 30, y: -160 } },
+  "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: -160, y: 30 } }
 }
 
 export const useEditorStore = create<EditorStoreType>()(

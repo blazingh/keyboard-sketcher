@@ -15,7 +15,6 @@ export default function Icon() {
       // ImageResponse JSX element
       <div
         style={{
-          background: 'transparent',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -23,9 +22,8 @@ export default function Icon() {
           justifyContent: 'center',
           color: 'white',
         }}
-        className='font-'
       >
-        <IconLogo className="text-white" width={"32px"} height={"38px"} />
+        <IconLogo width={"32px"} height={"38px"} />
       </div>
     ),
     // ImageResponse options

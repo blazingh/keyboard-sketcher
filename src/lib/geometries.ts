@@ -12,16 +12,18 @@ export function CSG2Geom(csg: Geom3): BufferGeometry<NormalBufferAttributes> {
   const vertices: any[] = [];
   const indices: any[] = [];
   let idx = 0;
+
   csg.polygons.forEach((polygon) => {
+    const indexes: any[] = [];
     polygon.vertices.forEach((vertex) => {
-      vertex.index = idx;
+      indexes.push(idx)
       vertices.push(vertex[0], vertex[1], vertex[2]);
       idx++;
     });
-    const first = polygon.vertices[0].index;
+    const first = indexes[0];
     for (let i = 2; i < polygon.vertices.length; i++) {
-      const second = polygon.vertices[i - 1].index;
-      const third = polygon.vertices[i].index;
+      const second = indexes[i - 1];
+      const third = indexes[i];
       indices.push(first, second, third);
     }
   });

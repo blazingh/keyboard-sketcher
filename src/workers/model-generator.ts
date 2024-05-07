@@ -59,7 +59,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   const nodes: SimpleNode[] = e.data.nodes.map((node: Node) => {
     return {
       type: "switch",
-      position: { x: node.pos.x / 10, y: node.pos.y / 10, r: 0 },
+      position: { x: node.pos.x / 10 + node.size.w / 20, y: node.pos.y / 10 + node.size.h / 20, r: 0 },
       size: { w: node.size.w / 10, h: node.size.h / 10 }
     }
   })

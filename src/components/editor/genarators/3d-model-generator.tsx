@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import InputWithKeypad from "@/components/virtual-numpad-input";
 import { useEditorStore } from "../stores/editor-store";
 import { GeomsStlPreview } from "@/components/geoms-stl-preview";
+import { useEffect } from "react";
 
 export default function ThreeDModelGenerator() {
   return (
@@ -29,15 +30,9 @@ export default function ThreeDModelGenerator() {
 
 function ModelGeneratorOptions() {
   const store = useThreeDModelGeneratorStore()
-  const { nodes } = useEditorStore((state) => ({ nodes: state.nodesArray }))
   return (
     <ScrollArea className="w-full h-full">
       <div className="w-full flex flex-col gap-4 p-4">
-
-        <Button onClick={() => store.generateModel(nodes())}>
-          generate
-        </Button>
-
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
@@ -82,6 +77,12 @@ function ModelGeneratorOptions() {
 
 function ModelGeneratorPreview() {
   const store = useThreeDModelGeneratorStore()
+  const { nodes } = useEditorStore((state) => ({ nodes: state.nodesArray }))
+
+  useEffect(() => {
+    store.generateModel(nodes())
+  }, [store.params])
+
   return (
     <>
       {/* loader overlay */}

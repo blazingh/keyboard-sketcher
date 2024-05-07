@@ -8,25 +8,35 @@ import { Input } from "@/components/ui/input";
 import { useThreeDModelGeneratorStore } from "../stores/3d-model-generator-store";
 import { Button } from "@/components/ui/button";
 import InputWithKeypad from "@/components/virtual-numpad-input";
+import { useEditorStore } from "../stores/editor-store";
+import { GeomsStlPreview } from "@/components/geoms-stl-preview";
 
 export default function ThreeDModelGenerator() {
   return (
-    <div className="w-full h-[90svh] flex flex-col-reverse lg:flex-row gap-2">
-      <div className="w-full lg:w-[350px] h-full lg:h-full border rounded relative overflow-hidden">
+    <div className="h-[90svh] flex flex-col-reverse lg:flex-row gap-2">
+
+      <div className="w-full lg:w-[350px] h-full border rounded relative overflow-hidden">
         <ModelGeneratorOptions />
       </div>
+
       <div className="w-full h-full rounded relative overflow-hidden">
         <ModelGeneratorPreview />
       </div>
+
     </div>
   )
 }
 
 function ModelGeneratorOptions() {
   const store = useThreeDModelGeneratorStore()
+  const { nodes } = useEditorStore((state) => ({ nodes: state.nodesArray }))
   return (
     <ScrollArea className="w-full h-full">
       <div className="w-full flex flex-col gap-4 p-4">
+
+        <Button onClick={() => store.generateModel(nodes())}>
+          generate
+        </Button>
 
 
         <div className="flex flex-col gap-2">
@@ -71,14 +81,19 @@ function ModelGeneratorOptions() {
 }
 
 function ModelGeneratorPreview() {
+  const store = useThreeDModelGeneratorStore()
   return (
-    <div className="w-full h-full">
+    <>
       {/* loader overlay */}
-      {true && (
-        <div className="absolute top-0 left-0 w-full h-full bg-white/10 flex items-center justify-center pointer-events-none">
+      {store.worker && (
+        <div className="absolute top-0 left-0 w-full h-full bg-black/50 flex items-center justify-center pointer-events-none z-10">
           <Loader2 className="w-10 lg:w-16 h-10 lg:h-16 animate-spin" />
         </div>
       )}
-    </div>
+
+      {store.generatedGeoms && (
+        <GeomsStlPreview geoms={store.generatedGeoms} />
+      )}
+    </>
   )
 }

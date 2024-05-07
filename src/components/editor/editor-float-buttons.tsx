@@ -33,7 +33,7 @@ export function EditorFloatButtons() {
 
             <DropdownMenuItem disabled>
               <Printer className="mr-2" />
-              Print sketch
+              Print 2D sketch
             </DropdownMenuItem>
 
           </DropdownMenuContent>

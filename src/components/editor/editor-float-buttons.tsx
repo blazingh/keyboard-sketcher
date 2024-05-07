@@ -1,4 +1,4 @@
-import { Box, CircuitBoard, Sparkles } from "lucide-react";
+import { Box, CircuitBoard, Printer, Sparkles } from "lucide-react";
 import { Button } from "../ui/button";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../ui/dropdown-menu";
 import ThreeDModelGeneratorDialog from "./dialogs/3d-model-generator";
@@ -28,7 +28,12 @@ export function EditorFloatButtons() {
 
             <DropdownMenuItem disabled>
               <CircuitBoard className="mr-2" />
-              generate pcb
+              Generate pcb
+            </DropdownMenuItem>
+
+            <DropdownMenuItem disabled>
+              <Printer className="mr-2" />
+              Print sketch
             </DropdownMenuItem>
 
           </DropdownMenuContent>

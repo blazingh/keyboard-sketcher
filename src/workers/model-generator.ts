@@ -1,7 +1,8 @@
 import { primitives, booleans, hulls, extrusions, expansions, transforms, utils, geometries } from '@jscad/modeling'
 import { Geom3 } from '@jscad/modeling/src/geometries/types';
-import { getNodesBorderPoints } from '@/lib/hull-nodes';
 import { ModelWorkerResult } from './model-a-options';
+import { Node } from '@/components/editor/stores/editor-store';
+import { getNodesOutinePoints } from '@/components/editor/lib/nodes-ouline-points';
 
 const defaultOptions = {
   switchGruveThick: 1.5,
@@ -55,18 +56,18 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   o.caseBottomMargin = Math.max(o.standoffThick, o.caseBottomMargin)
   o.caseTopRadius = Math.min(o.wallThick / 2, o.caseTopRadius)
 
-  const nodes: SimpleNode[] = e.data.nodes.map((node: any) => {
+  const nodes: SimpleNode[] = e.data.nodes.map((node: Node) => {
     return {
-      type: node.type,
-      position: { x: node.position.x / 10, y: node.position.y / 10, r: node.data.rotation },
-      size: { w: node.data.width / 10, h: node.data.height / 10 }
+      type: "switch",
+      position: { x: node.pos.x / 10, y: node.pos.y / 10, r: 0 },
+      size: { w: node.size.w / 10, h: node.size.h / 10 }
     }
   })
 
   const switch_nodes = nodes.filter((node: any) => node.type === "switch")
   const mcu_nodes = nodes.filter((node: any) => node.type === "mcu")
 
-  const borderPoints = getNodesBorderPoints(e.data.nodes as any, 140 / 2, o.wallThick * 10)
+  const borderPoints = getNodesOutinePoints(e.data.nodes as any, 140 / 2, o.wallThick * 10)
   const sides: number[][][] = []
 
   borderPoints.map((point, index) => {

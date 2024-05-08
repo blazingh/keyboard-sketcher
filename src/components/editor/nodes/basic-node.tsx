@@ -152,7 +152,7 @@ export function BasicNode({
           height={node.size.h - 2}
           className={cn(
             "fill-secondary stroke-2",
-            nodeActive ? "stroke-primary" : "stroke-white/50"
+            nodeActive ? "stroke-primary" : "stroke-white/70"
           )}
         >
           {nodeRuler && (

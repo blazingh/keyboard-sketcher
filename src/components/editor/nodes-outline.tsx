@@ -24,12 +24,12 @@ export function NodesOutline({
     <>
       <polygon
         id="Nodes-Ouline-Inner"
-        className="stroke-white stroke-2 fill-transparent"
+        className="stroke-white/70 stroke-2 fill-transparent"
         points={points.inner.map((c) => [c[0], c[1]].join(" ")).join(" ")}
       />
       <polygon
         id="Nodes-Ouline-Outer"
-        className="stroke-white stroke-2 fill-transparent"
+        className="stroke-white/70 stroke-2 fill-transparent"
         points={points.outer.map((c) => [c[0], c[1]].join(" ")).join(" ")}
       />
     </>

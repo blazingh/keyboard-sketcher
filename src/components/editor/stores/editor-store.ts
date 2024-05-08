@@ -220,8 +220,20 @@ export const useEditorStore = create<EditorStoreType>()(
         const newIds = get().addNodes(nodes)
         set({ activeNodes: newIds })
       },
-      flipActiveNodes: () => { },
-
+      flipActiveNodes: () => {
+        const nodes: Node[] = get().activeNodes.map(nodeId => get().nodes[nodeId])
+        let minX = Infinity, maxX = -Infinity;
+        for (const node of nodes) {
+          minX = Math.min(minX, node.pos.x);
+          maxX = Math.max(maxX, node.pos.x);
+        }
+        const centerX = (minX + maxX) / 2;
+        set(produce((draft: State) => {
+          for (const node of nodes) {
+            draft.nodes[node.id].pos.x = centerX - (node.pos.x - centerX);
+          }
+        }))
+      },
       setTransformMatrix(matrix) {
         set(produce((state: State) => {
           state.transformMatrix = matrix

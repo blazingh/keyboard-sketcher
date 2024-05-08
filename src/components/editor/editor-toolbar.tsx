@@ -75,7 +75,7 @@ export default function EditorToolbar() {
       </div>
       <div className='flex items-center [&>button]:w-10 [&>button]:h-10'>
 
-        <Button variant={"ghost"} disabled={!store.activeNodes.length}>
+        <Button variant={"ghost"} onClick={() => store.flipActiveNodes()} disabled={!store.activeNodes.length}>
           <FlipHorizontal className='shrink-0 cursor-copy' />
         </Button>
 

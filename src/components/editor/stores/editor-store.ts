@@ -205,8 +205,10 @@ export const useEditorStore = create<EditorStoreType>()(
         set(produce((state: State) => {
           get().activeNodes.forEach(id => {
             delete state.nodes[id]
-            state.activeNodes = []
+            const index = state.rulerNodes.findIndex((a: string) => a === id)
+            if (index !== -1) state.rulerNodes.splice(index, 1)
           })
+          state.activeNodes = []
         }))
       },
       copyActivedNodes: (xy) => {

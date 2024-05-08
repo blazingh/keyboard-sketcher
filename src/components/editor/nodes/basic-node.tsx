@@ -75,8 +75,8 @@ export function BasicNode({
     onDrag: (({ movement, tap }) => {
       tap && nodeClick()
       const dxy = {
-        x: movement[0] / (zoomTransformMatrix?.scaleX || 1),
-        y: movement[1] / (zoomTransformMatrix?.scaleY || 1)
+        x: Math.round((movement[0] / (zoomTransformMatrix?.scaleX || 1)) / 10) * 10,
+        y: Math.round((movement[1] / (zoomTransformMatrix?.scaleY || 1)) / 10) * 10
       }
       setActiveDxy(dxy)
       if (activeNodes.length === 1)

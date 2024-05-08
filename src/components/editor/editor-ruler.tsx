@@ -41,7 +41,7 @@ export function EditorRuler({
   return (
     <g transform={transform}>
       {lines.map(line => (
-        <g>
+        <g key={line.num}>
           <line
             x1={line.points[0][0]}
             y1={line.points[0][1]}
@@ -60,7 +60,6 @@ export function EditorRuler({
           >
             {(line.length / 10).toFixed(1)} ㎜
           </text>
-
         </g>
       ))}
     </g>

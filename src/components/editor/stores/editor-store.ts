@@ -37,7 +37,7 @@ type State = {
 
 type Action = {
   updateNodes: (newNodes: Node[]) => void
-  addNode: (node: Node) => Node["id"]
+  addNodes: (nodes: Node[]) => Node["id"][]
   deleteNode: (id: Node["id"]) => void
 
   setActiveDxy: (xy: { x: number, y: number }) => void
@@ -59,6 +59,8 @@ type Action = {
 
   moveActiveNodes: (xy: [number, number]) => void
   deleteActiveNodes: () => void
+  copyActivedNodes: (xy: [number, number]) => void
+  flipActiveNodes: () => void
 
   setTransformMatrix: (matrix: TransformMatrix) => void
 }
@@ -87,12 +89,16 @@ export const useEditorStore = create<EditorStoreType>()(
         set({ editorMode: mode })
       },
 
-      addNode: (node) => {
-        const randId = v4uuid()
+      addNodes: (nodes) => {
+        const ids: Node["id"][] = []
         set(produce((state: State) => {
-          state.nodes[randId] = { ...node, id: randId }
+          nodes.forEach(node => {
+            const randId = v4uuid()
+            state.nodes[randId] = { ...node, id: randId }
+            ids.push(randId)
+          });
         }))
-        return randId
+        return ids
       },
       deleteNode: (id) => {
         set(produce((state: State) => {
@@ -203,6 +209,18 @@ export const useEditorStore = create<EditorStoreType>()(
           })
         }))
       },
+      copyActivedNodes: (xy) => {
+        const nodes: Node[] = []
+        get().activeNodes.forEach(node => {
+          nodes.push(produce(get().nodes[node], (draft: Node) => {
+            draft.pos.x += xy[0]
+            draft.pos.y += xy[1]
+          }))
+        })
+        const newIds = get().addNodes(nodes)
+        set({ activeNodes: newIds })
+      },
+      flipActiveNodes: () => { },
 
       setTransformMatrix(matrix) {
         set(produce((state: State) => {

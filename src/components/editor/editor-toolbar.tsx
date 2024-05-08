@@ -2,7 +2,7 @@
 
 import { baseNodeState, useEditorStore } from './stores/editor-store';
 import { Button } from '@/components/ui/button';
-import { Copy, PlusIcon, Redo2, Ruler, Trash, Trash2, Undo2 } from 'lucide-react';
+import { Copy, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import {
@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Toggle } from '../ui/toggle';
 
 export default function EditorToolbar() {
   const store = useEditorStore()
@@ -59,9 +60,9 @@ export default function EditorToolbar() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <Button variant={"ghost"} disabled>
+        <Toggle variant={"default"} pressed={store.rulerActive} onPressedChange={(state) => { store.setRulerState(state) }} >
           <Ruler className='shrink-0' />
-        </Button>
+        </Toggle>
 
       </div>
       <div className='flex items-center [&>button]:w-10 [&>button]:h-10'>

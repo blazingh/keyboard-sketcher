@@ -1,5 +1,6 @@
-import { useEditorStore } from "./stores/editor-store";
+import { Node, baseNodeState, useEditorStore } from "./stores/editor-store";
 import { useGesture } from "@use-gesture/react";
+import { produce } from "immer";
 import { useEffect, useRef } from "react";
 
 export default function NodesAdditionOverlay({ width, height }: { width: number, height: number }) {
@@ -14,12 +15,16 @@ export default function NodesAdditionOverlay({ width, height }: { width: number,
 
   const bind = useGesture({
     onDragEnd: (e) => {
-      if (!store.transformMatrix || !store.activeNodeAddition) return
+      if (!store.transformMatrix) return
+      const node = baseNodeState
       const pos = {
-        x: Math.round((e.xy[0] - store.transformMatrix.translateX) / store.transformMatrix.scaleX / 10) * 10 - store.activeNodeAddition?.size.w / 2,
-        y: Math.round((e.xy[1] - store.transformMatrix.translateY) / store.transformMatrix.scaleY / 10) * 10 - store.activeNodeAddition?.size.h / 2,
+        x: Math.round((e.xy[0] - store.transformMatrix.translateX) / store.transformMatrix.scaleX / 10) * 10 - node.size.w / 2,
+        y: Math.round((e.xy[1] - store.transformMatrix.translateY) / store.transformMatrix.scaleY / 10) * 10 - node.size.h / 2,
       }
-      store.activateNodeForAddition(null, pos)
+      store.addNode(produce(node, (draft: Node) => {
+        draft.pos = pos
+      }))
+      store.setEditorMode("normal")
     },
   })
 

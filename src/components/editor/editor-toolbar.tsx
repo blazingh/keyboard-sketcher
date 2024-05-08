@@ -1,8 +1,8 @@
 "use client"
 
-import { baseNodeState, useEditorStore } from './stores/editor-store';
+import { useEditorStore } from './stores/editor-store';
 import { Button } from '@/components/ui/button';
-import { Copy, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
+import { Copy, MousePointer2, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import {
@@ -42,16 +42,24 @@ export default function EditorToolbar() {
 
         <Separator orientation='vertical' className='h-6 mx-2' />
 
+        <Toggle variant={"default"} pressed={store.editorMode === "normal"} onPressedChange={(state) => state && store.setEditorMode("normal")} >
+          <MousePointer2 className='shrink-0' />
+        </Toggle>
+
+        <Toggle variant={"default"} pressed={store.editorMode === "ruler"} onPressedChange={(state) => state && store.setEditorMode("ruler")} >
+          <Ruler className='shrink-0' />
+        </Toggle>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant={"ghost"}>
+            <Button variant={"ghost"} className={cn(store.editorMode === "addition" && "bg-accent text-primary")}>
               <PlusIcon className='shrink-0' />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem
               onClick={() => {
-                store.activateNodeForAddition(baseNodeState, null)
+                store.setEditorMode("addition")
               }}
             >
               switch
@@ -59,10 +67,6 @@ export default function EditorToolbar() {
             <DropdownMenuItem disabled>constroller</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <Toggle variant={"default"} pressed={store.rulerActive} onPressedChange={(state) => { store.setRulerState(state) }} >
-          <Ruler className='shrink-0' />
-        </Toggle>
 
       </div>
       <div className='flex items-center [&>button]:w-10 [&>button]:h-10'>

@@ -40,10 +40,10 @@ export function BasicNode({
     updateSnapLines,
     resetSnapLines,
     snapLines,
-    rulerActive,
     rulerNodes,
     toggleRulerNode,
-    setRulerState,
+    editorMode,
+    setEditorMode,
   } = useEditorStore()
 
   const nodeActive = activeNodes.includes(node.id)
@@ -72,7 +72,7 @@ export function BasicNode({
       if (activeNodes.length >= 1 && !nodeActive)
         clearActiveNodes()
       addActiveNode(node.id)
-      setRulerState(false)
+      setEditorMode("normal")
     },
 
     onDragMove: (args) => {
@@ -109,7 +109,7 @@ export function BasicNode({
   });
 
   function nodeClick() {
-    if (rulerActive)
+    if (editorMode === "ruler")
       toggleRulerNode(node.id)
     else
       toggleActiveNode(node.id)

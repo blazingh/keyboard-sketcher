@@ -254,7 +254,7 @@ function ZoomContent({
         }
 
         {/* node addition overlay */}
-        {store.activeNodeAddition && (
+        {store.editorMode === "addition" && (
           <NodesAdditionOverlay width={width} height={height} />
         )}
 

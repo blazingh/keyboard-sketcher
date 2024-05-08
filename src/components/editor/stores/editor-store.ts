@@ -21,13 +21,17 @@ export type Node = {
 
 type State = {
   nodes: { [key: Node["id"]]: Node },
-  snapLines?: GetSnapLinesResult,
   nodesArray: () => Node[],
   activeNodes: Node["id"][],
   rulerNodes: Node["id"][],
-  rulerActive: boolean,
+
+  editorMode: "normal" | "ruler" | "addition" | "copy"
+
+  snapLines?: GetSnapLinesResult,
+
   activeDxy: { x: number, y: number }
   transformMatrix: TransformMatrix | null
+
   activeNodeAddition: null | Node
 }
 
@@ -36,11 +40,9 @@ type Action = {
   addNode: (node: Node) => Node["id"]
   deleteNode: (id: Node["id"]) => void
 
-  activateNodeForAddition: (node: State["activeNodeAddition"], pos: Node["pos"] | null) => void
-
   setActiveDxy: (xy: { x: number, y: number }) => void
 
-  setRulerState: (state: boolean) => void
+  setEditorMode: (mode: State["editorMode"]) => void
 
   addActiveNode: (id: Node["id"]) => void
   removeActiveNode: (id: Node["id"]) => void
@@ -78,11 +80,11 @@ export const useEditorStore = create<EditorStoreType>()(
   persist(
     temporal((set, get) => ({
       nodes: initialNodes,
-      rulerActive: false,
+      editorMode: "normal",
       activeNodeAddition: null,
 
-      setRulerState: (state) => {
-        set({ rulerActive: state })
+      setEditorMode: (mode) => {
+        set({ editorMode: mode })
       },
 
       addNode: (node) => {
@@ -98,19 +100,6 @@ export const useEditorStore = create<EditorStoreType>()(
           if (index !== -1) state.activeNodes.splice(index, 1)
           delete state.nodes[id]
         }))
-      },
-
-      activateNodeForAddition: (node, pos) => {
-        if (!pos && node) {
-          set({ activeNodeAddition: node })
-          return
-        }
-        const activeNode = get().activeNodeAddition
-        if (pos && !node && activeNode) {
-          get().addNode({ ...activeNode, pos: pos })
-          set({ activeNodeAddition: null })
-        }
-
       },
 
       nodesArray: () => Object.values(get().nodes),

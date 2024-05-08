@@ -78,7 +78,7 @@ export const useEditorStore = create<EditorStoreType>()(
   persist(
     temporal((set, get) => ({
       nodes: initialNodes,
-      rulerActive: true,
+      rulerActive: false,
       activeNodeAddition: null,
 
       setRulerState: (state) => {

@@ -2,7 +2,7 @@
 
 import { useEditorStore } from './stores/editor-store';
 import { Button } from '@/components/ui/button';
-import { Copy, MousePointer2, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
+import { Copy, FlipHorizontal, MousePointer2, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import {
@@ -50,6 +50,10 @@ export default function EditorToolbar() {
           <Ruler className='shrink-0' />
         </Toggle>
 
+        <Toggle variant={"default"} disabled={!store.activeNodes.length} pressed={store.editorMode === "copy"} onPressedChange={(state) => state && store.setEditorMode("copy")} >
+          <Copy className='shrink-0' />
+        </Toggle>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant={"ghost"} className={cn(store.editorMode === "addition" && "bg-accent text-primary")}>
@@ -72,7 +76,7 @@ export default function EditorToolbar() {
       <div className='flex items-center [&>button]:w-10 [&>button]:h-10'>
 
         <Button variant={"ghost"} disabled={!store.activeNodes.length}>
-          <Copy className='shrink-0 cursor-copy' />
+          <FlipHorizontal className='shrink-0 cursor-copy' />
         </Button>
 
         <Button variant={"ghost"} onClick={() => store.deleteActiveNodes()} disabled={!store.activeNodes.length}>

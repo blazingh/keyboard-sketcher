@@ -6,6 +6,7 @@ import { EditorStoreType, Node, useEditorStore } from '../stores/editor-store';
 import { produce } from "immer";
 import { useGesture } from "@use-gesture/react";
 import { cn } from "@/lib/utils";
+import { Ruler, RulerIcon } from "lucide-react";
 
 const selector = (state: EditorStoreType) => ({
   clearActiveNodes: state.clearActiveNodes,
@@ -38,10 +39,15 @@ export function BasicNode({
     toggleActiveNode,
     updateSnapLines,
     resetSnapLines,
-    snapLines
-  } = useEditorStore(selector)
+    snapLines,
+    rulerActive,
+    rulerNodes,
+    toggleRulerNode,
+    setRulerState,
+  } = useEditorStore()
 
   const nodeActive = activeNodes.includes(node.id)
+  const nodeRuler = rulerNodes.includes(node.id)
 
   const {
     x,
@@ -66,6 +72,7 @@ export function BasicNode({
       if (activeNodes.length >= 1 && !nodeActive)
         clearActiveNodes()
       addActiveNode(node.id)
+      setRulerState(false)
     },
 
     onDragMove: (args) => {
@@ -102,7 +109,10 @@ export function BasicNode({
   });
 
   function nodeClick() {
-    toggleActiveNode(node.id)
+    if (rulerActive)
+      toggleRulerNode(node.id)
+    else
+      toggleActiveNode(node.id)
   }
 
   const binds = useGesture({
@@ -142,10 +152,26 @@ export function BasicNode({
           height={node.size.h - 2}
           className={cn(
             "fill-secondary stroke-2",
-            nodeActive ? "stroke-primary" : "stroke-white"
+            nodeActive ? "stroke-primary" : "stroke-white/50"
           )}
         >
+          {nodeRuler && (
+            <rect
+              x={(x || 0) + 1}
+              y={(y || 0) + 1}
+              width={node.size.w - 10}
+              height={node.size.h - 10}
+              fill="white"
+            />
+          )}
         </rect>
+        {nodeRuler && (
+          <RulerIcon
+            x={(x || 0) + node.size.w / 2 - 12}
+            y={(y || 0) + node.size.h / 2 - 12}
+            stroke="white"
+          />
+        )}
         {false && (<>
           <text x={x} y={(y || 0) - 25} fontSize="10" fill="white">
             id: {JSON.stringify(node.id)}

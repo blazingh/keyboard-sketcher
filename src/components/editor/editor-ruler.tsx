@@ -54,7 +54,7 @@ export function EditorRuler({
             x={(line.points[0][0] + line.points[1][0]) / 2}
             y={(line.points[0][1] + line.points[1][1]) / 2 + 6}
             textAnchor="middle"
-            font-size="18"
+            fontSize="18"
             fill="white"
             fontWeight={"500"}
           >

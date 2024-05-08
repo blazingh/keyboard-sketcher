@@ -21,9 +21,9 @@ export default function NodesAdditionOverlay({ width, height }: { width: number,
         x: Math.round((e.xy[0] - store.transformMatrix.translateX) / store.transformMatrix.scaleX / 10) * 10 - node.size.w / 2,
         y: Math.round((e.xy[1] - store.transformMatrix.translateY) / store.transformMatrix.scaleY / 10) * 10 - node.size.h / 2,
       }
-      store.addNode(produce(node, (draft: Node) => {
+      store.addNodes([produce(node, (draft: Node) => {
         draft.pos = pos
-      }))
+      })])
       store.setEditorMode("normal")
     },
   })

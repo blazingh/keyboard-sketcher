@@ -24,6 +24,8 @@ type State = {
   snapLines?: GetSnapLinesResult,
   nodesArray: () => Node[],
   activeNodes: Node["id"][],
+  rulerNodes: Node["id"][],
+  rulerActive: boolean,
   activeDxy: { x: number, y: number }
   transformMatrix: TransformMatrix | null
   activeNodeAddition: null | Node
@@ -38,10 +40,17 @@ type Action = {
 
   setActiveDxy: (xy: { x: number, y: number }) => void
 
+  setRulerState: (state: boolean) => void
+
   addActiveNode: (id: Node["id"]) => void
   removeActiveNode: (id: Node["id"]) => void
   toggleActiveNode: (id: Node["id"]) => void
   clearActiveNodes: () => void
+
+  addRulerNode: (id: Node["id"]) => void
+  removeRulerNode: (id: Node["id"]) => void
+  toggleRulerNode: (id: Node["id"]) => void
+  clearRulerNodes: () => void
 
   updateSnapLines: (target: Node) => void
   resetSnapLines: () => void
@@ -69,7 +78,12 @@ export const useEditorStore = create<EditorStoreType>()(
   persist(
     temporal((set, get) => ({
       nodes: initialNodes,
+      rulerActive: true,
       activeNodeAddition: null,
+
+      setRulerState: (state) => {
+        set({ rulerActive: state })
+      },
 
       addNode: (node) => {
         const randId = v4uuid()
@@ -101,6 +115,8 @@ export const useEditorStore = create<EditorStoreType>()(
 
       nodesArray: () => Object.values(get().nodes),
       activeNodes: [],
+      rulerNodes: [],
+
       snapLines: { ...defaultSnapLinesResult },
       activeDxy: { x: 0, y: 0 },
       transformMatrix: null,
@@ -140,6 +156,39 @@ export const useEditorStore = create<EditorStoreType>()(
       },
       clearActiveNodes: () => {
         set({ activeNodes: [] })
+      },
+
+      addRulerNode: (id) => {
+        set(produce((state: State) => {
+          const index = state.rulerNodes.findIndex((a: string) => a === id)
+          if (index === -1) {
+            if (state.rulerNodes.length > 1)
+              state.rulerNodes = [state.rulerNodes[1], id]
+            else
+              state.rulerNodes.push(id)
+          }
+        }))
+      },
+      removeRulerNode: (id) => {
+        set(produce((state: State) => {
+          const index = state.rulerNodes.findIndex((a: string) => a === id)
+          if (index !== -1) state.rulerNodes.splice(index, 1)
+        }))
+      },
+      toggleRulerNode: (id) => {
+        set(produce((state: State) => {
+          const index = state.rulerNodes.findIndex((a: string) => a === id)
+          if (index !== -1) state.rulerNodes.splice(index, 1)
+          else {
+            if (state.rulerNodes.length > 1)
+              state.rulerNodes = [state.rulerNodes[1], id]
+            else
+              state.rulerNodes.push(id)
+          }
+        }))
+      },
+      clearRulerNodes: () => {
+        set({ rulerNodes: [] })
       },
 
       updateSnapLines: (target) => {

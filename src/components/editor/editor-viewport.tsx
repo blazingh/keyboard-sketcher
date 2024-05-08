@@ -13,6 +13,7 @@ import NodesAdditionOverlay from './nodes-addition-overlay';
 import EditorToolbar from './editor-toolbar';
 import NodesToolbar from './nodes-toolbar';
 import { EditorFloatButtons } from './editor-float-buttons';
+import { EditorRuler } from './editor-ruler';
 
 
 const editorWidth = 1500
@@ -255,6 +256,11 @@ function ZoomContent({
         {/* node addition overlay */}
         {store.activeNodeAddition && (
           <NodesAdditionOverlay width={width} height={height} />
+        )}
+
+        {/* nodes ruler */}
+        {store.rulerNodes.length === 2 && (
+          <EditorRuler transform={zoom.toString()} />
         )}
 
 

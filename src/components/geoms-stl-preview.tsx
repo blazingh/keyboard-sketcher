@@ -3,8 +3,9 @@ import { ModelWorkerResult } from "@/workers/model-a-options";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { useState } from "react";
-import { BackSide, DirectionalLight, MeshStandardMaterial, PCFSoftShadowMap } from "three";
+import { BackSide, DirectionalLight, Mesh, MeshStandardMaterial, PCFSoftShadowMap } from "three";
 import { Switch } from "./ui/switch";
+import { STLExporter } from 'three/addons/exporters/STLExporter.js';
 import { Button } from "./ui/button";
 import { ChevronDown, Download, FileBox } from "lucide-react";
 import { Separator } from "./ui/separator";
@@ -69,7 +70,18 @@ export function GeomsStlPreview({ geoms }: { geoms: ModelWorkerResult["geometrie
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {geoms.map((csg: ModelWorkerResult["geometries"][number]) => (
-              <DropdownMenuItem key={csg.id}>
+              <DropdownMenuItem key={csg.id} onClick={() => {
+                const exporter = new STLExporter()
+                const buffer = exporter.parse(
+                  new Mesh(CSG2Geom(csg.geom)),
+                  { binary: true }
+                )
+                const link = document.createElement('a');
+                const blob = new Blob([buffer], { type: 'application/octet-stream' })
+                link.href = URL.createObjectURL(blob)
+                link.download = `${csg.label}.stl`
+                link.click()
+              }}>
                 <FileBox className="mr-2" /> {csg.label}.stl
               </DropdownMenuItem>
             ))}

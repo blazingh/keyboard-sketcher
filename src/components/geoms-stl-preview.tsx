@@ -5,6 +5,10 @@ import { Canvas } from "@react-three/fiber";
 import { useState } from "react";
 import { BackSide, DirectionalLight, MeshStandardMaterial, PCFSoftShadowMap } from "three";
 import { Switch } from "./ui/switch";
+import { Button } from "./ui/button";
+import { ChevronDown, Download, FileBox } from "lucide-react";
+import { Separator } from "./ui/separator";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 export function GeomsStlPreview({ geoms }: { geoms: ModelWorkerResult["geometries"] }) {
 
@@ -53,6 +57,24 @@ export function GeomsStlPreview({ geoms }: { geoms: ModelWorkerResult["geometrie
             <label>{csg.label}</label>
           </div>
         ))}
+      </div>
+      <div className="absolute bottom-4 right-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className="pr-1">
+              Download
+              <Separator orientation="vertical" className="mx-2 mr-1 bg-current" />
+              <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {geoms.map((csg: ModelWorkerResult["geometries"][number]) => (
+              <DropdownMenuItem key={csg.id}>
+                <FileBox className="mr-2" /> {csg.label}.stl
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
     </div>

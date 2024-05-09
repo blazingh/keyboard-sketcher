@@ -16,7 +16,6 @@ export default function NodesToolbar({
   if (false
     || !store.activeNodes
     || !isDeepEqual(store.activeDxy, { x: 0, y: 0 })
-    || transformMatrix.scaleX < 0.3
   ) return null
 
   const nodes: Node[] = store.activeNodes.map((nodeId) => {

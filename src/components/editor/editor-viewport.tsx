@@ -3,7 +3,7 @@
 import { Node, useEditorStore } from './stores/editor-store';
 import { useGesture } from "@use-gesture/react";
 import { BasicNode } from "./nodes/basic-node";
-import { Zoom, applyMatrixToPoint } from "@visx/zoom";
+import { Zoom } from "@visx/zoom";
 import { useEffect, useState } from 'react';
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
 import { useHotkeys } from 'react-hotkeys-hook';

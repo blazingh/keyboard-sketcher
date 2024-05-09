@@ -3,7 +3,7 @@
 import { Node, useEditorStore } from './stores/editor-store';
 import { useGesture } from "@use-gesture/react";
 import { BasicNode } from "./nodes/basic-node";
-import { Zoom } from "@visx/zoom";
+import { Zoom, applyMatrixToPoint } from "@visx/zoom";
 import { useEffect, useState } from 'react';
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -72,10 +72,10 @@ export function EditorViewPortContent({
         <Zoom<SVGRectElement>
           width={width}
           height={height}
-          scaleXMax={2.1}
-          scaleYMax={2.1}
-          scaleXMin={0.21}
-          scaleYMin={0.21}
+          scaleXMax={2.2}
+          scaleYMax={2.2}
+          scaleXMin={0.22}
+          scaleYMin={0.22}
           initialTransformMatrix={transformMatrix ?? defaultInitialTransformMatrix}
         >
           {(zoom) => ZoomContent({ zoom, width, height })}
@@ -147,12 +147,12 @@ function ZoomContent({
         setInitOrigin([0, 0])
         return
       }
-      const scaleVal = Math.min(Math.max(initMatrix.scaleX + (movement[0] - 1) * 0.7, 0.21), 2.1)
+      const scaleVal = Math.min(Math.max(initMatrix.scaleX + (movement[0] - 1) * 0.7, 0.22), 2.2)
       const newMatrix = {
         scaleX: scaleVal,
         scaleY: scaleVal,
-        translateX: initMatrix.translateX + (origin[0] - initOrigin[0]),
-        translateY: initMatrix.translateY + (origin[1] - initOrigin[1]),
+        translateX: Math.min(Math.max(initMatrix.translateX + (origin[0] - initOrigin[0]), -editorWidth * scaleVal + width / 2), editorWidth * scaleVal + width / 2),
+        translateY: Math.min(Math.max(initMatrix.translateY + (origin[1] - initOrigin[1]), -editorHeight * scaleVal + height / 2), editorHeight * scaleVal + height / 2),
         skewY: 0,
         skewX: 0
       }
@@ -162,12 +162,26 @@ function ZoomContent({
       if (!last)
         zoom.handleWheel(event)
     },
-    onDrag: ({ first, last, buttons, touches, event, ...e }) => {
-      if (buttons === 2)
-        zoom.dragMove(event as any)
+    onDrag: ({ first, last, buttons, touches, movement, event, ...e }) => {
+      if (buttons === 2) {
+        if (first) {
+          setInitMatrix(zoom.transformMatrix)
+          return
+        }
+        const { scaleY, scaleX, translateX, translateY } = initMatrix
+        const newMatrix = {
+          scaleX: scaleX,
+          scaleY: scaleY,
+          translateX: Math.min(Math.max(translateX + movement[0], -editorWidth * scaleX + width / 2), editorWidth * scaleX + width / 2),
+          translateY: Math.min(Math.max(translateY + movement[1], -editorHeight * scaleY + height / 2), editorHeight * scaleY + height / 2),
+          skewY: 0,
+          skewX: 0
+        }
+        zoom.setTransformMatrix(newMatrix)
+      }
       if (buttons === 1 && touches === 1) {
         first && setBoxOrigin(e.xy)
-        !first && setBoxSize(e.movement)
+        !first && setBoxSize(movement)
       }
     },
   }, { drag: { filterTaps: true, threshold: 10, pointer: { buttons: [1, 2, 4] } } })

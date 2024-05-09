@@ -4,7 +4,7 @@ import { Node, useEditorStore } from './stores/editor-store';
 import { useGesture } from "@use-gesture/react";
 import { BasicNode } from "./nodes/basic-node";
 import { Zoom } from "@visx/zoom";
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Key } from 'ts-key-enum';
@@ -19,16 +19,15 @@ import { EditorRuler } from './editor-ruler';
 const editorWidth = 1500
 const editorHeight = 1000
 
-const defaultInitialTransformMatrix = {
-  scaleX: 1,
-  scaleY: 1,
-  translateX: editorWidth / 2,
-  translateY: editorHeight / 2,
-  skewX: 0,
-  skewY: 0,
-}
 
-export type TransformMatrix = typeof defaultInitialTransformMatrix
+export type TransformMatrix = {
+  scaleX: number,
+  scaleY: number,
+  translateX: number,
+  translateY: number,
+  skewX: number,
+  skewY: number,
+}
 
 function isInsideSelectionBox(box: any, node: Node) {
   return (
@@ -59,6 +58,15 @@ export function EditorViewPortContent({
 }) {
   const { transformMatrix } = useEditorStore((state) => ({ transformMatrix: state.transformMatrix }))
 
+  const defaultInitialTransformMatrix = useMemo(() => ({
+    scaleX: 1,
+    scaleY: 1,
+    translateX: width / 2,
+    translateY: height / 2,
+    skewX: 0,
+    skewY: 0,
+  }), [width, height])
+
   useEffect(() => {
     useEditorStore.persist.rehydrate()
   }, [])
@@ -69,17 +77,19 @@ export function EditorViewPortContent({
     <div className="" style={{ touchAction: 'none' }}>
       <div className='relative' style={{ width, height }}>
         <EditorFloatButtons />
-        <Zoom<SVGRectElement>
-          width={width}
-          height={height}
-          scaleXMax={2.2}
-          scaleYMax={2.2}
-          scaleXMin={0.22}
-          scaleYMin={0.22}
-          initialTransformMatrix={transformMatrix ?? defaultInitialTransformMatrix}
-        >
-          {(zoom) => ZoomContent({ zoom, width, height })}
-        </Zoom>
+        {width && height &&
+          <Zoom<SVGRectElement>
+            width={width}
+            height={height}
+            scaleXMax={2.2}
+            scaleYMax={2.2}
+            scaleXMin={0.22}
+            scaleYMin={0.22}
+            initialTransformMatrix={transformMatrix ?? defaultInitialTransformMatrix}
+          >
+            {(zoom) => ZoomContent({ zoom, width, height })}
+          </Zoom>
+        }
       </div>
     </div>
   );
@@ -96,6 +106,16 @@ function ZoomContent({
 }) {
 
   const store = useEditorStore()
+
+  const defaultInitialTransformMatrix = {
+    scaleX: 1,
+    scaleY: 1,
+    translateX: 0,
+    translateY: 0,
+    skewX: 0,
+    skewY: 0,
+  }
+
 
   useHotkeys(Key.ArrowUp, () => store.moveActiveNodes([0, -10]))
   useHotkeys(Key.ArrowDown, () => store.moveActiveNodes([0, 10]))

@@ -3,8 +3,7 @@
 import { Node, useEditorStore } from './stores/editor-store';
 import { useGesture } from "@use-gesture/react";
 import { BasicNode } from "./nodes/basic-node";
-import { Zoom } from "@visx/zoom";
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Key } from 'ts-key-enum';
@@ -14,20 +13,11 @@ import EditorToolbar from './editor-toolbar';
 import NodesToolbar from './nodes-toolbar';
 import { EditorFloatButtons } from './editor-float-buttons';
 import { EditorRuler } from './editor-ruler';
+import { useViewportTransformationStore } from './stores/viewport-transformation-store';
 
 
 const editorWidth = 1500
 const editorHeight = 1000
-
-
-export type TransformMatrix = {
-  scaleX: number,
-  scaleY: number,
-  translateX: number,
-  translateY: number,
-  skewX: number,
-  skewY: number,
-}
 
 function isInsideSelectionBox(box: any, node: Node) {
   return (
@@ -56,66 +46,40 @@ export function EditorViewPortContent({
   width: number,
   height: number,
 }) {
-  const { transformMatrix } = useEditorStore((state) => ({ transformMatrix: state.transformMatrix }))
-
-  const defaultInitialTransformMatrix = useMemo(() => ({
-    scaleX: 1,
-    scaleY: 1,
-    translateX: width / 2,
-    translateY: height / 2,
-    skewX: 0,
-    skewY: 0,
-  }), [width, height])
 
   useEffect(() => {
     useEditorStore.persist.rehydrate()
+    useViewportTransformationStore.persist.rehydrate()
   }, [])
 
-  if (!useEditorStore.persist?.hasHydrated()) return null
+  if (!useEditorStore.persist?.hasHydrated() || !useViewportTransformationStore.persist.hasHydrated()) return null
 
   return (
     <div className="" style={{ touchAction: 'none' }}>
       <div className='relative' style={{ width, height }}>
         <EditorFloatButtons />
-        {width && height &&
-          <Zoom<SVGRectElement>
-            width={width}
-            height={height}
-            scaleXMax={2.2}
-            scaleYMax={2.2}
-            scaleXMin={0.22}
-            scaleYMin={0.22}
-            initialTransformMatrix={transformMatrix ?? defaultInitialTransformMatrix}
-          >
-            {(zoom) => ZoomContent({ zoom, width, height })}
-          </Zoom>
+        {(width && height) &&
+          <EditorContent width={width} height={height} />
         }
       </div>
     </div>
   );
 }
 
-function ZoomContent({
-  zoom,
+function EditorContent({
   width,
   height,
 }: {
-  zoom: Parameters<Parameters<typeof Zoom>[0]["children"]>[0]
   width: number,
   height: number
 }) {
 
   const store = useEditorStore()
+  const { initViewport, transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
 
-  const defaultInitialTransformMatrix = {
-    scaleX: 1,
-    scaleY: 1,
-    translateX: 0,
-    translateY: 0,
-    skewX: 0,
-    skewY: 0,
-  }
-
+  useEffect(() => {
+    initViewport({ w: width, h: height })
+  }, [width, height])
 
   useHotkeys(Key.ArrowUp, () => store.moveActiveNodes([0, -10]))
   useHotkeys(Key.ArrowDown, () => store.moveActiveNodes([0, 10]))
@@ -127,26 +91,18 @@ function ZoomContent({
     store.clearActiveNodes()
   }
 
-  const [initOrigin, setInitOrigin] = useState([0, 0])
-  const [initMatrix, setInitMatrix] = useState(defaultInitialTransformMatrix)
-
   const [boxOrigin, setBoxOrigin] = useState([0, 0])
   const [boxSize, setBoxSize] = useState([0, 0])
 
-  useEffect(() => {
-    store.setTransformMatrix(zoom.transformMatrix)
-  }, [zoom.transformMatrix])
-
-
   const bind = useGesture({
     onContextMenu: (e) => e.event.preventDefault(),
-    onDragStart: (e) => zoom.dragStart(e.event as any),
+    onDragStart: () => { },
     onDragEnd: () => {
       const box = {
-        x: (Math.min(0, boxSize[0]) + boxOrigin[0] - zoom.transformMatrix.translateX) / zoom.transformMatrix.scaleX,
-        y: (Math.min(0, boxSize[1]) + boxOrigin[1] - zoom.transformMatrix.translateY) / zoom.transformMatrix.scaleY,
-        w: (Math.max(boxSize[0], -boxSize[0])) / zoom.transformMatrix.scaleX,
-        h: (Math.max(boxSize[1], -boxSize[1])) / zoom.transformMatrix.scaleY,
+        x: (Math.min(0, boxSize[0]) + boxOrigin[0] - transformMatrix.x) / transformMatrix.s,
+        y: (Math.min(0, boxSize[1]) + boxOrigin[1] - transformMatrix.y) / transformMatrix.s,
+        w: (Math.max(boxSize[0], -boxSize[0])) / transformMatrix.s,
+        h: (Math.max(boxSize[1], -boxSize[1])) / transformMatrix.s,
       }
       store.nodesArray().map((node) => {
         if (isInsideSelectionBox(box, node)) {
@@ -154,52 +110,38 @@ function ZoomContent({
         }
       })
       setBoxSize([0, 0])
-      zoom.dragEnd()
     },
     onDoubleClick: () => handleViewPortTap(),
-    onPinch: ({ first, last, movement, origin }) => {
-      if (first) {
-        setInitOrigin(origin)
-        setInitMatrix(zoom.transformMatrix)
-        return
+    onPinchStart: ({ origin }) => { },
+    onPinchEnd: ({ origin }) => { },
+    onPinch: ({ delta, first, last }) => {
+      if (first || last) return
+      const transformation = {
+        s: delta[0],
+        x: 0,
+        y: 0,
       }
-      if (last) {
-        setInitOrigin([0, 0])
-        return
-      }
-      const scaleVal = Math.min(Math.max(initMatrix.scaleX + (movement[0] - 1) * 0.7, 0.22), 2.2)
-      const newMatrix = {
-        scaleX: scaleVal,
-        scaleY: scaleVal,
-        translateX: Math.min(Math.max(initMatrix.translateX + (origin[0] - initOrigin[0]), -editorWidth * scaleVal + width / 2), editorWidth * scaleVal + width / 2),
-        translateY: Math.min(Math.max(initMatrix.translateY + (origin[1] - initOrigin[1]), -editorHeight * scaleVal + height / 2), editorHeight * scaleVal + height / 2),
-        skewY: 0,
-        skewX: 0
-      }
-      zoom.setTransformMatrix(newMatrix)
+      setTransformMatrix(transformation)
     },
-    onWheel: ({ last, event }) => {
-      if (!last)
-        zoom.handleWheel(event)
+    onWheel: ({ last, ...e }) => {
+      if (last) return
+      const transformation = {
+        s: 0.1 * (e.event.deltaY > 0 ? -transformMatrix.s : transformMatrix.s),
+        x: 0,
+        y: 0,
+      }
+      setTransformMatrix(transformation)
     },
     onDrag: ({ first, last, buttons, touches, movement, event, ...e }) => {
-      if (buttons === 2) {
-        if (first) {
-          setInitMatrix(zoom.transformMatrix)
-          return
-        }
-        const { scaleY, scaleX, translateX, translateY } = initMatrix
-        const newMatrix = {
-          scaleX: scaleX,
-          scaleY: scaleY,
-          translateX: Math.min(Math.max(translateX + movement[0], -editorWidth * scaleX + width / 2), editorWidth * scaleX + width / 2),
-          translateY: Math.min(Math.max(translateY + movement[1], -editorHeight * scaleY + height / 2), editorHeight * scaleY + height / 2),
-          skewY: 0,
-          skewX: 0
-        }
-        zoom.setTransformMatrix(newMatrix)
+      if (first) {
       }
-      if (buttons === 1 && touches === 1) {
+      const transformation = {
+        s: 0,
+        x: e.delta[0],
+        y: e.delta[1],
+      }
+      setTransformMatrix(transformation)
+      if (buttons === 1 && touches === 1 && store.editorMode === "select") {
         first && setBoxOrigin(e.xy)
         !first && setBoxSize(movement)
       }
@@ -210,14 +152,12 @@ function ZoomContent({
     <div>
 
       {/* nodes toolbar */}
-      {!zoom.isDragging &&
-        <NodesToolbar transformMatrix={zoom.transformMatrix} />
-      }
+      <NodesToolbar />
 
-      <svg width={width} height={height} >
+      <svg width={width} height={height}  >
 
         {/* background */}
-        <g transform={zoom.toString()}>
+        <g transform={TransformMatrixStyle()}>
           <pattern id="pattern-circles" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse">
             <circle id="pattern-circle" cx="0" cy="0" r="0.5" fill="#fff" fillOpacity={0.5}></circle>
             <circle id="pattern-circle" cx="10" cy="0" r="0.5" fill="#fff" fillOpacity={0.5}></circle>
@@ -228,13 +168,13 @@ function ZoomContent({
         </g>
 
         {/* snap lines */}
-        <g id="snapliens-groups" transform={zoom.toString()} strokeWidth={1} stroke='blue'>
+        <g id="snapliens-groups" transform={TransformMatrixStyle()} strokeWidth={1} stroke='blue'>
           {store.snapLines?.horizontal && <path id="snapLineH" d={`M ${-editorWidth} ${store.snapLines.horizontal} H ${editorWidth * 2}`} />}
           {store.snapLines?.vertical && <path id="snapLineV" d={`M ${store.snapLines.vertical} ${-editorHeight} V ${editorHeight * 2}`} />}
         </g>
 
         {/* nodes outline */}
-        <g transform={zoom.toString()}>
+        <g transform={TransformMatrixStyle()}>
           <defs>
             <NodesOutline nodes={function(nodes) {
               return nodes.map(node => {
@@ -264,12 +204,11 @@ function ZoomContent({
         />
 
         {/* nodes */}
-        <g id="points" transform={zoom.toString()}>
+        <g id="points" transform={TransformMatrixStyle()}>
           {store.nodesArray().map((node) => (
             <BasicNode
               key={node.id}
               node={node}
-              zoomTransformMatrix={zoom.transformMatrix}
             />
           ))}
         </g>
@@ -294,7 +233,7 @@ function ZoomContent({
 
         {/* nodes ruler */}
         {store.rulerNodes.length === 2 && (
-          <EditorRuler transform={zoom.toString()} />
+          <EditorRuler />
         )}
 
 

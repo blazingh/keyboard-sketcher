@@ -3,16 +3,15 @@ import { Node, useEditorStore } from "./stores/editor-store"
 import { findEnclosingBox } from "./lib/nodes-utils"
 import { Button } from "../ui/button"
 import { Plus } from "lucide-react"
-import { TransformMatrix } from "./editor-viewport"
 import { produce } from "immer"
 import isDeepEqual from 'fast-deep-equal';
+import { useViewportTransformationStore } from "./stores/viewport-transformation-store"
 
 export default function NodesToolbar({
-  transformMatrix
 }: {
-  transformMatrix: TransformMatrix
-}) {
+  }) {
   const store = useEditorStore()
+  const { transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
   if (false
     || !store.activeNodes
     || !isDeepEqual(store.activeDxy, { x: 0, y: 0 })
@@ -37,10 +36,10 @@ export default function NodesToolbar({
         'absolute pointer-events-none *:pointer-events-auto ',
       )}
       style={{
-        left: x * transformMatrix.scaleX + transformMatrix.translateX,
-        top: y * transformMatrix.scaleY + transformMatrix.translateY,
-        width: w * transformMatrix.scaleX,
-        height: h * transformMatrix.scaleY
+        left: x * transformMatrix.s + transformMatrix.x,
+        top: y * transformMatrix.s + transformMatrix.y,
+        width: w * transformMatrix.s,
+        height: h * transformMatrix.s
       }}
     >
       {/* left toolbar */}

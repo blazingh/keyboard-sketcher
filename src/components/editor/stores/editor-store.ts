@@ -4,7 +4,6 @@ import { persist } from 'zustand/middleware'
 import { produce } from 'immer'
 import { temporal } from 'zundo';
 import isDeepEqual from 'fast-deep-equal';
-import { TransformMatrix } from '../editor-viewport';
 import { v4 as v4uuid } from "uuid";
 
 export type Node = {
@@ -19,20 +18,37 @@ export type Node = {
   }
 }
 
+export type TransformMatrix = {
+  x: number, // x translation
+  y: number, // y translation
+  s: number // scale 
+}
+
 type State = {
+  /* nodes include switch, controllers or any newly added item to the viewport */
   nodes: { [key: Node["id"]]: Node },
   nodesArray: () => Node[],
+
+  /* selected Node */
   activeNodes: Node["id"][],
+  /* Nodes to draw the ruler in between. max is 2  */
   rulerNodes: Node["id"][],
 
-  editorMode: "normal" | "ruler" | "addition" | "copy"
+  /* diferent modes to handle different actions 
+   * normal: allows user to pan the viewport
+   * select: allows user to use selection
+   * ruler: allows user to select rulerNodes
+   * addition: draws an overlay and lets the user add a node
+   * copy: display nodes toolbar that lets the user copy selected nodes
+   */
+  editorMode: "normal" | "ruler" | "addition" | "copy" | "select"
 
+  /* snapLines position */
   snapLines?: GetSnapLinesResult,
 
+  /* current draged node x and y displacement, used to translate the selected nodes on pointer drag */
   activeDxy: { x: number, y: number }
-  transformMatrix: TransformMatrix | null
 
-  activeNodeAddition: null | Node
 }
 
 type Action = {
@@ -62,10 +78,7 @@ type Action = {
   copyActivedNodes: (xy: [number, number]) => void
   flipActiveNodes: () => void
 
-  setTransformMatrix: (matrix: TransformMatrix) => void
 }
-
-export type EditorStoreType = State & Action
 
 export const baseNodeState: Node = {
   id: "1", size: { w: 140, h: 140 }, pos: { x: 0, y: 0 }
@@ -78,6 +91,7 @@ const initialNodes: { [key: Node["id"]]: Node } = {
   "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: -160, y: 30 } }
 }
 
+export type EditorStoreType = State & Action
 export const useEditorStore = create<EditorStoreType>()(
   persist(
     temporal((set, get) => ({
@@ -114,7 +128,6 @@ export const useEditorStore = create<EditorStoreType>()(
 
       snapLines: { ...defaultSnapLinesResult },
       activeDxy: { x: 0, y: 0 },
-      transformMatrix: null,
 
       setActiveDxy: (xy) => {
         set(produce((state) => {
@@ -236,11 +249,7 @@ export const useEditorStore = create<EditorStoreType>()(
           }
         }))
       },
-      setTransformMatrix(matrix) {
-        set(produce((state: State) => {
-          state.transformMatrix = matrix
-        }))
-      },
+
     }),
       {
         partialize: (state) => ({ nodes: state.nodes }),
@@ -251,8 +260,8 @@ export const useEditorStore = create<EditorStoreType>()(
     {
       name: 'sketcher-nodes',
       skipHydration: true,
-      version: 2,
-      partialize: (state) => ({ nodes: state.nodes, transformMatrix: state.transformMatrix }),
+      version: 3,
+      partialize: (state) => ({ nodes: state.nodes }),
     }
   )
 )

@@ -1,13 +1,14 @@
 import { produce } from "immer"
 import { Node, useEditorStore } from "./stores/editor-store"
+import { useViewportTransformationStore } from "./stores/viewport-transformation-store"
 
 export function EditorRuler({
-  transform
 }: {
-  transform: string
-}) {
+  }) {
 
   const store = useEditorStore()
+  const { transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
+
 
   const [a, b] = [
     produce(store.nodes[store.rulerNodes[0]], (draft: Node) => {
@@ -39,7 +40,7 @@ export function EditorRuler({
     )
 
   return (
-    <g transform={transform}>
+    <g transform={TransformMatrixStyle()}>
       {lines.map(line => (
         <g key={line.num}>
           <line

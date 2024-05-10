@@ -36,12 +36,11 @@ type State = {
 
   /* diferent modes to handle different actions 
    * normal: allows user to pan the viewport
-   * select: allows user to use selection
+   * select: allows user to use selection and display nodes toolbar
    * ruler: allows user to select rulerNodes
    * addition: draws an overlay and lets the user add a node
-   * copy: display nodes toolbar that lets the user copy selected nodes
    */
-  editorMode: "normal" | "ruler" | "addition" | "copy" | "select"
+  editorMode: "normal" | "ruler" | "addition" | "select"
 
   /* snapLines position */
   snapLines?: GetSnapLinesResult,

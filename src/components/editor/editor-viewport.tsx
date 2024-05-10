@@ -89,6 +89,8 @@ function EditorContent({
 
   function handleViewPortTap() {
     store.clearActiveNodes()
+    store.clearRulerNodes()
+    store.setEditorMode("normal")
   }
 
   const [boxOrigin, setBoxOrigin] = useState([0, 0])
@@ -133,14 +135,14 @@ function EditorContent({
       setTransformMatrix(transformation)
     },
     onDrag: ({ first, last, buttons, touches, movement, event, ...e }) => {
-      if (first) {
+      if (store.editorMode === "normal" || buttons === 2) {
+        const transformation = {
+          s: 0,
+          x: e.delta[0],
+          y: e.delta[1],
+        }
+        setTransformMatrix(transformation)
       }
-      const transformation = {
-        s: 0,
-        x: e.delta[0],
-        y: e.delta[1],
-      }
-      setTransformMatrix(transformation)
       if (buttons === 1 && touches === 1 && store.editorMode === "select") {
         first && setBoxOrigin(e.xy)
         !first && setBoxSize(movement)

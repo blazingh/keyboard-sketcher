@@ -11,10 +11,11 @@ export default function NodesToolbar({
 }: {
   }) {
   const store = useEditorStore()
-  const { transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
+  const { transformMatrix } = useViewportTransformationStore()
   if (false
     || !store.activeNodes
     || !isDeepEqual(store.activeDxy, { x: 0, y: 0 })
+    || store.editorMode !== "select"
   ) return null
 
   const nodes: Node[] = store.activeNodes.map((nodeId) => {
@@ -44,35 +45,27 @@ export default function NodesToolbar({
     >
       {/* left toolbar */}
       <div className='h-full absolute -left-12 top-1/2 -translate-y-1/2 transition-all flex items-center justify-center '>
-        {store.editorMode === "copy" &&
-          <Button className='w-8 h-8' onClick={() => store.copyActivedNodes([-w - 50, 0])}>
-            <Plus className='shrink-0' />
-          </Button>
-        }
+        <Button className='w-8 h-8' onClick={() => store.copyActivedNodes([-w - 50, 0])}>
+          <Plus className='shrink-0' />
+        </Button>
       </div>
       {/* top toolbar */}
       <div className='w-full h-10 absolute -top-12 left-1/2 -translate-x-1/2 transition-all flex items-center justify-center '>
-        {store.editorMode === "copy" &&
-          <Button className='w-8 h-8' onClick={() => store.copyActivedNodes([0, -h - 50])}>
-            <Plus className='shrink-0' />
-          </Button>
-        }
+        <Button className='w-8 h-8' onClick={() => store.copyActivedNodes([0, -h - 50])}>
+          <Plus className='shrink-0' />
+        </Button>
       </div>
       {/* right toolbar */}
       <div className='h-full absolute -right-12 top-1/2 -translate-y-1/2 transition-all flex items-center justify-center '>
-        {store.editorMode === "copy" &&
-          <Button className='w-8 h-8' onClick={() => store.copyActivedNodes([w + 50, 0])}>
-            <Plus className='shrink-0' />
-          </Button>
-        }
+        <Button className='w-8 h-8' onClick={() => store.copyActivedNodes([w + 50, 0])}>
+          <Plus className='shrink-0' />
+        </Button>
       </div>
       {/* bottom toolbar */}
       <div className='w-full h-10 absolute -bottom-12 left-1/2 -translate-x-1/2 transition-all flex items-center justify-center '>
-        {store.editorMode === "copy" &&
-          <Button className='w-8 h-8' onClick={() => store.copyActivedNodes([0, h + 50])}>
-            <Plus className='shrink-0' />
-          </Button>
-        }
+        <Button className='w-8 h-8' onClick={() => store.copyActivedNodes([0, h + 50])}>
+          <Plus className='shrink-0' />
+        </Button>
       </div>
     </div>
   )

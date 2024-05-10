@@ -2,7 +2,7 @@
 
 import { useEditorStore } from './stores/editor-store';
 import { Button } from '@/components/ui/button';
-import { Copy, FlipHorizontal, MousePointer2, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
+import { BoxSelect, Copy, FlipHorizontal, Hand, MousePointer2, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import {
@@ -43,15 +43,15 @@ export default function EditorToolbar() {
         <Separator orientation='vertical' className='h-6 mx-2' />
 
         <Toggle variant={"default"} pressed={store.editorMode === "normal"} onPressedChange={(state) => state && store.setEditorMode("normal")} >
-          <MousePointer2 className='shrink-0' />
+          <Hand className='shrink-0' />
+        </Toggle>
+
+        <Toggle variant={"default"} pressed={store.editorMode === "select"} onPressedChange={(state) => state && store.setEditorMode("select")} >
+          <BoxSelect className='shrink-0' />
         </Toggle>
 
         <Toggle variant={"default"} pressed={store.editorMode === "ruler"} onPressedChange={(state) => state && store.setEditorMode("ruler")} >
           <Ruler className='shrink-0' />
-        </Toggle>
-
-        <Toggle variant={"default"} disabled={!store.activeNodes.length} pressed={store.editorMode === "copy"} onPressedChange={(state) => state && store.setEditorMode("copy")} >
-          <Copy className='shrink-0' />
         </Toggle>
 
         <DropdownMenu>

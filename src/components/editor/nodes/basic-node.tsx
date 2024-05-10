@@ -84,6 +84,8 @@ export function BasicNode({
           draft.pos.x = node.pos.x + dxy.x
           draft.pos.y = node.pos.y + dxy.y
         }))
+      else
+        resetSnapLines()
 
     }),
     onDragEnd: (() => {

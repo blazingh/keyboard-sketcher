@@ -32,7 +32,12 @@ export default function EditorToolbar() {
 
         <Separator orientation='vertical' className='h-6 mx-2' />
 
-        <Button variant={"ghost"} onClick={() => undo()} disabled={!pastStates.length}>
+        <Button variant={"ghost"} onClick={() => {
+          store.clearActiveNodes()
+          store.clearRulerNodes()
+          undo()
+        }}
+          disabled={!pastStates.length}>
           <Undo2 className='shrink-0' />
         </Button>
 

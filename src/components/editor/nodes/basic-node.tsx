@@ -6,6 +6,7 @@ import { produce } from "immer";
 import { useGesture } from "@use-gesture/react";
 import { cn } from "@/lib/utils";
 import { RulerIcon } from "lucide-react";
+import { useViewportTransformationStore } from "../stores/viewport-transformation-store";
 
 const selector = (state: EditorStoreType) => ({
   activeNodes: state.activeNodes,
@@ -29,10 +30,8 @@ const selector = (state: EditorStoreType) => ({
 
 export function BasicNode({
   node,
-  zoomTransformMatrix
 }: {
   node: Node;
-  zoomTransformMatrix?: TransformMatrix;
 }) {
 
   const {
@@ -51,6 +50,8 @@ export function BasicNode({
     editorMode,
     setEditorMode,
   } = useEditorStore(selector)
+
+  const { initViewport, transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
 
   const nodeActive = activeNodes.includes(node.id)
   const nodeRuler = rulerNodes.includes(node.id)
@@ -75,8 +76,8 @@ export function BasicNode({
     onDrag: (({ movement, tap }) => {
       tap && nodeClick()
       const dxy = {
-        x: Math.round((movement[0] / (zoomTransformMatrix?.scaleX || 1)) / 10) * 10,
-        y: Math.round((movement[1] / (zoomTransformMatrix?.scaleY || 1)) / 10) * 10
+        x: Math.round((movement[0] / (transformMatrix.s || 1)) / 10) * 10,
+        y: Math.round((movement[1] / (transformMatrix.s || 1)) / 10) * 10
       }
       setActiveDxy(dxy)
       if (activeNodes.length === 1)
@@ -94,14 +95,8 @@ export function BasicNode({
 
       // updated the active nodes position
       moveActiveNodes([
-        Math.round((snapLines?.snapPosition.x
-          ? snapLines.snapPosition.x - (node.pos.x || 0)
-          : dx
-        ) / 10) * 10,
-        Math.round((snapLines?.snapPosition.y
-          ? snapLines.snapPosition.y - (node.pos.y || 0)
-          : dy
-        ) / 10) * 10
+        Math.round((dx) / 10) * 10,
+        Math.round((dy) / 10) * 10
       ])
 
       resetSnapLines()

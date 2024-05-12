@@ -14,6 +14,10 @@ import NodesToolbar from './nodes-toolbar';
 import { EditorFloatButtons } from './editor-float-buttons';
 import { EditorRuler } from './editor-ruler';
 import { useViewportTransformationStore } from './stores/viewport-transformation-store';
+import { cn } from '@/lib/utils';
+import { ArcGroupNode } from './nodes/snap-arc';
+import { Slider } from '../ui/slider';
+import { produce } from 'immer';
 
 
 const editorWidth = 1500
@@ -156,6 +160,69 @@ function EditorContent({
       {/* nodes toolbar */}
       <NodesToolbar />
 
+      <div
+        className={cn(
+          'absolute pointer-events-none *:pointer-events-auto border bg-secondary rounded flex flex-col gap-8',
+        )}
+        style={{
+          left: 0 * transformMatrix.s + transformMatrix.x,
+          top: 0 * transformMatrix.s + transformMatrix.y,
+          width: 500 * transformMatrix.s,
+          height: 500 * transformMatrix.s
+        }}
+      >
+        {function() {
+          const arc = store.arcGroupsArray()[0]
+          if (!arc) return null
+          return (
+            <>
+              <Slider
+                value={[arc.switchCount]}
+                min={1}
+                max={10}
+                onValueChange={(v) => {
+                  store.updateArcGroup(produce(arc, draft => {
+                    draft.switchCount = v[0]
+                  }))
+                }}
+              />
+              <Slider
+                value={[arc.switchGap]}
+                min={0}
+                max={700}
+                step={10}
+                onValueChange={(v) => {
+                  store.updateArcGroup(produce(arc, draft => {
+                    draft.switchGap = v[0]
+                  }))
+                }}
+              />
+              <Slider
+                value={[arc.radius]}
+                min={0}
+                max={1400}
+                onValueChange={(v) => {
+                  store.updateArcGroup(produce(arc, draft => {
+                    draft.radius = v[0]
+                  }))
+                }}
+              />
+              <Slider
+                value={[arc.pos.r]}
+                min={0}
+                max={360}
+                onValueChange={(v) => {
+                  store.updateArcGroup(produce(arc, draft => {
+                    draft.pos.r = v[0]
+                  }))
+                }}
+              />
+            </>
+          )
+        }()}
+
+      </div>
+
       <svg width={width} height={height}  >
 
         {/* background */}
@@ -167,12 +234,6 @@ function EditorContent({
             <circle id="pattern-circle" cx="10" cy="10" r="0.5" fill="#fff" fillOpacity={0.5}></circle>
           </pattern>
           <rect id="rect" x={-editorWidth} y={-editorHeight} width={editorWidth * 2} height={editorHeight * 2} fill="url(#pattern-circles)" stroke='white' strokeWidth={2}></rect>
-        </g>
-
-        {/* snap lines */}
-        <g id="snapliens-groups" transform={TransformMatrixStyle()} strokeWidth={1} stroke='blue'>
-          {store.snapLines?.horizontal && <path id="snapLineH" d={`M ${-editorWidth} ${store.snapLines.horizontal} H ${editorWidth * 2}`} />}
-          {store.snapLines?.vertical && <path id="snapLineV" d={`M ${store.snapLines.vertical} ${-editorHeight} V ${editorHeight * 2}`} />}
         </g>
 
         {/* nodes outline */}
@@ -187,10 +248,12 @@ function EditorContent({
                   pos: {
                     x: node.pos.x + store.activeDxy.x,
                     y: node.pos.y + store.activeDxy.y,
+                    r: 0
                   }
                 }
               })
-            }(store.nodesArray())} />
+            }(store.nodesArray())}
+            />
           </defs>
           <use x="0" y="0" xlinkHref="#Nodes-Ouline-Inner" />
           <use x="0" y="0" xlinkHref="#Nodes-Ouline-Outer" />
@@ -205,8 +268,18 @@ function EditorContent({
           {...bind()}
         />
 
+        {/* arcGroup nodes */}
+        <g transform={TransformMatrixStyle()}>
+          {store.arcGroupsArray().map((arc) => (
+            <ArcGroupNode
+              key={arc.id}
+              arc={arc}
+            />
+          ))}
+        </g>
+
         {/* nodes */}
-        <g id="points" transform={TransformMatrixStyle()}>
+        <g transform={TransformMatrixStyle()}>
           {store.nodesArray().map((node) => (
             <BasicNode
               key={node.id}

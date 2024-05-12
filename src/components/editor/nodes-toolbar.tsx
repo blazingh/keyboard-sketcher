@@ -20,10 +20,8 @@ export default function NodesToolbar({
 
   const nodes: Node[] = store.activeNodes.map((nodeId) => {
     return produce(store.nodes[nodeId], draft => {
-      draft.pos = {
-        x: draft.pos.x + store.activeDxy.x,
-        y: draft.pos.y + store.activeDxy.y,
-      }
+      draft.pos.x += store.activeDxy.x
+      draft.pos.y += store.activeDxy.y
     })
   })
 

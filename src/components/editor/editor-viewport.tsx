@@ -15,7 +15,7 @@ import { EditorFloatButtons } from './editor-float-buttons';
 import { EditorRuler } from './editor-ruler';
 import { useViewportTransformationStore } from './stores/viewport-transformation-store';
 import { cn } from '@/lib/utils';
-import { ArcGroupNode } from './nodes/snap-arc';
+import { ArcGroupNode } from './nodes/arc-group-node';
 import { Slider } from '../ui/slider';
 import { produce } from 'immer';
 

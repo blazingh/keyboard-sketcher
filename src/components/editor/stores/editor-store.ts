@@ -6,16 +6,19 @@ import { temporal } from 'zundo';
 import isDeepEqual from 'fast-deep-equal';
 import { v4 as v4uuid } from "uuid";
 
+export type Pos = {
+  x: number,
+  y: number,
+  r: number,
+}
+
 export type Node = {
   id: string,
   size: {
     w: number,
     h: number
   }
-  pos: {
-    x: number,
-    y: number,
-  }
+  pos: Pos
 }
 
 export type TransformMatrix = {
@@ -24,10 +27,22 @@ export type TransformMatrix = {
   s: number // scale 
 }
 
+export type ArcGroup = {
+  id: string,
+  pos: Pos,
+  switchCount: number,
+  switchGap: number,
+  radius: number
+}
+
 type State = {
   /* nodes include switch, controllers or any newly added item to the viewport */
   nodes: { [key: Node["id"]]: Node },
   nodesArray: () => Node[],
+
+  /* arcGroup contain nodes spanned along the arc */
+  arcGroups: { [key: ArcGroup["id"]]: ArcGroup },
+  arcGroupsArray: () => ArcGroup[],
 
   /* selected Node */
   activeNodes: Node["id"][],
@@ -57,6 +72,8 @@ type Action = {
 
   setActiveDxy: (xy: { x: number, y: number }) => void
 
+  updateArcGroup: (arc: ArcGroup) => void,
+
   setEditorMode: (mode: State["editorMode"]) => void
 
   addActiveNode: (id: Node["id"]) => void
@@ -80,14 +97,14 @@ type Action = {
 }
 
 export const baseNodeState: Node = {
-  id: "1", size: { w: 140, h: 140 }, pos: { x: 0, y: 0 }
+  id: "1", size: { w: 140, h: 140 }, pos: { x: 0, y: 0, r: 0 }
 }
 
 const initialNodes: { [key: Node["id"]]: Node } = {
-  "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 30, y: 30 } },
-  "2": { id: "2", size: { w: 140, h: 140 }, pos: { x: -160, y: -160 } },
-  "4": { id: "4", size: { w: 140, h: 140 }, pos: { x: 30, y: -160 } },
-  "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: -160, y: 30 } }
+  "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 30, y: 30, r: 0 } },
+  "2": { id: "2", size: { w: 140, h: 140 }, pos: { x: -160, y: -160, r: 0 } },
+  "4": { id: "4", size: { w: 140, h: 140 }, pos: { x: 30, y: -160, r: 0 } },
+  "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: -160, y: 30, r: 0 } }
 }
 
 export type EditorStoreType = State & Action
@@ -97,6 +114,23 @@ export const useEditorStore = create<EditorStoreType>()(
       nodes: initialNodes,
       editorMode: "normal",
       activeNodeAddition: null,
+
+      arcGroups: {
+        "nnn": {
+          id: "nnn",
+          pos: { x: 0, y: 0, r: 0 },
+          switchCount: 4,
+          switchGap: 50,
+          radius: 500
+        }
+      },
+      arcGroupsArray: () => Object.values(get().arcGroups),
+
+      updateArcGroup: (arc) => {
+        set(produce((state: State) => {
+          state.arcGroups[arc.id] = arc
+        }))
+      },
 
       setEditorMode: (mode) => {
         set({ editorMode: mode })

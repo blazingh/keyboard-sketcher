@@ -1,12 +1,11 @@
 "use client"
 
-import { TransformMatrix } from "@visx/zoom/lib/types";
 import { EditorStoreType, Node, useEditorStore } from '../stores/editor-store';
-import { produce } from "immer";
 import { useGesture } from "@use-gesture/react";
 import { cn } from "@/lib/utils";
 import { RulerIcon } from "lucide-react";
 import { useViewportTransformationStore } from "../stores/viewport-transformation-store";
+
 
 const selector = (state: EditorStoreType) => ({
   activeNodes: state.activeNodes,
@@ -25,7 +24,7 @@ const selector = (state: EditorStoreType) => ({
   rulerNodes: state.rulerNodes,
   toggleRulerNode: state.toggleRulerNode,
   editorMode: state.editorMode,
-  setEditorMode: state.setEditorMode
+  setEditorMode: state.setEditorMode,
 })
 
 export function BasicNode({
@@ -49,7 +48,8 @@ export function BasicNode({
     toggleRulerNode,
     editorMode,
     setEditorMode,
-  } = useEditorStore(selector)
+    ...store
+  } = useEditorStore()
 
   const { initViewport, transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
 
@@ -80,26 +80,16 @@ export function BasicNode({
         y: Math.round((movement[1] / (transformMatrix.s || 1)) / 10) * 10
       }
       setActiveDxy(dxy)
-      if (activeNodes.length === 1)
-        updateSnapLines(produce(node, draft => {
-          draft.pos.x = node.pos.x + dxy.x
-          draft.pos.y = node.pos.y + dxy.y
-        }))
-      else
-        resetSnapLines()
-
     }),
     onDragEnd: (() => {
       // check if the node has bean moved
       if (activeDxy.x === 0 && activeDxy.y === 0) return
-
       // updated the active nodes position
       moveActiveNodes([
         Math.round((dx) / 10) * 10,
         Math.round((dy) / 10) * 10
       ])
 
-      resetSnapLines()
       setActiveDxy({ x: 0, y: 0 })
     }),
   },
@@ -107,32 +97,29 @@ export function BasicNode({
   )
 
 
+
   return (
     <g
-      transform={`translate(${nodeActive ? dx : 0}, ${nodeActive ? dy : 0})`}
       className="touch-none"
+      transform={`translate(${nodeActive ? dx : 0}, ${nodeActive ? dy : 0})`}
       {...binds()}
     >
       <rect
-        x={(x || 0) + 1}
-        y={(y || 0) + 1}
+        x={x - node.size.w / 2}
+        y={y - node.size.h / 2}
         rx={5}
-        width={node.size.w - 2}
-        height={node.size.h - 2}
+        width={node.size.w}
+        height={node.size.h}
         className={cn(
           "fill-secondary stroke-2",
-          nodeActive ? "stroke-primary" : "stroke-white/70"
+          nodeActive ? "stroke-primary" : "stroke-white/70",
         )}
+        style={{
+          transformBox: "fill-box",
+          transformOrigin: "center",
+          transform: `rotate(${node.pos.r ?? 0}deg)`
+        }}
       >
-        {nodeRuler && (
-          <rect
-            x={(x || 0) + 1}
-            y={(y || 0) + 1}
-            width={node.size.w - 10}
-            height={node.size.h - 10}
-            fill="white"
-          />
-        )}
       </rect>
       {nodeRuler && (
         <RulerIcon
@@ -151,4 +138,4 @@ export function BasicNode({
       </>)}
     </g>
   );
-};
+}

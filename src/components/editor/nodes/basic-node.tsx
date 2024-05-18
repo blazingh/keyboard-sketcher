@@ -14,8 +14,8 @@ const selector = (state: EditorStoreType) => ({
   moveActiveNodes: state.moveActiveNodes,
   addActiveNode: state.addActiveNode,
 
-  setActiveDxy: state.setActiveDxy,
-  activeDxy: state.activeDxy,
+  activeDisplacement: state.activeDisplacement,
+  setActiveDisplacement: state.setActiveDisplacement,
 
   snapLines: state.snapLines,
   updateSnapLines: state.updateSnapLines,
@@ -35,10 +35,10 @@ export function BasicNode({
 
   const {
     moveActiveNodes,
-    setActiveDxy,
+    activeDisplacement,
+    setActiveDisplacement,
     clearActiveNodes,
     addActiveNode,
-    activeDxy,
     activeNodes,
     toggleActiveNode,
     updateSnapLines,
@@ -54,9 +54,8 @@ export function BasicNode({
   const { initViewport, transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
 
   const nodeActive = activeNodes.includes(node.id)
-  const nodeRuler = rulerNodes.includes(node.id)
   const { x, y } = node.pos
-  const { x: dx, y: dy } = activeDxy
+  const { x: dx, y: dy } = activeDisplacement
 
   function nodeClick() {
     if (editorMode === "ruler")
@@ -75,28 +74,24 @@ export function BasicNode({
     }),
     onDrag: (({ movement, tap }) => {
       tap && nodeClick()
-      const dxy = {
-        x: Math.round((movement[0] / (transformMatrix.s || 1)) / 10) * 10,
-        y: Math.round((movement[1] / (transformMatrix.s || 1)) / 10) * 10
+      const displacement = {
+        x: Math.round((movement[0] / transformMatrix.s) / 10) * 10,
+        y: Math.round((movement[1] / transformMatrix.s) / 10) * 10,
+        r: 0
       }
-      setActiveDxy(dxy)
+      setActiveDisplacement(displacement)
     }),
     onDragEnd: (() => {
       // check if the node has bean moved
-      if (activeDxy.x === 0 && activeDxy.y === 0) return
+      if (dx === 0 && dy === 0) return
       // updated the active nodes position
-      moveActiveNodes([
-        Math.round((dx) / 10) * 10,
-        Math.round((dy) / 10) * 10
-      ])
-
-      setActiveDxy({ x: 0, y: 0 })
+      moveActiveNodes([dx, dy])
+      // reset the active x and y displacement
+      setActiveDisplacement({ x: 0, y: 0, r: 0 })
     }),
   },
     { drag: { delay: true, threshold: 10, filterTaps: true } }
   )
-
-
 
   return (
     <g
@@ -121,19 +116,14 @@ export function BasicNode({
         }}
       >
       </rect>
-      {nodeRuler && (
-        <RulerIcon
-          x={(x || 0) + node.size.w / 2 - 12}
-          y={(y || 0) + node.size.h / 2 - 12}
-          stroke="white"
-        />
-      )}
       {false && (<>
+        {/*
         <text x={x} y={(y || 0) - 25} fontSize="10" fill="white">
           id: {JSON.stringify(node.id)}
         </text>
+        */}
         <text x={x} y={(y || 0) - 10} fontSize="10" fill="white">
-          {JSON.stringify(node.pos)}
+          {JSON.stringify({ ...node.pos, ...node.size })}
         </text>
       </>)}
     </g>

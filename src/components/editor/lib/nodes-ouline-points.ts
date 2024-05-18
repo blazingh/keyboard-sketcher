@@ -8,16 +8,16 @@ function mirrorPointsHorizontally(points: number[][]) {
   return points.map(point => [point[0] * -1, point[1]]);
 }
 
-export function getNodesOutinePoints(nodes: Node[], p: number = 0, wallThick: number = 40): outlinePoints {
+export function getNodesOutinePoints(nodes: Node[], p: number = 0): outlinePoints {
 
   const initPoints: any = []
   nodes.forEach(node => {
     const { x, y } = node.pos;
     const { w, h } = node.size
-    initPoints.push([x - p, y - p]);
-    initPoints.push([x + w + p, y + h + p]);
-    initPoints.push([x + w + p, y - p]);
-    initPoints.push([x - p, y + h + p]);
+    initPoints.push([x + p + w / 2, y + p + h / 2]);
+    initPoints.push([x - p - w / 2, y - p - h / 2]);
+    initPoints.push([x + p + w / 2, y - p - h / 2]);
+    initPoints.push([x - p - w / 2, y + p + h / 2]);
   });
 
   const flippedPoints = mirrorPointsHorizontally(initPoints)
@@ -53,6 +53,6 @@ export function getNodesOutinePoints(nodes: Node[], p: number = 0, wallThick: nu
     [mirrorPointsHorizontally(flippedHull as number[][])] as Polygon,
     [originalHull as number[][]] as Polygon
   )[0][0] as any
-  //  console.log(newHull1, finalHull)
+
   return finalHull
 }

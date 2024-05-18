@@ -5,10 +5,11 @@ export function findEnclosingBox(nodes: Node[]) {
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   nodes.forEach(node => {
     if (!node) return
-    minX = Math.min(minX, node.pos.x);
-    minY = Math.min(minY, node.pos.y);
-    maxX = Math.max(maxX, node.pos.x + node.size.w);
-    maxY = Math.max(maxY, node.pos.y + node.size.h);
+    const { pos: { x, y }, size: { w, h } } = node
+    minX = Math.min(minX, x - w / 2);
+    minY = Math.min(minY, y - h / 2);
+    maxX = Math.max(maxX, x + w / 2);
+    maxY = Math.max(maxY, y + h / 2);
   });
   const width = maxX - minX;
   const height = maxY - minY;

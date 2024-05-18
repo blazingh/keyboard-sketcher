@@ -13,7 +13,6 @@ import EditorToolbar from './editor-toolbar';
 import { EditorFloatButtons } from './editor-float-buttons';
 import { EditorRuler } from './editor-ruler';
 import { useViewportTransformationStore } from './stores/viewport-transformation-store';
-import { ArcGroupNode } from './nodes/arc-group-node';
 import NodesTranformationTools from './nodes-transformation-tools';
 
 

@@ -122,7 +122,7 @@ export default function NodesTranformationTools({
           }}
         >
           <MoveVertical
-            className="h-14 w-14 absolute -translate-y-1/2 -translate-x-1/2 hover:cursor-grab active:cursor-grabbing touch-none active:stroke-primary"
+            className="h-10 w-10 absolute -translate-y-1/2 -translate-x-1/2 hover:cursor-grab active:cursor-grabbing touch-none active:stroke-primary"
             {...bindsDragY()}
           />
         </div>
@@ -137,7 +137,7 @@ export default function NodesTranformationTools({
           }}
         >
           <MoveHorizontal
-            className="h-14 w-14 absolute -translate-y-1/2 -translate-x-1/2  hover:cursor-grab active:cursor-grabbing touch-none active:stroke-primary"
+            className="h-10 w-10 absolute -translate-y-1/2 -translate-x-1/2  hover:cursor-grab active:cursor-grabbing touch-none active:stroke-primary"
             {...bindsDragX()}
           />
         </div>
@@ -156,7 +156,7 @@ export default function NodesTranformationTools({
         {/* top rigth rotaion handle */}
         <div
           className={cn(
-            'absolute -top-5 -right-10 transition-all flex items-start justify-start overflow-hidden h-5 w-14 pointer-events-auto',
+            'absolute -top-3 -right-11 transition-all flex items-start justify-start overflow-hidden h-[15px] w-14 pointer-events-auto',
             (dy !== 0 || dx !== 0) && "hidden"
           )}
           style={{
@@ -164,8 +164,8 @@ export default function NodesTranformationTools({
           }}
         >
           <div className="group absolute hover:cursor-grab active:cursor-grabbing touch-none" {...bindsDragR()}>
-            <RotateCw className="h-14 w-14 absolute group-active:stroke-primary" />
-            <RotateCcw className="h-14 w-14 absolute group-active:stroke-primary" />
+            <RotateCw className="h-10 w-10 absolute group-active:stroke-primary" />
+            <RotateCcw className="h-10 w-10 absolute group-active:stroke-primary" />
           </div>
         </div>
       </div>

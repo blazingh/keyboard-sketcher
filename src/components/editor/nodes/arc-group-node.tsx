@@ -7,7 +7,7 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
 
   const { switchGap, switchCount, pos, radius } = arc
 
-  const { TransformMatrixStyle } = useViewportTransformationStore()
+  const { } = useViewportTransformationStore()
 
 
   const totalLength = (switchCount * 140) + ((switchCount - 1) * switchGap);
@@ -18,7 +18,6 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
     for (let index = 0; index < switchCount; index++) {
       array.push(produce(baseNodeState, draft => {
         const distance = index * (140 + switchGap) + 70
-        // Create a temporary SVG path element to utilize its methods
         const tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
         tempPath.setAttribute("d", v.path);
         const arcPoint = tempPath.getPointAtLength(distance)
@@ -33,7 +32,6 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
 
   return (
     <g
-      transform={TransformMatrixStyle()}
     >
       <circle
         cx={pos.x}

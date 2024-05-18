@@ -112,10 +112,14 @@ export default function NodesTranformationTools({
         style={{ ...pos }}
       >
         {/* bottom left transaltion handels */}
-        <div className={cn(
-          'absolute top-1/2 -left-5 transition-all pointer-events-auto',
-          (dx !== 0 || dr !== 0) && "hidden"
-        )}
+        <div
+          className={cn(
+            'absolute top-1/2 -left-5 transition-all pointer-events-auto',
+            (dx !== 0 || dr !== 0) && "hidden"
+          )}
+          style={{
+            transform: `scale(${ts})`
+          }}
         >
           <MoveVertical
             className="h-14 w-14 absolute -translate-y-1/2 -translate-x-1/2 hover:cursor-grab active:cursor-grabbing touch-none active:stroke-primary"
@@ -123,10 +127,15 @@ export default function NodesTranformationTools({
           />
         </div>
         {/* bottom left transaltion handels */}
-        <div className={cn(
-          'absolute -bottom-5 left-1/2 transition-all pointer-events-auto',
-          (dy !== 0 || dr !== 0) && "hidden"
-        )}>
+        <div
+          className={cn(
+            'absolute -bottom-5 left-1/2 transition-all pointer-events-auto',
+            (dy !== 0 || dr !== 0) && "hidden"
+          )}
+          style={{
+            transform: `scale(${ts}) `
+          }}
+        >
           <MoveHorizontal
             className="h-14 w-14 absolute -translate-y-1/2 -translate-x-1/2  hover:cursor-grab active:cursor-grabbing touch-none active:stroke-primary"
             {...bindsDragX()}
@@ -145,10 +154,14 @@ export default function NodesTranformationTools({
         }}
       >
         {/* top rigth rotaion handle */}
-        <div className={cn(
-          'absolute -top-5 -right-10 transition-all flex items-start justify-start overflow-hidden h-5 w-14 rotate-45 pointer-events-auto',
-          (dy !== 0 || dx !== 0) && "hidden"
-        )}
+        <div
+          className={cn(
+            'absolute -top-5 -right-10 transition-all flex items-start justify-start overflow-hidden h-5 w-14 pointer-events-auto',
+            (dy !== 0 || dx !== 0) && "hidden"
+          )}
+          style={{
+            transform: `scale(${ts}) rotate(45deg)`
+          }}
         >
           <div className="group absolute hover:cursor-grab active:cursor-grabbing touch-none" {...bindsDragR()}>
             <RotateCw className="h-14 w-14 absolute group-active:stroke-primary" />

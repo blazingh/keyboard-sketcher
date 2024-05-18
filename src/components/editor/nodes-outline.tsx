@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Node } from "./stores/editor-store";
 import { getNodesOutinePoints } from "./lib/nodes-ouline-points";
+import { useThreeDModelGeneratorStore } from "./stores/3d-model-generator-store";
 
 export function NodesOutline({
   nodes,
@@ -8,10 +9,12 @@ export function NodesOutline({
   nodes: Node[]
 }) {
 
+  const model = useThreeDModelGeneratorStore()
+
   const points = useMemo(() => {
     if (nodes.length < 1) return { inner: [], outer: [] }
-    const basePoints = getNodesOutinePoints(nodes, 40)
-    const offsetPoints = getNodesOutinePoints(nodes, 40 + 50)
+    const basePoints = getNodesOutinePoints(nodes, parseFloat(model.params.wallSwitchPadding) * 10)
+    const offsetPoints = getNodesOutinePoints(nodes, parseFloat(model.params.wallSwitchPadding) * 10 + parseFloat(model.params.wallThick) * 10)
     return {
       inner: basePoints,
       outer: offsetPoints

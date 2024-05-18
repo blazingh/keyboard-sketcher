@@ -10,6 +10,7 @@ const defaultOptions = {
 
   plateThick: 3,
   wallThick: 4,
+  wallSwitchPadding: 4,
   caseTopMargin: 0,
   caseBottomMargin: 10,
   caseTopRadius: 0,
@@ -47,6 +48,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   // make sure all data are floats numbers
   o.plateThick = parseFloat(o.plateThick as any)
   o.wallThick = parseFloat(o.wallThick as any)
+  o.wallSwitchPadding = parseFloat(o.wallSwitchPadding as any)
   o.caseTopMargin = parseFloat(o.caseTopMargin as any)
   o.caseBottomMargin = parseFloat(o.caseBottomMargin as any)
   o.caseTopRadius = parseFloat(o.caseTopRadius as any)
@@ -67,7 +69,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   const switch_nodes = nodes.filter((node: any) => node.type === "switch")
   const mcu_nodes = nodes.filter((node: any) => node.type === "mcu")
 
-  const borderPoints = getNodesOutinePoints(e.data.nodes as any, 50)
+  const borderPoints = getNodesOutinePoints(e.data.nodes as any, o.wallSwitchPadding * 10)
   const sides: number[][][] = []
 
   borderPoints.map((point, index) => {

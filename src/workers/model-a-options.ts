@@ -10,6 +10,7 @@ export type ModelWorkerResult = {
 
 export type ModelAOptionsTypes = {
   plateThick: string,
+  wallSwitchPadding: string,
   wallThick: string,
   caseTopMargin: string,
   caseBottomMargin: string,
@@ -18,6 +19,7 @@ export type ModelAOptionsTypes = {
 
 export const modelADefaultOptionsValues: ModelAOptionsTypes = {
   plateThick: "3",
+  wallSwitchPadding: "4.5",
   wallThick: "4",
   caseTopMargin: "0",
   caseBottomMargin: "10",
@@ -43,6 +45,13 @@ export const modelAOptionsList: {
       key: "wallThick",
       label: "Case Walls Thickness",
       description: "case walls thickness",
+      type: "number"
+    },
+    {
+      id: 25,
+      key: "wallSwitchPadding",
+      label: "wall switch distance",
+      description: "distance between the switches and case walls",
       type: "number"
     },
     {

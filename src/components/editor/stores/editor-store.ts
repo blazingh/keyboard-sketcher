@@ -14,11 +14,11 @@ export type Pos = {
 
 export type Node = {
   id: string,
+  pos: Pos
   size: {
     w: number,
     h: number
   }
-  pos: Pos
 }
 
 export type TransformMatrix = {
@@ -62,7 +62,7 @@ type State = {
 
   /* current draged node x and y displacement, used to translate the selected nodes on pointer drag */
   activeDxy: { x: number, y: number }
-
+  activeDisplacement: Pos
 }
 
 type Action = {
@@ -71,6 +71,7 @@ type Action = {
   deleteNode: (id: Node["id"]) => void
 
   setActiveDxy: (xy: { x: number, y: number }) => void
+  setActiveDisplacement: (displacement: Pos) => void
 
   updateArcGroup: (arc: ArcGroup) => void,
 
@@ -161,10 +162,16 @@ export const useEditorStore = create<EditorStoreType>()(
 
       snapLines: { ...defaultSnapLinesResult },
       activeDxy: { x: 0, y: 0 },
+      activeDisplacement: { x: 0, y: 0, r: 0 },
 
       setActiveDxy: (xy) => {
         set(produce((state) => {
           state.activeDxy = xy
+        }))
+      },
+      setActiveDisplacement: (displacement) => {
+        set(produce((state) => {
+          state.activeDisplacement = displacement
         }))
       },
 
@@ -242,8 +249,8 @@ export const useEditorStore = create<EditorStoreType>()(
       moveActiveNodes: (xy: [number, number]) => {
         set(produce((state: State) => {
           get().activeNodes.forEach(id => {
-            state.nodes[id].pos.x += xy[0]
-            state.nodes[id].pos.y += xy[1]
+            state.nodes[id].pos.x = Math.round((state.nodes[id].pos.x + xy[0]) / 10) * 10
+            state.nodes[id].pos.y = Math.round((state.nodes[id].pos.y + xy[1]) / 10) * 10
           })
         }))
       },

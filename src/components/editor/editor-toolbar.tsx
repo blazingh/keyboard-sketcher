@@ -2,7 +2,7 @@
 
 import { useEditorStore } from './stores/editor-store';
 import { Button } from '@/components/ui/button';
-import { BoxSelect, Copy, FlipHorizontal, Hand, MousePointer2, Move, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
+import { BoxSelect, Copy, FlipHorizontal, FlipVertical, Hand, MousePointer2, Move, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import {
@@ -87,8 +87,12 @@ export default function EditorToolbar() {
       </div>
       <div className='flex items-center [&>button]:w-10 [&>button]:h-10'>
 
-        <Button variant={"ghost"} onClick={() => store.flipActiveNodes()} disabled={!store.activeNodes.length}>
+        <Button variant={"ghost"} onClick={() => store.flipActiveNodesHorizontally()} disabled={!store.activeNodes.length}>
           <FlipHorizontal className='shrink-0 cursor-copy' />
+        </Button>
+
+        <Button variant={"ghost"} onClick={() => store.flipActiveNodesVertically()} disabled={!store.activeNodes.length}>
+          <FlipVertical className='shrink-0 cursor-copy' />
         </Button>
 
         <Button variant={"ghost"} onClick={() => store.deleteActiveNodes()} disabled={!store.activeNodes.length}>

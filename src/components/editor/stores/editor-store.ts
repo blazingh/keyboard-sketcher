@@ -94,7 +94,8 @@ type Action = {
   moveActiveNodes: (displacement: Pos) => void
   deleteActiveNodes: () => void
   copyActivedNodes: (xy: [number, number]) => void
-  flipActiveNodes: () => void
+  flipActiveNodesHorizontally: () => void
+  flipActiveNodesVertically: () => void
 
 }
 
@@ -278,7 +279,7 @@ export const useEditorStore = create<EditorStoreType>()(
         const newIds = get().addNodes(nodes)
         set({ activeNodes: newIds })
       },
-      flipActiveNodes: () => {
+      flipActiveNodesHorizontally: () => {
         const nodes: Node[] = get().activeNodes.map(nodeId => get().nodes[nodeId])
         let minX = Infinity, maxX = -Infinity;
         for (const node of nodes) {
@@ -289,6 +290,20 @@ export const useEditorStore = create<EditorStoreType>()(
         set(produce((draft: State) => {
           for (const node of nodes) {
             draft.nodes[node.id].pos.x = centerX - (node.pos.x - centerX);
+          }
+        }))
+      },
+      flipActiveNodesVertically: () => {
+        const nodes: Node[] = get().activeNodes.map(nodeId => get().nodes[nodeId])
+        let minY = Infinity, maxY = -Infinity;
+        for (const node of nodes) {
+          minY = Math.min(minY, node.pos.y);
+          maxY = Math.max(maxY, node.pos.y);
+        }
+        const centerY = (minY + maxY) / 2;
+        set(produce((draft: State) => {
+          for (const node of nodes) {
+            draft.nodes[node.id].pos.y = centerY - (node.pos.y - centerY);
           }
         }))
       },

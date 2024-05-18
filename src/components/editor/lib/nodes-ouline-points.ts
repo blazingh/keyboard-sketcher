@@ -1,6 +1,5 @@
 import { Node } from '@/components/editor/stores/editor-store';
 import hull from 'hull.js'
-import polygonClipping, { Polygon } from "polygon-clipping"
 import { getRotatedNodeCorners } from './nodes-utils';
 
 type outlinePoints = number[][]
@@ -32,12 +31,13 @@ export function getNodesOutinePoints(nodes: Node[], p: number = 0): outlinePoint
   });
   */
 
-  const originalHull = hull(initPoints, (70) * 5)
-  const flippedHull = hull(flippedPoints, (70) * 5)
-  const finalHull = polygonClipping.union(
-    [mirrorPointsHorizontally(flippedHull as number[][])] as Polygon,
-    [originalHull as number[][]] as Polygon
-  )[0][0] as any
+  const originalHull = hull(initPoints, (70) * 5) as number[][]
+  const flippedHull = hull(flippedPoints, (70) * 5) as number[][]
+
+  const finalHull = hull([
+    ...mirrorPointsHorizontally(flippedHull),
+    ...originalHull
+  ], 70 * 5) as number[][]
 
   return finalHull
 }

@@ -49,6 +49,8 @@ export default function NodesDuplicationTools({
       <div
         className='absolute -left-12 top-1/2 -translate-y-1/2 transition-all'
         style={{
+          transformBox: "fill-box",
+          transformOrigin: "top right",
           scale: `${ts}`
         }}
       >
@@ -62,6 +64,8 @@ export default function NodesDuplicationTools({
       <div
         className='absolute -top-12 left-1/2 -translate-x-1/2 transition-all'
         style={{
+          transformBox: "fill-box",
+          transformOrigin: "bottom left",
           scale: `${ts}`
         }}
       >
@@ -73,6 +77,8 @@ export default function NodesDuplicationTools({
       <div
         className='absolute -right-12 top-1/2 -translate-y-1/2 transition-all '
         style={{
+          transformBox: "fill-box",
+          transformOrigin: "top left",
           scale: `${ts}`
         }}
       >
@@ -84,6 +90,8 @@ export default function NodesDuplicationTools({
       <div
         className='absolute -bottom-12 left-1/2 -translate-x-1/2 transition-all '
         style={{
+          transformBox: "fill-box",
+          transformOrigin: "top left",
           scale: `${ts}`
         }}
       >

@@ -249,9 +249,9 @@ function EditorContent({
                 return {
                   ...node,
                   pos: {
-                    x: node.pos.x + store.activeDxy.x,
-                    y: node.pos.y + store.activeDxy.y,
-                    r: 0
+                    x: node.pos.x + store.activeDisplacement.x,
+                    y: node.pos.y + store.activeDisplacement.y,
+                    r: node.pos.r + store.activeDisplacement.r
                   }
                 }
               })
@@ -270,16 +270,6 @@ function EditorContent({
           className='touch-none'
           {...bind()}
         />
-
-        {/* arcGroup nodes */}
-        <g transform={TransformMatrixStyle()}>
-          {store.arcGroupsArray().map((arc) => (
-            <ArcGroupNode
-              key={arc.id}
-              arc={arc}
-            />
-          ))}
-        </g>
 
         {/* nodes */}
         <g transform={TransformMatrixStyle()}>

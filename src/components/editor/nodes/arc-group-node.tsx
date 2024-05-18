@@ -7,9 +7,6 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
 
   const { switchGap, switchCount, pos, radius } = arc
 
-  const { } = useViewportTransformationStore()
-
-
   const totalLength = (switchCount * 140) + ((switchCount - 1) * switchGap);
   const v = generateArcPath(totalLength, radius, pos)
 

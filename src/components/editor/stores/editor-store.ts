@@ -302,7 +302,7 @@ export const useEditorStore = create<EditorStoreType>()(
     {
       name: 'sketcher-nodes',
       skipHydration: true,
-      version: 3,
+      version: 4,
       partialize: (state) => ({ nodes: state.nodes }),
     }
   )

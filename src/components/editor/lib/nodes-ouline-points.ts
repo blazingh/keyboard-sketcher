@@ -1,6 +1,7 @@
 import { Node } from '@/components/editor/stores/editor-store';
 import hull from 'hull.js'
 import { getRotatedNodeCorners } from './nodes-utils';
+import { primitives, booleans, hulls, extrusions, expansions, transforms, utils, geometries } from '@jscad/modeling'
 
 type outlinePoints = number[][]
 
@@ -39,5 +40,17 @@ export function getNodesOutinePoints(nodes: Node[], p: number = 0): outlinePoint
     ...originalHull
   ], 70 * 5) as number[][]
 
-  return finalHull
+  const sides: number[][][] = []
+
+  finalHull.map((point, index) => {
+    if (index == finalHull.length - 1) return
+    sides.push([point, finalHull[index + 1]])
+  })
+
+  const geom = geometries.geom2.create(sides as any)
+  const points = expansions.offset({ delta: p }, geom).sides.map((points) => {
+    return points[0]
+  })
+
+  return points
 }

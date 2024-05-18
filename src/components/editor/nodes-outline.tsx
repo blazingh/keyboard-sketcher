@@ -1,6 +1,4 @@
 import { useMemo } from "react";
-/* @ts-ignore */
-import Offset from "polygon-offset";
 import { Node } from "./stores/editor-store";
 import { getNodesOutinePoints } from "./lib/nodes-ouline-points";
 
@@ -12,11 +10,11 @@ export function NodesOutline({
 
   const points = useMemo(() => {
     if (nodes.length < 1) return { inner: [], outer: [] }
-    const basePoints = getNodesOutinePoints(nodes, 140 / 2)
-    const offset = new Offset()
+    const basePoints = getNodesOutinePoints(nodes, 40)
+    const offsetPoints = getNodesOutinePoints(nodes, 40 + 50)
     return {
       inner: basePoints,
-      outer: offset.data(basePoints).margin(35)[0] as [number, number][]
+      outer: offsetPoints
     }
   }, [nodes])
 

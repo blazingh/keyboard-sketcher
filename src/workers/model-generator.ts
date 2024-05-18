@@ -59,7 +59,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   const nodes: SimpleNode[] = e.data.nodes.map((node: Node) => {
     return {
       type: "switch",
-      position: { x: node.pos.x / 10 + node.size.w / 20, y: node.pos.y / 10 + node.size.h / 20, r: 0 },
+      position: { x: node.pos.x / 10, y: node.pos.y / 10, r: node.pos.r },
       size: { w: node.size.w / 10, h: node.size.h / 10 }
     }
   })
@@ -67,12 +67,14 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   const switch_nodes = nodes.filter((node: any) => node.type === "switch")
   const mcu_nodes = nodes.filter((node: any) => node.type === "mcu")
 
-  const borderPoints = getNodesOutinePoints(e.data.nodes as any, 140 / 2)
+  const borderPoints = getNodesOutinePoints(e.data.nodes as any, 50)
   const sides: number[][][] = []
 
   borderPoints.map((point, index) => {
-    if (index == borderPoints.length - 1) return
-    sides.push([point, borderPoints[index + 1]])
+    if (index == borderPoints.length - 1)
+      sides.push([point, borderPoints[0]])
+    else
+      sides.push([point, borderPoints[index + 1]])
   })
 
   let base_plate = transforms.scale([0.1, 0.1, 1], geometries.geom2.create(sides as any))

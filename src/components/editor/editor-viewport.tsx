@@ -14,6 +14,7 @@ import { EditorFloatButtons } from './editor-float-buttons';
 import { EditorRuler } from './editor-ruler';
 import { useViewportTransformationStore } from './stores/viewport-transformation-store';
 import NodesTranformationTools from './nodes-transformation-tools';
+import NodesDuplicationTools from './nodes-duplication-tools';
 
 
 const editorWidth = 1500
@@ -23,8 +24,8 @@ function isInsideSelectionBox(box: any, node: Node) {
   return (
     node.pos.x >= box.x &&
     node.pos.y >= box.y &&
-    node.pos.x + node.size.w <= box.x + box.w &&
-    node.pos.y + node.size.h <= box.y + box.h
+    node.pos.x <= box.x + box.w &&
+    node.pos.y <= box.y + box.h
   );
 }
 
@@ -100,18 +101,21 @@ function EditorContent({
     onContextMenu: (e) => e.event.preventDefault(),
     onDragStart: () => { },
     onDragEnd: () => {
-      const box = {
-        x: (Math.min(0, boxSize[0]) + boxOrigin[0] - transformMatrix.x) / transformMatrix.s,
-        y: (Math.min(0, boxSize[1]) + boxOrigin[1] - transformMatrix.y) / transformMatrix.s,
-        w: (Math.max(boxSize[0], -boxSize[0])) / transformMatrix.s,
-        h: (Math.max(boxSize[1], -boxSize[1])) / transformMatrix.s,
-      }
-      store.nodesArray().map((node) => {
-        if (isInsideSelectionBox(box, node)) {
-          store.addActiveNode(node.id)
+      if (store.editorMode === "select") {
+        const box = {
+          x: (Math.min(0, boxSize[0]) + boxOrigin[0] - transformMatrix.x) / transformMatrix.s,
+          y: (Math.min(0, boxSize[1]) + boxOrigin[1] - transformMatrix.y) / transformMatrix.s,
+          w: (Math.max(boxSize[0], -boxSize[0])) / transformMatrix.s,
+          h: (Math.max(boxSize[1], -boxSize[1])) / transformMatrix.s,
         }
-      })
-      setBoxSize([0, 0])
+        store.nodesArray().map((node) => {
+          if (isInsideSelectionBox(box, node)) {
+            store.addActiveNode(node.id)
+          }
+        })
+        setBoxSize([0, 0])
+        store.setEditorMode("normal")
+      }
     },
     onDoubleClick: () => handleViewPortTap(),
     onPinchStart: ({ origin }) => { },
@@ -135,7 +139,7 @@ function EditorContent({
       setTransformMatrix(transformation)
     },
     onDrag: ({ first, last, buttons, touches, movement, event, ...e }) => {
-      if (store.editorMode === "normal" || buttons === 2) {
+      if (store.editorMode !== "select" || buttons === 2) {
         const transformation = {
           s: 0,
           x: e.delta[0],
@@ -153,11 +157,14 @@ function EditorContent({
   return (
     <div>
 
-      {/* nodes toolbar */}
-      {/*
-      <NodesToolbar />
-      */}
-      <NodesTranformationTools />
+      {/* nodes duplication toolbar */}
+      {store.editorMode === "copy" &&
+        <NodesDuplicationTools />
+      }
+      {/* nodes transformation toolbar */}
+      {store.editorMode === "normal" &&
+        <NodesTranformationTools />
+      }
 
       {/*
       <div

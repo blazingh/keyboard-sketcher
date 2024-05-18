@@ -1,6 +1,7 @@
 import { Node } from '@/components/editor/stores/editor-store';
 import hull from 'hull.js'
 import polygonClipping, { Polygon } from "polygon-clipping"
+import { getRotatedNodeCorners } from './nodes-utils';
 
 type outlinePoints = number[][]
 
@@ -12,31 +13,15 @@ export function getNodesOutinePoints(nodes: Node[], p: number = 0): outlinePoint
 
   const initPoints: any = []
   nodes.forEach(node => {
-    const { x, y } = node.pos;
-    const { w, h } = node.size
-    initPoints.push([x + p + w / 2, y + p + h / 2]);
-    initPoints.push([x - p - w / 2, y - p - h / 2]);
-    initPoints.push([x + p + w / 2, y - p - h / 2]);
-    initPoints.push([x - p - w / 2, y + p + h / 2]);
+    const pnts = getRotatedNodeCorners(node)
+    pnts.forEach(pnt => {
+      initPoints.push([pnt.x, pnt.y]);
+    })
   });
 
   const flippedPoints = mirrorPointsHorizontally(initPoints)
 
-  /*
-    mcu_nodes.forEach(node => {
-      const { x, y } = node.pos;
-      initPoints.push([x, y]);
-      initPoints.push([x + 105, y]);
-      initPoints.push([x - 105, y]);
-      initPoints.push([x, y + 260]);
-      initPoints.push([x, y - 260 + wallThick]);
-      initPoints.push([x + 105, y + 260]);
-      initPoints.push([x - 105, y + 260]);
-      initPoints.push([x + 105, y - 260 + wallThick]);
-      initPoints.push([x - 105, y - 260 + wallThick]);
-    });
-    */
-
+  /* this code is for adding split keyboard support */
   /*
   const dbscan = new cluster.DBSCAN()
   let clusters = dbscan.run(points1, 250, 50);

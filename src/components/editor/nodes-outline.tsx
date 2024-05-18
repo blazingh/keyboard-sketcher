@@ -12,7 +12,7 @@ export function NodesOutline({
 
   const points = useMemo(() => {
     if (nodes.length < 1) return { inner: [], outer: [] }
-    const basePoints = getNodesOutinePoints(nodes, 140 / 2, 35)
+    const basePoints = getNodesOutinePoints(nodes, 140 / 2)
     const offset = new Offset()
     return {
       inner: basePoints,

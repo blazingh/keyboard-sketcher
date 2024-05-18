@@ -23,7 +23,7 @@ export function findEnclosingBox(nodes: Node[]) {
   };
 }
 
-function getRotatedNodeCorners(node: Node): { x: number, y: number }[] {
+export function getRotatedNodeCorners(node: Node): { x: number, y: number }[] {
   const { pos: { x: centerX, y: centerY, r }, size: { w, h } } = node;
   // Convert rotation angle from degrees to radians
   const angle = r * Math.PI / 180;

@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { ArcGroupNode } from './nodes/arc-group-node';
 import { Slider } from '../ui/slider';
 import { produce } from 'immer';
+import NodesTranformationTools from './nodes-transformation-tools';
 
 
 const editorWidth = 1500
@@ -85,10 +86,10 @@ function EditorContent({
     initViewport({ w: width, h: height })
   }, [width, height])
 
-  useHotkeys(Key.ArrowUp, () => store.moveActiveNodes([0, -10]))
-  useHotkeys(Key.ArrowDown, () => store.moveActiveNodes([0, 10]))
-  useHotkeys(Key.ArrowLeft, () => store.moveActiveNodes([-10, 0]))
-  useHotkeys(Key.ArrowRight, () => store.moveActiveNodes([10, 0]))
+  useHotkeys(Key.ArrowUp, () => store.moveActiveNodes({ x: 0, y: -10, r: 0 }))
+  useHotkeys(Key.ArrowDown, () => store.moveActiveNodes({ x: 0, y: 10, r: 0 }))
+  useHotkeys(Key.ArrowLeft, () => store.moveActiveNodes({ x: -10, y: 0, r: 0 }))
+  useHotkeys(Key.ArrowRight, () => store.moveActiveNodes({ x: 10, y: 0, r: 0 }))
   useHotkeys(Key.Delete, () => store.deleteActiveNodes())
 
   function handleViewPortTap() {
@@ -158,8 +159,12 @@ function EditorContent({
     <div>
 
       {/* nodes toolbar */}
+      {/*
       <NodesToolbar />
+      */}
+      <NodesTranformationTools />
 
+      {/*
       <div
         className={cn(
           'absolute pointer-events-none *:pointer-events-auto border bg-secondary rounded flex flex-col gap-8',
@@ -222,8 +227,10 @@ function EditorContent({
         }()}
 
       </div>
+      */}
 
       <svg width={width} height={height}  >
+
 
         {/* background */}
         <g transform={TransformMatrixStyle()}>

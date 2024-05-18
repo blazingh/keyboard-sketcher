@@ -90,7 +90,7 @@ type Action = {
   updateSnapLines: (target: Node) => void
   resetSnapLines: () => void
 
-  moveActiveNodes: (xy: [number, number]) => void
+  moveActiveNodes: (displacement: Pos) => void
   deleteActiveNodes: () => void
   copyActivedNodes: (xy: [number, number]) => void
   flipActiveNodes: () => void
@@ -246,11 +246,13 @@ export const useEditorStore = create<EditorStoreType>()(
         set({ snapLines: undefined })
       },
 
-      moveActiveNodes: (xy: [number, number]) => {
+      moveActiveNodes: (displacement) => {
+        const { x, y, r } = displacement
         set(produce((state: State) => {
           get().activeNodes.forEach(id => {
-            state.nodes[id].pos.x = Math.round((state.nodes[id].pos.x + xy[0]) / 10) * 10
-            state.nodes[id].pos.y = Math.round((state.nodes[id].pos.y + xy[1]) / 10) * 10
+            state.nodes[id].pos.x = Math.round((state.nodes[id].pos.x + x) / 10) * 10
+            state.nodes[id].pos.y = Math.round((state.nodes[id].pos.y + y) / 10) * 10
+            state.nodes[id].pos.r = Math.round((state.nodes[id].pos.r + r) / 5) * 5
           })
         }))
       },

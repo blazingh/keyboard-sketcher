@@ -3,7 +3,6 @@
 import { EditorStoreType, Node, useEditorStore } from '../stores/editor-store';
 import { useGesture } from "@use-gesture/react";
 import { cn } from "@/lib/utils";
-import { RulerIcon } from "lucide-react";
 import { useViewportTransformationStore } from "../stores/viewport-transformation-store";
 
 
@@ -17,12 +16,6 @@ const selector = (state: EditorStoreType) => ({
   activeDisplacement: state.activeDisplacement,
   setActiveDisplacement: state.setActiveDisplacement,
 
-  snapLines: state.snapLines,
-  updateSnapLines: state.updateSnapLines,
-
-  resetSnapLines: state.resetSnapLines,
-  rulerNodes: state.rulerNodes,
-  toggleRulerNode: state.toggleRulerNode,
   editorMode: state.editorMode,
   setEditorMode: state.setEditorMode,
 })
@@ -34,33 +27,27 @@ export function BasicNode({
 }) {
 
   const {
-    moveActiveNodes,
-    activeDisplacement,
-    setActiveDisplacement,
-    clearActiveNodes,
-    addActiveNode,
     activeNodes,
     toggleActiveNode,
-    updateSnapLines,
-    resetSnapLines,
-    snapLines,
-    rulerNodes,
-    toggleRulerNode,
+    clearActiveNodes,
+    moveActiveNodes,
+    addActiveNode,
+
+    activeDisplacement,
+    setActiveDisplacement,
+
     editorMode,
     setEditorMode,
-    ...store
-  } = useEditorStore()
+  } = useEditorStore(selector)
 
   const { initViewport, transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
 
   const nodeActive = activeNodes.includes(node.id)
   const { x, y } = node.pos
-  const { x: dx, y: dy } = activeDisplacement
+  const { x: dx, y: dy, r: dr } = activeDisplacement
 
   function nodeClick() {
-    if (editorMode === "ruler")
-      toggleRulerNode(node.id)
-    else
+    if (editorMode === "normal")
       toggleActiveNode(node.id)
   }
 
@@ -85,7 +72,7 @@ export function BasicNode({
       // check if the node has bean moved
       if (dx === 0 && dy === 0) return
       // updated the active nodes position
-      moveActiveNodes([dx, dy])
+      moveActiveNodes(activeDisplacement)
       // reset the active x and y displacement
       setActiveDisplacement({ x: 0, y: 0, r: 0 })
     }),
@@ -112,7 +99,7 @@ export function BasicNode({
         style={{
           transformBox: "fill-box",
           transformOrigin: "center",
-          transform: `rotate(${node.pos.r ?? 0}deg)`
+          transform: `rotate(${node.pos.r + (nodeActive ? dr : 0)}deg)`
         }}
       >
       </rect>

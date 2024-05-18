@@ -10,14 +10,10 @@ import { Key } from 'ts-key-enum';
 import { NodesOutline } from './nodes-outline';
 import NodesAdditionOverlay from './nodes-addition-overlay';
 import EditorToolbar from './editor-toolbar';
-import NodesToolbar from './nodes-toolbar';
 import { EditorFloatButtons } from './editor-float-buttons';
 import { EditorRuler } from './editor-ruler';
 import { useViewportTransformationStore } from './stores/viewport-transformation-store';
-import { cn } from '@/lib/utils';
 import { ArcGroupNode } from './nodes/arc-group-node';
-import { Slider } from '../ui/slider';
-import { produce } from 'immer';
 import NodesTranformationTools from './nodes-transformation-tools';
 
 

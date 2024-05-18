@@ -1,11 +1,10 @@
 import { cn } from "@/lib/utils"
 import { Node, useEditorStore } from "./stores/editor-store"
 import { findEnclosingBox } from "./lib/nodes-utils"
-import { MoveHorizontal, MoveRight, MoveUp, MoveVertical, RotateCcw, RotateCw } from "lucide-react"
+import { MoveHorizontal, MoveVertical, RotateCcw, RotateCw } from "lucide-react"
 import { produce } from "immer"
 import { useViewportTransformationStore } from "./stores/viewport-transformation-store"
 import { useGesture } from "@use-gesture/react"
-import { useState } from "react"
 
 export default function NodesTranformationTools({
 }: {

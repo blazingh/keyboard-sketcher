@@ -5,6 +5,7 @@ import { MoveHorizontal, MoveVertical, RotateCcw, RotateCw } from "lucide-react"
 import { produce } from "immer"
 import { useViewportTransformationStore } from "./stores/viewport-transformation-store"
 import { useGesture } from "@use-gesture/react"
+import { Button } from "../ui/button"
 
 export default function NodesTranformationTools({
 }: {
@@ -121,10 +122,14 @@ export default function NodesTranformationTools({
             transform: `scale(${ts})`
           }}
         >
-          <MoveVertical
-            className="h-10 w-10 absolute -translate-y-1/2 -translate-x-1/2 hover:cursor-grab active:cursor-grabbing touch-none active:stroke-primary"
+          <Button
+            className="h-10 w-6 p-0 absolute -translate-y-1/2 -translate-x-1/2 touch-none"
             {...bindsDragY()}
-          />
+          >
+            <MoveVertical
+              className="shrink-0 pointer-events-none"
+            />
+          </Button>
         </div>
         {/* bottom left transaltion handels */}
         <div
@@ -136,10 +141,14 @@ export default function NodesTranformationTools({
             transform: `scale(${ts}) `
           }}
         >
-          <MoveHorizontal
-            className="h-10 w-10 absolute -translate-y-1/2 -translate-x-1/2  hover:cursor-grab active:cursor-grabbing touch-none active:stroke-primary"
+          <Button
+            className="h-6 w-10 p-0 absolute -translate-y-1/2 -translate-x-1/2  hover:cursor-grab active:cursor-grabbing touch-none"
             {...bindsDragX()}
-          />
+          >
+            <MoveHorizontal
+              className="shrink-0 pointer-events-none"
+            />
+          </Button>
         </div>
       </div>
       <div

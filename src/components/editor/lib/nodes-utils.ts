@@ -23,14 +23,14 @@ export function findEnclosingBox(nodes: Node[]) {
   };
 }
 
-export function getRotatedNodeCorners(node: Node): { x: number, y: number }[] {
+export function getRotatedNodeCorners(node: Node, p: number = 0): { x: number, y: number }[] {
   const { pos: { x: centerX, y: centerY, r }, size: { w, h } } = node;
   // Convert angle from degrees to radians
   const radians = -r * Math.PI / 180;
 
   // Half width and half height
-  const halfWidth = w / 2;
-  const halfHeight = h / 2;
+  const halfWidth = (w + p) / 2;
+  const halfHeight = (h + p) / 2;
 
   // Define rotation matrix
   const rotationMatrix = [

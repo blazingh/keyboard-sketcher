@@ -58,3 +58,15 @@ export function getRotatedNodeCorners(node: Node, p: number = 0): { x: number, y
 
   return corners;
 }
+
+export function normalizeAngle(angle: number) {
+  // Use modulo to wrap the angle within the range [0, 360)
+  angle = angle % 360;
+
+  // If the angle is negative, add 360 to wrap it into the positive range
+  if (angle < 0) {
+    angle += 360;
+  }
+
+  return angle;
+}

@@ -1,27 +1,34 @@
 import { Node } from '@/components/editor/stores/editor-store';
 import hull from 'hull.js'
 import { primitives, booleans, hulls, extrusions, expansions, transforms, utils, geometries } from '@jscad/modeling'
+import polygonClipping from "polygon-clipping"
 
 type outlinePoints = number[][]
 
-function mirrorPointsHorizontally(points: number[][]) {
+function mirrorPointsHorizontally(points: number[][]): [number, number][] {
   return points.map(point => [point[0] * -1, point[1]]);
+}
+function mirrorPointsVertically(points: number[][]): [number, number][] {
+  return points.map(point => [point[0], point[1] * -1]);
 }
 
 export function getNodesOutinePoints(nodes: Node[], p: number = 0): outlinePoints {
 
+  const hullPadd = 140 * 4
+
   const initPoints: number[][] = []
 
   nodes.forEach(node => {
-    primitives.rectangle({
-      size: [node.size.w, node.size.h],
-      center: [node.pos.x, node.pos.y]
-    }).sides.forEach((pnts) => {
-      initPoints.push(rotatePoint(pnts[0], [node.pos.x, node.pos.y], -node.pos.r))
+    const { pos: { x, y, r }, size: { w, h } } = node;
+    [
+      [x + h / 2, y + h / 2],
+      [x + h / 2, y - h / 2],
+      [x - h / 2, y + h / 2],
+      [x - h / 2, y - h / 2],
+    ].forEach((pnt) => {
+      initPoints.push(rotatePoint(pnt, [node.pos.x, node.pos.y], -node.pos.r))
     })
   });
-
-  const flippedPoints = mirrorPointsHorizontally(initPoints)
 
   /* this code is for adding split keyboard support */
   /*
@@ -34,13 +41,18 @@ export function getNodesOutinePoints(nodes: Node[], p: number = 0): outlinePoint
   });
   */
 
-  const originalHull = hull(initPoints, (70) * 5) as number[][]
-  const flippedHull = hull(flippedPoints, (70) * 5) as number[][]
+  const HflippedPoints = mirrorPointsHorizontally(initPoints)
+  //const VflippedPoints = mirrorPointsVertically(initPoints)
 
-  const finalHull = hull([
-    ...mirrorPointsHorizontally(flippedHull),
-    ...originalHull
-  ], 70 * 5) as number[][]
+  const originalHull = hull(initPoints, hullPadd) as [number, number][]
+  const hFlippedHull = mirrorPointsHorizontally(hull(HflippedPoints, hullPadd) as [number, number][])
+  // const vFlippedHull = mirrorPointsVertically(hull(VflippedPoints, hullPadd) as [number, number][])
+
+  const finalHull = polygonClipping.union(
+    [originalHull],
+    [hFlippedHull],
+    // [vFlippedHull],
+  )[0][0] as any as number[][]
 
   const sides: number[][][] = []
 
@@ -56,6 +68,7 @@ export function getNodesOutinePoints(nodes: Node[], p: number = 0): outlinePoint
 
   return points
 }
+
 function rotatePoint(p1: number[], p2: number[], angle: number) {
   // Convert angle from degrees to radians
   let radians = angle * (Math.PI / 180);

@@ -5,6 +5,7 @@ import { produce } from 'immer'
 import { temporal } from 'zundo';
 import isDeepEqual from 'fast-deep-equal';
 import { v4 as v4uuid } from "uuid";
+import { normalizeAngle } from '../lib/nodes-utils';
 
 export type Pos = {
   x: number,
@@ -254,7 +255,7 @@ export const useEditorStore = create<EditorStoreType>()(
           get().activeNodes.forEach(id => {
             state.nodes[id].pos.x = Math.round((state.nodes[id].pos.x + x) / 10) * 10
             state.nodes[id].pos.y = Math.round((state.nodes[id].pos.y + y) / 10) * 10
-            state.nodes[id].pos.r = Math.round((state.nodes[id].pos.r + r) / 5) * 5
+            state.nodes[id].pos.r = normalizeAngle(Math.round((state.nodes[id].pos.r + r) / 5) * 5)
           })
         }))
       },

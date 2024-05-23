@@ -15,6 +15,7 @@ import { EditorRuler } from './editor-ruler';
 import { useViewportTransformationStore } from './stores/viewport-transformation-store';
 import NodesTranformationTools from './nodes-transformation-tools';
 import NodesDuplicationTools from './nodes-duplication-tools';
+import { normalizeAngle } from './lib/nodes-utils';
 
 
 const editorWidth = 1500
@@ -256,7 +257,7 @@ function EditorContent({
                   pos: {
                     x: node.pos.x + store.activeDisplacement.x,
                     y: node.pos.y + store.activeDisplacement.y,
-                    r: node.pos.r + store.activeDisplacement.r
+                    r: normalizeAngle(node.pos.r + store.activeDisplacement.r)
                   }
                 }
               })

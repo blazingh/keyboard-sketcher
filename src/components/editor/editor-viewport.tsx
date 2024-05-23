@@ -91,7 +91,6 @@ function EditorContent({
   function handleViewPortTap() {
     store.clearActiveNodes()
     store.clearRulerNodes()
-    store.setEditorMode("normal")
   }
 
   const [boxOrigin, setBoxOrigin] = useState([0, 0])

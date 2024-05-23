@@ -15,9 +15,6 @@ const selector = (state: EditorStoreType) => ({
 
   activeDisplacement: state.activeDisplacement,
   setActiveDisplacement: state.setActiveDisplacement,
-
-  editorMode: state.editorMode,
-  setEditorMode: state.setEditorMode,
 })
 
 export function BasicNode({
@@ -35,9 +32,6 @@ export function BasicNode({
 
     activeDisplacement,
     setActiveDisplacement,
-
-    editorMode,
-    setEditorMode,
   } = useEditorStore(selector)
 
   const { initViewport, transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
@@ -47,8 +41,7 @@ export function BasicNode({
   const { x: dx, y: dy, r: dr } = activeDisplacement
 
   function nodeClick() {
-    if (editorMode === "normal")
-      toggleActiveNode(node.id)
+    toggleActiveNode(node.id)
   }
 
   const binds = useGesture({
@@ -57,7 +50,6 @@ export function BasicNode({
       if (activeNodes.length >= 1 && !nodeActive)
         clearActiveNodes()
       addActiveNode(node.id)
-      setEditorMode("normal")
     }),
     onDrag: (({ movement, tap }) => {
       tap && nodeClick()
@@ -103,14 +95,14 @@ export function BasicNode({
         }}
       >
       </rect>
-      {false && (<>
+      {true && (<>
         {/*
         <text x={x} y={(y || 0) - 25} fontSize="10" fill="white">
           id: {JSON.stringify(node.id)}
         </text>
         */}
         <text x={x} y={(y || 0) - 10} fontSize="10" fill="white">
-          {JSON.stringify({ ...node.pos, ...node.size })}
+          {JSON.stringify({ ...node.pos })}
         </text>
       </>)}
     </g>

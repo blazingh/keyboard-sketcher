@@ -11,7 +11,7 @@ function mirrorPointsHorizontally(points: number[][]) {
 
 export function getNodesOutinePoints(nodes: Node[], p: number = 0): outlinePoints {
 
-  const initPoints: any = []
+  const initPoints: number[][] = []
   nodes.forEach(node => {
     const pnts = getRotatedNodeCorners(node)
     pnts.forEach(pnt => {
@@ -49,7 +49,7 @@ export function getNodesOutinePoints(nodes: Node[], p: number = 0): outlinePoint
 
   const geom = geometries.geom2.create(sides as any)
   const points = expansions.offset({ delta: p }, geom).sides.map((points) => {
-    return points[0]
+    return points[1]
   })
 
   return points

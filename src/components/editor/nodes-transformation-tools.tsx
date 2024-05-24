@@ -123,11 +123,12 @@ export default function NodesTranformationTools({
           }}
         >
           <Button
+            variant={"ghost"}
             className="h-10 w-6 p-0 absolute -translate-y-1/2 -translate-x-1/2 touch-none"
             {...bindsDragY()}
           >
             <MoveVertical
-              className="shrink-0 pointer-events-none"
+              className="h-10 w-10 shrink-0 pointer-events-none"
             />
           </Button>
         </div>
@@ -142,11 +143,12 @@ export default function NodesTranformationTools({
           }}
         >
           <Button
+            variant={"ghost"}
             className="h-6 w-10 p-0 absolute -translate-y-1/2 -translate-x-1/2  hover:cursor-grab active:cursor-grabbing touch-none"
             {...bindsDragX()}
           >
             <MoveHorizontal
-              className="shrink-0 pointer-events-none"
+              className=" w-10 h-10 shrink-0 pointer-events-none"
             />
           </Button>
         </div>
@@ -172,7 +174,7 @@ export default function NodesTranformationTools({
             transform: `scale(${ts}) rotate(45deg)`
           }}
         >
-          <div className="group absolute hover:cursor-grab active:cursor-grabbing touch-none" {...bindsDragR()}>
+          <div className="group absolute hover:cursor-grab active:cursor-grabbing touch-none w-10 h-10" {...bindsDragR()}>
             <RotateCw className="h-10 w-10 absolute group-active:stroke-primary" />
             <RotateCcw className="h-10 w-10 absolute group-active:stroke-primary" />
           </div>

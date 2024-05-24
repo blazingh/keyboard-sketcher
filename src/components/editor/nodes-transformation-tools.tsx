@@ -112,7 +112,7 @@ export default function NodesTranformationTools({
         )}
         style={{ ...pos }}
       >
-        {/* bottom left transaltion handels */}
+        {/* Vertical translation handel */}
         <div
           className={cn(
             'absolute top-1/2 -left-5 transition-all pointer-events-auto',
@@ -122,17 +122,16 @@ export default function NodesTranformationTools({
             transform: `scale(${ts})`
           }}
         >
-          <Button
-            variant={"ghost"}
-            className="h-10 w-6 p-0 absolute -translate-y-1/2 -translate-x-1/2 touch-none"
+          <div
+            className="h-10 w-10 p-0 absolute -translate-y-1/2 -translate-x-1/2 hover:cursor-grab active:cursor-grabbing touch-none group"
             {...bindsDragY()}
           >
             <MoveVertical
-              className="h-10 w-10 shrink-0 pointer-events-none"
+              className="h-10 w-10 shrink-0 pointer-events-none group-active:stroke-primary"
             />
-          </Button>
+          </div>
         </div>
-        {/* bottom left transaltion handels */}
+        {/* Horizontal translation handel */}
         <div
           className={cn(
             'absolute -bottom-5 left-1/2 transition-all pointer-events-auto',
@@ -142,15 +141,14 @@ export default function NodesTranformationTools({
             transform: `scale(${ts}) `
           }}
         >
-          <Button
-            variant={"ghost"}
-            className="h-6 w-10 p-0 absolute -translate-y-1/2 -translate-x-1/2  hover:cursor-grab active:cursor-grabbing touch-none"
+          <div
+            className="h-10 w-10 p-0 absolute -translate-y-1/2 -translate-x-1/2  hover:cursor-grab active:cursor-grabbing touch-none group"
             {...bindsDragX()}
           >
             <MoveHorizontal
-              className=" w-10 h-10 shrink-0 pointer-events-none"
+              className=" w-10 h-10 shrink-0 pointer-events-none group-active:stroke-primary"
             />
-          </Button>
+          </div>
         </div>
       </div>
       <div
@@ -174,7 +172,10 @@ export default function NodesTranformationTools({
             transform: `scale(${ts}) rotate(45deg)`
           }}
         >
-          <div className="group absolute hover:cursor-grab active:cursor-grabbing touch-none w-10 h-10" {...bindsDragR()}>
+          <div
+            className="group absolute hover:cursor-grab active:cursor-grabbing touch-none w-10 h-10"
+            {...bindsDragR()}
+          >
             <RotateCw className="h-10 w-10 absolute group-active:stroke-primary" />
             <RotateCcw className="h-10 w-10 absolute group-active:stroke-primary" />
           </div>

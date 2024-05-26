@@ -17,6 +17,7 @@ export default function SimpleNumberInput(props: { onValueChange?: (v: number) =
   return (
     <div className="relative">
       <Input {...props}
+        readOnly
         className={cn(
           props.className,
           "pointer-events-none px-12 text-center",

@@ -1,8 +1,6 @@
 import { cn } from "@/lib/utils"
 import { Node, useEditorStore } from "./stores/editor-store"
 import { findEnclosingBox } from "./lib/nodes-utils"
-import { Button } from "../ui/button"
-import { Plus } from "lucide-react"
 import { produce } from "immer"
 import isDeepEqual from 'fast-deep-equal';
 import { useViewportTransformationStore } from "./stores/viewport-transformation-store"

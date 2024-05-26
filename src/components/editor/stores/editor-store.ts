@@ -125,7 +125,7 @@ export const useEditorStore = create<EditorStoreType>()(
           pos: { x: 0, y: 0, r: 0 },
           switchCount: [3, 0, 5, 0],
           switchGap: [50, 0, 50, 0],
-          radius: [1000, 0, 10000, 0]
+          radius: [1000, 0, Number.MAX_SAFE_INTEGER, 0]
         }
       },
       arcGroupsArray: () => Object.values(get().arcGroups),

@@ -1,7 +1,6 @@
 import { ArcGroup, Node, Pos, baseNodeState } from "../stores/editor-store"
 import { produce } from "immer"
 import { BasicNode } from "./basic-node";
-import { useViewportTransformationStore } from "../stores/viewport-transformation-store";
 
 export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
 
@@ -17,7 +16,7 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
     switchCount.forEach((switchC, num) => {
       if (switchC === 0) return
       const totalLength = ((switchCount[num] - 1) * (140 + switchGap[num]));
-      const v = generateArcPath(totalLength, radius[num], pos, num)
+      const v = generateArcPath(totalLength, radius[num], pos, num as any)
       const array: Node[] = []
       for (let index = 0; index < switchCount[num]; index++) {
         array.push(produce(baseNodeState, draft => {
@@ -37,20 +36,20 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
   }
 
   return (
-    <g
-    >
-      {arcs().map((arc, index) => (
-        <g
-          key={index}
-          className="opacity-50"
-        >
-          {arc.array.map((node: any) => (
-            <BasicNode
-              key={node.id}
-              node={node}
-            />
-          ))}
-          {/*
+    <g>
+      {
+        arcs().map((arc, index) => (
+          <g
+            key={index}
+            className="opacity-30"
+          >
+            {arc.array.map((node: any) => (
+              <BasicNode
+                key={node.id}
+                node={node}
+              />
+            ))}
+            {/*
           <circle
             cx={pos.x}
             cy={pos.y}
@@ -66,18 +65,16 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
             strokeOpacity={0.5}
           />
           */}
-        </g>
-      ))}
+          </g>
+        ))}
     </g>
   )
 }
 
 function getOrientation(distance: any, path: any) {
   // Calculate the tangent vectors at the point (using both increment and decrement)
-  var increment = 1; // Increment to get the point slightly ahead
-  var decrement = -1; // Decrement to get the point slightly behind
-  var tangentIncrement = path.getPointAtLength(distance + increment);
-  var tangentDecrement = path.getPointAtLength(distance + decrement);
+  const tangentIncrement = path.getPointAtLength(distance + 1);
+  const tangentDecrement = path.getPointAtLength(distance + -1);
 
   // Calculate the tangent vector by subtracting the point coordinates
   var tangentX = tangentIncrement.x - tangentDecrement.x;
@@ -88,19 +85,15 @@ function getOrientation(distance: any, path: any) {
   var angleDegrees = angleRadians * (180 / Math.PI);
 
   // Adjust the angle to point away from the path (if needed)
-  if (angleDegrees < 0) {
-    angleDegrees += 180;
-  } else {
-    angleDegrees -= 180;
-  }
-  return angleDegrees
+  return angleDegrees + (angleDegrees < 0 ? 180 : -180)
 }
 
-function generateArcPath(arcLength: number, _radius: number, center: Pos, dir: number = 0) {
+function generateArcPath(arcLength: number, _radius: number, center: Pos, dir: 0 | 1 | 2 | 3) {
   let radius = _radius
 
   const circumference = 2 * Math.PI * radius;
   const angle = (arcLength / circumference) * (2 * Math.PI); // Convert arc length to radians
+  const arcAngle = angle * (180 / Math.PI);   // convert radians to degrees
 
   // Calculate the starting and ending points of the arcs
   const initStart = { x: radius, y: 0 };
@@ -112,26 +105,22 @@ function generateArcPath(arcLength: number, _radius: number, center: Pos, dir: n
     Math.pow(initStart.y - initEnd.y, 2)
   );
 
-  // convert radians to degrees
-  const arcAngle = angle * (180 / Math.PI);
-
   // rotato the arc
   const start = center
-  let end = null
-  if (dir === 2) // right
-    end = rotatePoint({ x: center.x + length, y: 0, r: 0 }, { ...center, r: arcAngle / 2 + center.r })
-  else if (dir === 0) // left
-    end = rotatePoint({ x: center.x - length, y: 0, r: 0 }, { ...center, r: arcAngle / -2 + center.r })
-  else
+  let end: any = null
+  if (!dir || dir === 2) // right
     end = rotatePoint({ x: center.x + length, y: 0, r: 0 }, { ...center, r: arcAngle / 2 })
+  if (dir === 0) //left 
+    end = rotatePoint({ x: center.x - length, y: 0, r: 0 }, { ...center, r: arcAngle / -2 + center.r })
 
   // Determine the sweep flag (whether the arc is drawn in the positive or negative direction)
   const sweepFlag = angle <= Math.PI ? 0 : 1;
 
   // Construct the SVG path string
-  let path = null
-  path = `M ${start.x},${start.y} A ${radius},${radius} 0 ${sweepFlag} 1 ${end.x},${end.y}`;
-  if (dir === 0)
+  let path: any = null
+  if (!dir || dir === 2) // right
+    path = `M ${start.x},${start.y} A ${radius},${radius} 0 ${sweepFlag} 1 ${end.x},${end.y}`;
+  if (dir === 0) // left
     path = `M ${start.x},${start.y} A ${radius},${radius} 0 ${sweepFlag} 0 ${end.x},${end.y}`;
 
   return {

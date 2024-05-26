@@ -17,6 +17,7 @@ import NodesTranformationTools from './nodes-transformation-tools';
 import NodesDuplicationTools from './nodes-duplication-tools';
 import { normalizeAngle } from './lib/nodes-utils';
 import { ArcGroupNode } from './nodes/arc-group-node';
+import NodesArcTools from './nodes-arc-tools';
 
 
 const editorWidth = 1500
@@ -166,74 +167,12 @@ function EditorContent({
       {store.editorMode === "normal" &&
         <NodesTranformationTools />
       }
-
-      {/*
-      <div
-        className={cn(
-          'absolute pointer-events-none *:pointer-events-auto border bg-secondary rounded flex flex-col gap-8',
-        )}
-        style={{
-          left: 0 * transformMatrix.s + transformMatrix.x,
-          top: 0 * transformMatrix.s + transformMatrix.y,
-          width: 500 * transformMatrix.s,
-          height: 500 * transformMatrix.s
-        }}
-      >
-        {function() {
-          const arc = store.arcGroupsArray()[0]
-          if (!arc) return null
-          return (
-            <>
-              <Slider
-                value={[arc.switchCount]}
-                min={1}
-                max={10}
-                onValueChange={(v) => {
-                  store.updateArcGroup(produce(arc, draft => {
-                    draft.switchCount = v[0]
-                  }))
-                }}
-              />
-              <Slider
-                value={[arc.switchGap]}
-                min={0}
-                max={700}
-                step={10}
-                onValueChange={(v) => {
-                  store.updateArcGroup(produce(arc, draft => {
-                    draft.switchGap = v[0]
-                  }))
-                }}
-              />
-              <Slider
-                value={[arc.radius]}
-                min={0}
-                max={1400}
-                onValueChange={(v) => {
-                  store.updateArcGroup(produce(arc, draft => {
-                    draft.radius = v[0]
-                  }))
-                }}
-              />
-              <Slider
-                value={[arc.pos.r]}
-                min={0}
-                max={360}
-                onValueChange={(v) => {
-                  store.updateArcGroup(produce(arc, draft => {
-                    draft.pos.r = v[0]
-                  }))
-                }}
-              />
-            </>
-          )
-        }()}
-
-      </div>
-      */}
+      {/* nodes arc toolbar */}
+      {store.editorMode === "arc" &&
+        <NodesArcTools />
+      }
 
       <svg width={width} height={height}  >
-
 
         {/* background */}
         <g transform={TransformMatrixStyle()}>

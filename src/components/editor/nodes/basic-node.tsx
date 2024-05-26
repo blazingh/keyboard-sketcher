@@ -95,7 +95,7 @@ export function BasicNode({
         }}
       >
       </rect>
-      {true && (<>
+      {false && (<>
         {/*
         <text x={x} y={(y || 0) - 25} fontSize="10" fill="white">
           id: {JSON.stringify(node.id)}

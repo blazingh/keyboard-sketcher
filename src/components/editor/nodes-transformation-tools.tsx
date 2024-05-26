@@ -77,8 +77,8 @@ export default function NodesTranformationTools({
         y: toolbarBox.y + movement[1],
       })
       const displacement = {
-        x: 0,  //Math.round((movement[0] / ts) / 10) * 10,
-        y: 0, //Math.round((movement[1] / ts) / 10) * 10,
+        x: 0,
+        y: 0,
         r: Math.round((newAngle - ogAngle) / 5) * 5
       }
       store.setActiveDisplacement(displacement)
@@ -162,7 +162,7 @@ export default function NodesTranformationTools({
           transform: `rotate(${dr}deg)`
         }}
       >
-        {/* top rigth rotaion handle */}
+        {/* rotation handle */}
         <div
           className={cn(
             'absolute -top-3 -right-11 transition-all flex items-start justify-start overflow-hidden h-[15px] w-14 pointer-events-auto',

@@ -16,6 +16,7 @@ import { useViewportTransformationStore } from './stores/viewport-transformation
 import NodesTranformationTools from './nodes-transformation-tools';
 import NodesDuplicationTools from './nodes-duplication-tools';
 import { normalizeAngle } from './lib/nodes-utils';
+import { ArcGroupNode } from './nodes/arc-group-node';
 
 
 const editorWidth = 1500
@@ -268,7 +269,7 @@ function EditorContent({
           <use x="0" y="0" xlinkHref="#Nodes-Ouline-Outer" />
         </g>
 
-        {/* zoom controlles */}
+        {/* viewport guestures controlles */}
         <rect
           width={width}
           height={height}
@@ -308,6 +309,13 @@ function EditorContent({
         {/* nodes ruler */}
         {store.rulerNodes.length === 2 && (
           <EditorRuler />
+        )}
+
+        {/* arc group */}
+        {store.arcGroups["nnn"] && (
+          <g transform={TransformMatrixStyle()}>
+            <ArcGroupNode arc={store.arcGroups["nnn"]} />
+          </g>
         )}
 
 

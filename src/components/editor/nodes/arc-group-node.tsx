@@ -5,51 +5,68 @@ import { useViewportTransformationStore } from "../stores/viewport-transformatio
 
 export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
 
-  const { switchGap, switchCount, pos, radius } = arc
+  const {
+    switchGap,
+    switchCount,
+    radius,
+    pos,
+  } = arc
 
-  const totalLength = (switchCount * 140) + ((switchCount - 1) * switchGap);
-  const v = generateArcPath(totalLength, radius, pos)
-
-  const arcNodes = () => {
-    const array: Node[] = []
-    for (let index = 0; index < switchCount; index++) {
-      array.push(produce(baseNodeState, draft => {
-        const distance = index * (140 + switchGap) + 70
-        const tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-        tempPath.setAttribute("d", v.path);
-        const arcPoint = tempPath.getPointAtLength(distance)
-        draft.id = String(Math.random())
-        draft.pos.x = arcPoint.x
-        draft.pos.y = arcPoint.y
-        draft.pos.r = getOrientation(distance, tempPath)
-      }))
-    }
-    return array
+  function arcs() {
+    let arcNodes: any[] = []
+    switchCount.forEach((switchC, num) => {
+      if (switchC === 0) return
+      const totalLength = ((switchCount[num] - 1) * (140 + switchGap[num]));
+      const v = generateArcPath(totalLength, radius[num], pos, num)
+      const array: Node[] = []
+      for (let index = 0; index < switchCount[num]; index++) {
+        array.push(produce(baseNodeState, draft => {
+          const distance = index * (140 + switchGap[num])
+          const tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          tempPath.setAttribute("d", v.path);
+          const arcPoint = tempPath.getPointAtLength(distance)
+          draft.id = String(Math.random())
+          draft.pos.x = arcPoint.x
+          draft.pos.y = arcPoint.y
+          draft.pos.r = getOrientation(distance, tempPath)
+        }))
+      }
+      arcNodes.push({ array, v })
+    })
+    return arcNodes
   }
 
   return (
     <g
     >
-      <circle
-        cx={pos.x}
-        cy={pos.y}
-        r={2}
-        stroke='red'
-        fill='red'
-      />
-      {arcNodes().map((node) => (
-        <BasicNode
-          key={node.id}
-          node={node}
-        />
+      {arcs().map((arc) => (
+        <g
+          className="opacity-50"
+        >
+          {arc.array.map((node: any) => (
+            <BasicNode
+              key={node.id}
+              node={node}
+            />
+          ))}
+          {/*
+          <circle
+            cx={pos.x}
+            cy={pos.y}
+            r={2}
+            stroke='red'
+            fill='red'
+          />
+          <path
+            d={arc.v.path}
+            strokeWidth={2}
+            stroke='white'
+            fill='none'
+            strokeOpacity={0.5}
+          />
+          */}
+        </g>
       ))}
-      <path
-        d={v.path}
-        strokeWidth={2}
-        stroke='white'
-        fill='none'
-        strokeOpacity={0.5}
-      />
     </g>
   )
 }
@@ -78,7 +95,9 @@ function getOrientation(distance: any, path: any) {
   return angleDegrees
 }
 
-function generateArcPath(arcLength: number, radius: number, center: Pos) {
+function generateArcPath(arcLength: number, _radius: number, center: Pos, dir: number = 0) {
+  let radius = _radius
+
   const circumference = 2 * Math.PI * radius;
   const angle = (arcLength / circumference) * (2 * Math.PI); // Convert arc length to radians
 
@@ -86,24 +105,36 @@ function generateArcPath(arcLength: number, radius: number, center: Pos) {
   const initStart = { x: radius, y: 0 };
   const initEnd = { x: radius * Math.cos(angle), y: radius * Math.sin(angle) };
 
-  // calculate the distance between the start and end
+  // calculate the distance between the start and the end
   const length = Math.sqrt(
     Math.pow(initStart.x - initEnd.x, 2) +
     Math.pow(initStart.y - initEnd.y, 2)
   );
 
+  // convert radians to degrees
+  const arcAngle = angle * (180 / Math.PI);
+
   // rotato the arc
-  const start = rotatePoint({ x: center.x - length / 2, y: 0, r: 0 }, center)
-  const end = rotatePoint({ x: center.x + length / 2, y: 0, r: 0 }, center)
+  const start = center
+  let end = null
+  if (dir === 2) // right
+    end = rotatePoint({ x: center.x + length, y: 0, r: 0 }, { ...center, r: arcAngle / 2 + center.r })
+  else if (dir === 0) // left
+    end = rotatePoint({ x: center.x - length, y: 0, r: 0 }, { ...center, r: arcAngle / -2 + center.r })
+  else
+    end = rotatePoint({ x: center.x + length, y: 0, r: 0 }, { ...center, r: arcAngle / 2 })
 
   // Determine the sweep flag (whether the arc is drawn in the positive or negative direction)
   const sweepFlag = angle <= Math.PI ? 0 : 1;
 
   // Construct the SVG path string
-  const path = `M ${start.x},${start.y} A ${radius},${radius} 0 ${sweepFlag} 1 ${end.x},${end.y}`;
+  let path = null
+  path = `M ${start.x},${start.y} A ${radius},${radius} 0 ${sweepFlag} 1 ${end.x},${end.y}`;
+  if (dir === 0)
+    path = `M ${start.x},${start.y} A ${radius},${radius} 0 ${sweepFlag} 0 ${end.x},${end.y}`;
 
   return {
-    path,
+    path
   }
 }
 
@@ -129,4 +160,3 @@ function rotatePoint(point: Pos, center: Pos) {
 
   return rotatedPoint;
 }
-

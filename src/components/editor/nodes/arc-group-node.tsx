@@ -39,8 +39,9 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
   return (
     <g
     >
-      {arcs().map((arc) => (
+      {arcs().map((arc, index) => (
         <g
+          key={index}
           className="opacity-50"
         >
           {arc.array.map((node: any) => (

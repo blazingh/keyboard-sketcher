@@ -2,7 +2,7 @@
 
 import { useEditorStore } from './stores/editor-store';
 import { Button } from '@/components/ui/button';
-import { BoxSelect, Copy, FlipHorizontal, FlipVertical, Hand, MousePointer2, Move, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
+import { BoxSelect, Copy, FlipHorizontal, FlipVertical, Hand, MousePointer2, Move, PlusIcon, Rainbow, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import {
@@ -53,6 +53,10 @@ export default function EditorToolbar() {
 
         <Toggle variant={"default"} pressed={store.editorMode === "copy"} onPressedChange={(state) => state && store.setEditorMode("copy")} >
           <Copy className='shrink-0' />
+        </Toggle>
+
+        <Toggle variant={"default"} pressed={store.editorMode === "arc"} onPressedChange={(state) => state && store.setEditorMode("arc")} >
+          <Rainbow className='shrink-0 rotate-45' />
         </Toggle>
 
         <Separator orientation='vertical' className='h-6 mx-2' />

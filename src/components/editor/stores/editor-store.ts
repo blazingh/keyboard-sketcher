@@ -57,7 +57,7 @@ type State = {
    * ruler: allows user to select points to measure distances
    * addition: draws an overlay and lets the user add a node
    */
-  editorMode: "normal" | "copy" | "select" | "ruler" | "addition"
+  editorMode: "normal" | "copy" | "select" | "ruler" | "addition" | "arc"
 
   /* snapLines position */
   snapLines?: GetSnapLinesResult,

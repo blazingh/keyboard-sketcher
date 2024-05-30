@@ -100,63 +100,62 @@ export default function NodesTranformationTools({
   const pos = {
     left: x * ts + tx,
     top: y * ts + ty,
-    width: w * ts,
-    height: h * ts
+    width: w,
+    height: h
   }
 
   return (
-    <>
+    <div
+      className={cn(
+        'absolute pointer-events-none *:pointer-events-auto ',
+      )}
+      style={{
+        ...pos,
+        transformBox: "fill-box",
+        transformOrigin: "top left",
+        transform: `scale(${ts})`
+      }}
+    >
+      {/* Vertical translation handel */}
       <div
         className={cn(
-          'absolute pointer-events-none',
+          'absolute top-1/2 -left-5',
+          (dx !== 0 || dr !== 0) && "hidden"
         )}
-        style={{ ...pos }}
       >
-        {/* Vertical translation handel */}
-        <div
-          className={cn(
-            'absolute top-1/2 -left-5 transition-all pointer-events-auto',
-            (dx !== 0 || dr !== 0) && "hidden"
-          )}
-          style={{
-            transform: `scale(${ts})`
-          }}
+        <Button
+          variant={"ghost"}
+          className="h-10 w-10 p-0 absolute -translate-y-1/2 -translate-x-1/2 hover:cursor-grab active:cursor-grabbing touch-none group active:bg-transparent"
+          {...bindsDragY()}
         >
-          <div
-            className="h-10 w-10 p-0 absolute -translate-y-1/2 -translate-x-1/2 hover:cursor-grab active:cursor-grabbing touch-none group"
-            {...bindsDragY()}
-          >
-            <MoveVertical
-              className="h-10 w-10 shrink-0 pointer-events-none group-active:stroke-primary"
-            />
-          </div>
-        </div>
-        {/* Horizontal translation handel */}
-        <div
-          className={cn(
-            'absolute -bottom-5 left-1/2 transition-all pointer-events-auto',
-            (dy !== 0 || dr !== 0) && "hidden"
-          )}
-          style={{
-            transform: `scale(${ts}) `
-          }}
+          <MoveVertical
+            className="h-10 w-10 shrink-0 pointer-events-none group-active:stroke-primary"
+          />
+        </Button>
+      </div>
+      {/* Horizontal translation handel */}
+      <div
+        className={cn(
+          'absolute -bottom-5 left-1/2',
+          (dy !== 0 || dr !== 0) && "hidden"
+        )}
+      >
+        <Button
+          variant={"ghost"}
+          className="h-10 w-10 p-0 absolute -translate-y-1/2 -translate-x-1/2  hover:cursor-grab active:cursor-grabbing touch-none group active:bg-transparent"
+          {...bindsDragX()}
         >
-          <div
-            className="h-10 w-10 p-0 absolute -translate-y-1/2 -translate-x-1/2  hover:cursor-grab active:cursor-grabbing touch-none group"
-            {...bindsDragX()}
-          >
-            <MoveHorizontal
-              className=" w-10 h-10 shrink-0 pointer-events-none group-active:stroke-primary"
-            />
-          </div>
-        </div>
+          <MoveHorizontal
+            className=" w-10 h-10 shrink-0 pointer-events-none group-active:stroke-primary"
+          />
+        </Button>
       </div>
       <div
         className={cn(
-          'absolute pointer-events-none',
+          'absolute w-full h-full pointer-events-none *:pointer-events-auto ',
+          (dy !== 0 || dx !== 0) && "hidden"
         )}
         style={{
-          ...pos,
           transformBox: "fill-box",
           transformOrigin: "center",
           transform: `rotate(${dr}deg)`
@@ -165,23 +164,20 @@ export default function NodesTranformationTools({
         {/* rotation handle */}
         <div
           className={cn(
-            'absolute -top-3 -right-11 transition-all flex items-start justify-start overflow-hidden h-[15px] w-14 pointer-events-auto',
-            (dy !== 0 || dx !== 0) && "hidden"
+            'absolute -top-3 -right-11 flex items-start justify-start overflow-hidden h-[15px] w-14 rotate-45'
           )}
-          style={{
-            transform: `scale(${ts}) rotate(45deg)`
-          }}
         >
-          <div
-            className="group absolute hover:cursor-grab active:cursor-grabbing touch-none w-10 h-10"
+          <Button
+            variant={"ghost"}
+            className="group absolute hover:cursor-grab active:cursor-grabbing touch-none w-10 h-10  active:bg-transparent"
             {...bindsDragR()}
           >
             <RotateCw className="h-10 w-10 absolute group-active:stroke-primary" />
             <RotateCcw className="h-10 w-10 absolute group-active:stroke-primary" />
-          </div>
+          </Button>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

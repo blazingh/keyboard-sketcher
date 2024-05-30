@@ -251,9 +251,11 @@ function EditorContent({
         )}
 
         {/* arc group */}
-        {store.arcGroups["nnn"] && (
+        {store.arcGroups["nnn"] && store.activeNodes.length > 0 && (
           <g transform={TransformMatrixStyle()}>
-            <ArcGroupNode arc={store.arcGroups["nnn"]} />
+            {store.activeNodes.map((nodeId) => (
+              <ArcGroupNode key={nodeId} arc={{ ...store.arcGroups["nnn"], pos: store.nodes[nodeId].pos }} />
+            ))}
           </g>
         )}
 

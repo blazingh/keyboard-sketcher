@@ -14,6 +14,7 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
 
   function arcs() {
     const arcs: any[] = []
+    const tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
     switchCounts.forEach((switchCount, side) => {
       if (switchCount === 0) return
       // calculate the arcLength
@@ -25,13 +26,13 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
       for (let index = 0; index < switchCount; index++) {
         ghostNodes.push(produce(baseNodeState, draft => {
           const distance = index * (140 + switchGaps[side])
-          const tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
           tempPath.setAttribute("d", arcPath);
           const { x, y } = tempPath.getPointAtLength(distance)
           draft.id = String(Math.random())
           draft.pos.x = x
           draft.pos.y = y
           draft.pos.r = getOrientation(distance, tempPath)
+          draft.selectable = false
         }))
       }
       arcs.push({ ghostNodes, arcPath })
@@ -45,7 +46,7 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
         key={index}
         className="opacity-30"
       >
-        {arc.ghostNodes.map((node: any) => (
+        {arc.ghostNodes.splice(1).map((node: any) => (
           <BasicNode
             key={node.id}
             node={node}
@@ -56,30 +57,13 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
   )
 }
 
-function getOrientation(distance: any, path: any) {
-  // Calculate the tangent vectors at the point (using both increment and decrement)
-  const tangentIncrement = path.getPointAtLength(distance + 1);
-  const tangentDecrement = path.getPointAtLength(distance + -1);
-
-  // Calculate the tangent vector by subtracting the point coordinates
-  var tangentX = tangentIncrement.x - tangentDecrement.x;
-  var tangentY = tangentIncrement.y - tangentDecrement.y;
-
-  // Calculate the angle between the tangent vector and the x-axis
-  var angleRadians = Math.atan2(tangentY, tangentX);
-  var angleDegrees = angleRadians * (180 / Math.PI);
-
-  // Adjust the angle to point away from the path (if needed)
-  return angleDegrees + (angleDegrees < 0 ? 180 : -180)
-}
-
 function generateArcPath(arcLength: number, radius: number, center: Pos, side: 0 | 1 | 2 | 3) {
   if (radius === 0) {
     let end: any = null
     if (!side || side === 2) // right
-      end = rotatePoint({ x: center.x + arcLength, y: 0, r: 0 }, { ...center, r: center.r })
+      end = rotatePoint({ x: center.x + arcLength, y: center.y, r: 0 }, { ...center, r: center.r })
     if (side === 0) //left 
-      end = rotatePoint({ x: center.x - arcLength, y: 0, r: 0 }, { ...center, r: center.r })
+      end = rotatePoint({ x: center.x - arcLength, y: center.y, r: 0 }, { ...center, r: center.r })
     const path = `M ${center.x},${center.y} L ${end.x},${end.y}`;
     return path
   }
@@ -102,9 +86,9 @@ function generateArcPath(arcLength: number, radius: number, center: Pos, side: 0
   const start = center
   let end: any = null
   if (!side || side === 2) // right
-    end = rotatePoint({ x: center.x + length, y: 0, r: 0 }, { ...center, r: arcAngle / 2 + center.r })
+    end = rotatePoint({ x: center.x + length, y: center.y, r: 0 }, { ...center, r: arcAngle / 2 + center.r })
   if (side === 0) //left 
-    end = rotatePoint({ x: center.x - length, y: 0, r: 0 }, { ...center, r: arcAngle / -2 + center.r })
+    end = rotatePoint({ x: center.x - length, y: center.y, r: 0 }, { ...center, r: arcAngle / -2 - center.r })
 
   const largArcFlag = angle <= Math.PI ? 0 : 1;
   const sweepFlag = side === 2 ? 1 : 0
@@ -114,3 +98,21 @@ function generateArcPath(arcLength: number, radius: number, center: Pos, side: 0
 
   return path
 }
+
+function getOrientation(distance: number, path: any) {
+  // Calculate the tangent vectors at the point (using both increment and decrement)
+  const tangentIncrement = path.getPointAtLength(distance + 1);
+  const tangentDecrement = path.getPointAtLength(distance + -1);
+
+  // Calculate the tangent vector by subtracting the point coordinates
+  var tangentX = tangentIncrement.x - tangentDecrement.x;
+  var tangentY = tangentIncrement.y - tangentDecrement.y;
+
+  // Calculate the angle between the tangent vector and the x-axis
+  var angleRadians = Math.atan2(tangentY, tangentX);
+  var angleDegrees = angleRadians * (180 / Math.PI);
+
+  // Adjust the angle to point away from the path (if needed)
+  return angleDegrees + (angleDegrees < 0 ? 180 : -180)
+}
+

@@ -20,6 +20,7 @@ export type Node = {
     w: number,
     h: number
   }
+  selectable: boolean
 }
 
 export type TransformMatrix = {
@@ -101,14 +102,14 @@ type Action = {
 }
 
 export const baseNodeState: Node = {
-  id: "1", size: { w: 140, h: 140 }, pos: { x: 0, y: 0, r: 0 }
+  id: "1", size: { w: 140, h: 140 }, pos: { x: 0, y: 0, r: 0 }, selectable: true
 }
 
 const initialNodes: { [key: Node["id"]]: Node } = {
-  "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 30, y: 30, r: 0 } },
-  "2": { id: "2", size: { w: 140, h: 140 }, pos: { x: -160, y: -160, r: 0 } },
-  "4": { id: "4", size: { w: 140, h: 140 }, pos: { x: 30, y: -160, r: 0 } },
-  "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: -160, y: 30, r: 0 } }
+  "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 30, y: 30, r: 0 }, selectable: true },
+  "2": { id: "2", size: { w: 140, h: 140 }, pos: { x: -160, y: -160, r: 0 }, selectable: true },
+  "4": { id: "4", size: { w: 140, h: 140 }, pos: { x: 30, y: -160, r: 0 }, selectable: true },
+  "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: -160, y: 30, r: 0 }, selectable: true }
 }
 
 export type EditorStoreType = State & Action
@@ -319,7 +320,7 @@ export const useEditorStore = create<EditorStoreType>()(
     {
       name: 'sketcher-nodes',
       skipHydration: true,
-      version: 4,
+      version: 5,
       partialize: (state) => ({ nodes: state.nodes }),
     }
   )

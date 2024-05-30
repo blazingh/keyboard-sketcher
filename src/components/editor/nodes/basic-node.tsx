@@ -41,6 +41,7 @@ export function BasicNode({
   const { x: dx, y: dy, r: dr } = activeDisplacement
 
   function nodeClick() {
+    if (!node.selectable) return
     toggleActiveNode(node.id)
   }
 

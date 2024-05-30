@@ -31,9 +31,9 @@ export type TransformMatrix = {
 export type ArcGroup = {
   id: string,
   pos: Pos,
-  switchCount: [number, number, number, number], // [left, top,rigth,bottom]
-  switchGap: [number, number, number, number], // [horizontal, vertical]
-  radius: [number, number, number, number], // [horizontal, vertical]
+  switchCounts: [number, number, number, number], // [left, top, rigth, bottom]
+  switchGaps: [number, number, number, number], // [left, top, rigth, bottom]
+  radiuses: [number, number, number, number], // [left, top, rigth, bottom]
 }
 
 type State = {
@@ -123,9 +123,9 @@ export const useEditorStore = create<EditorStoreType>()(
         "nnn": {
           id: "nnn",
           pos: { x: 0, y: 0, r: 0 },
-          switchCount: [3, 0, 5, 0],
-          switchGap: [50, 0, 50, 0],
-          radius: [1000, 0, Number.MAX_SAFE_INTEGER, 0]
+          switchCounts: [3, 0, 5, 0],
+          switchGaps: [50, 0, 50, 0],
+          radiuses: [1000, 0, 0, 0]
         }
       },
       arcGroupsArray: () => Object.values(get().arcGroups),

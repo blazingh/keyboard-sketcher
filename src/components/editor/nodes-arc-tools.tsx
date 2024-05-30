@@ -62,10 +62,10 @@ export default function NodesArcTools({
             <HelperTooltip desc={""} />
           </div>
           <SimpleNumberInput
-            defaultValue={arc.switchCount[0]}
+            defaultValue={arc.switchCounts[0]}
             onValueChange={(v) => {
               store.updateArcGroup(produce(arc, draft => {
-                draft.switchCount[0] = v
+                draft.switchCounts[0] = v
               }))
             }}
           />
@@ -76,10 +76,10 @@ export default function NodesArcTools({
             <HelperTooltip desc={""} />
           </div>
           <SimpleNumberInput
-            defaultValue={arc.switchCount[2]}
+            defaultValue={arc.switchCounts[2]}
             onValueChange={(v) => {
               store.updateArcGroup(produce(arc, draft => {
-                draft.switchCount[2] = v
+                draft.switchCounts[2] = v
               }))
             }}
           />

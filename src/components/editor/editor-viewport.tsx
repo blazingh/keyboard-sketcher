@@ -208,6 +208,15 @@ function EditorContent({
           <use x="0" y="0" xlinkHref="#Nodes-Ouline-Outer" />
         </g>
 
+        {/* arc ghost nodes */}
+        {(store.editorMode === "arc" && store.arcGroups["nnn"] && store.activeNodes.length > 0) && (
+          <g transform={TransformMatrixStyle()}>
+            {store.activeNodes.map((nodeId) => (
+              <ArcGroupNode key={nodeId} arc={{ ...store.arcGroups["nnn"], pos: store.nodes[nodeId].pos }} />
+            ))}
+          </g>
+        )}
+
         {/* viewport guestures controlles */}
         <rect
           width={width}
@@ -245,20 +254,10 @@ function EditorContent({
           <NodesAdditionOverlay width={width} height={height} />
         )}
 
-        {/* nodes ruler */}
+        {/* measure ruler */}
         {store.rulerNodes.length === 2 && (
           <EditorRuler />
         )}
-
-        {/* arc group */}
-        {store.arcGroups["nnn"] && store.activeNodes.length > 0 && (
-          <g transform={TransformMatrixStyle()}>
-            {store.activeNodes.map((nodeId) => (
-              <ArcGroupNode key={nodeId} arc={{ ...store.arcGroups["nnn"], pos: store.nodes[nodeId].pos }} />
-            ))}
-          </g>
-        )}
-
 
       </svg>
 

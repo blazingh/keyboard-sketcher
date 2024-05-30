@@ -107,7 +107,7 @@ export default function NodesTranformationTools({
   return (
     <div
       className={cn(
-        'absolute pointer-events-none *:pointer-events-auto ',
+        'absolute pointer-events-none *:pointer-events-auto',
       )}
       style={{
         ...pos,
@@ -152,13 +152,14 @@ export default function NodesTranformationTools({
       </div>
       <div
         className={cn(
-          'absolute w-full h-full pointer-events-none *:pointer-events-auto ',
+          'absolute w-full h-full *:pointer-events-auto',
           (dy !== 0 || dx !== 0) && "hidden"
         )}
         style={{
           transformBox: "fill-box",
           transformOrigin: "center",
-          transform: `rotate(${dr}deg)`
+          transform: `rotate(${dr}deg)`,
+          pointerEvents: "none",
         }}
       >
         {/* rotation handle */}

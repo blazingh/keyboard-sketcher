@@ -7,8 +7,7 @@ import { useViewportTransformationStore } from "./stores/viewport-transformation
 import SimpleNumberInput from "../simple-number-input"
 import { HelperTooltip } from "../helper-tooltip"
 import { Button } from "../ui/button";
-import { ArrowDownFromLine, ArrowLeftFromLine, ArrowLeftSquare, ArrowRightFromLine, ArrowRightLeft, ArrowRightSquare, ArrowUpFromLine, Check, X } from "lucide-react";
-import { Separator } from "../ui/separator";
+import { ArrowLeftSquare, ArrowRightSquare, Check, X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import InputWithKeypad from "../virtual-numpad-input";
 
@@ -84,6 +83,7 @@ export default function NodesArcTools({
             <TabsContent value={side} key={side} >
               <div className="flex flex-col gap-4 mt-4">
 
+                {/* nodes count */}
                 <div className="flex flex-col gap-2">
                   <div className="flex items-end justify-between">
                     <label className="text-sm">switches count</label>
@@ -99,6 +99,7 @@ export default function NodesArcTools({
                   />
                 </div>
 
+                {/* nodes spacing */}
                 <div className="flex flex-col gap-2">
                   <div className="flex items-end justify-between">
                     <label className="text-sm">Swithes gap</label>
@@ -114,6 +115,7 @@ export default function NodesArcTools({
                   />
                 </div>
 
+                {/* arc radius */}
                 <div className="flex flex-col gap-2">
                   <div className="flex items-end justify-between">
                     <label className="text-sm">Arc radius</label>
@@ -135,6 +137,8 @@ export default function NodesArcTools({
         </Tabs>
 
         <div className="w-full flex justify-between">
+
+          {/* cancel button */}
           <Button
             variant={"destructive"}
             size={"xs"}
@@ -145,6 +149,8 @@ export default function NodesArcTools({
           >
             <X />
           </Button>
+
+          {/* confirm button */}
           <Button size={"xs"}>
             <Check />
           </Button>

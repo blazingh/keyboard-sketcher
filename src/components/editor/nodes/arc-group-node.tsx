@@ -23,7 +23,7 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
       const arcPath = generateArcPath(arcLength, radiuses[side], pos, side as any)
       // generate the switches and place them on the arc
       const ghostNodes: Node[] = []
-      for (let index = 0; index < switchCount; index++) {
+      for (let index = 1; index < switchCount; index++) {
         ghostNodes.push(produce(baseNodeState, draft => {
           const distance = index * (140 + switchGaps[side])
           tempPath.setAttribute("d", arcPath);
@@ -46,7 +46,7 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
         key={index}
         className="opacity-30"
       >
-        {arc.ghostNodes.splice(1).map((node: any) => (
+        {arc.ghostNodes.map((node: any) => (
           <BasicNode
             key={node.id}
             node={node}

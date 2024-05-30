@@ -58,6 +58,7 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
 }
 
 function generateArcPath(arcLength: number, radius: number, center: Pos, side: 0 | 1 | 2 | 3) {
+  // if the raidus in 0, the arc will be a straight line
   if (radius === 0) {
     let end: any = null
     if (!side || side === 2) // right

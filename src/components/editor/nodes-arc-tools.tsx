@@ -81,7 +81,7 @@ export default function NodesArcTools({
             */}
           </TabsList>
           {["left", "up", "right", "down"].map((side, index) => (
-            <TabsContent value={side} >
+            <TabsContent value={side} key={side} >
               <div className="flex flex-col gap-4 mt-4">
 
                 <div className="flex flex-col gap-2">

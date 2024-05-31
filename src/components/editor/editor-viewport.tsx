@@ -212,7 +212,17 @@ function EditorContent({
         {(store.editorMode === "arc" && store.arcGroups["nnn"] && store.activeNodes.length > 0) && (
           <g transform={TransformMatrixStyle()}>
             {store.activeNodes.map((nodeId) => (
-              <ArcGroupNode key={nodeId} arc={{ ...store.arcGroups["nnn"], pos: store.nodes[nodeId].pos }} />
+              <ArcGroupNode
+                key={nodeId}
+                arc={{
+                  ...store.arcGroups["nnn"],
+                  pos: {
+                    x: store.nodes[nodeId].pos.x + store.activeDisplacement.x,
+                    y: store.nodes[nodeId].pos.y + store.activeDisplacement.y,
+                    r: store.nodes[nodeId].pos.r + store.activeDisplacement.r,
+                  }
+                }}
+              />
             ))}
           </g>
         )}

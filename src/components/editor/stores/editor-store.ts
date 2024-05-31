@@ -6,6 +6,7 @@ import { temporal } from 'zundo';
 import isDeepEqual from 'fast-deep-equal';
 import { v4 as v4uuid } from "uuid";
 import { normalizeAngle } from '../lib/nodes-utils';
+import { arcsGhostNodes } from '../nodes/arc-group-node';
 
 export type Pos = {
   x: number,
@@ -77,6 +78,7 @@ type Action = {
   setActiveDisplacement: (displacement: Pos) => void
 
   updateArcGroup: (arc: ArcGroup) => void,
+  appendGhostNodes: (arcs: ArcGroup[]) => void,
 
   setEditorMode: (mode: State["editorMode"]) => void
 
@@ -136,6 +138,14 @@ export const useEditorStore = create<EditorStoreType>()(
           state.arcGroups[arc.id] = arc
         }))
       },
+      appendGhostNodes: (arcs) => {
+        arcs.forEach((arc) => {
+          const ghostNodesGroups = arcsGhostNodes(arc)
+          ghostNodesGroups.forEach((ghostNodesGroup) => {
+            get().addNodes(ghostNodesGroup.ghostNodes)
+          })
+        })
+      },
 
       setEditorMode: (mode) => {
         set({ editorMode: mode })
@@ -146,7 +156,7 @@ export const useEditorStore = create<EditorStoreType>()(
         set(produce((state: State) => {
           nodes.forEach(node => {
             const randId = v4uuid()
-            state.nodes[randId] = { ...node, id: randId }
+            state.nodes[randId] = { ...node, id: randId, selectable: true }
             ids.push(randId)
           });
         }))

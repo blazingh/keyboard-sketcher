@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils"
-import { Node, useEditorStore } from "./stores/editor-store"
+import { ArcGroup, Node, useEditorStore } from "./stores/editor-store"
 import { findEnclosingBox } from "./lib/nodes-utils"
 import { produce } from "immer"
 import isDeepEqual from 'fast-deep-equal';
@@ -125,7 +125,7 @@ export default function NodesArcTools({
                     defaultValue={arc.radiuses[index]}
                     onValueChange={(v) => {
                       store.updateArcGroup(produce(arc, draft => {
-                        draft.radiuses[0] = parseInt(v)
+                        draft.radiuses[index] = parseInt(v)
                       }))
                     }}
                   />
@@ -151,7 +151,25 @@ export default function NodesArcTools({
           </Button>
 
           {/* confirm button */}
-          <Button size={"xs"}>
+          <Button
+            size={"xs"}
+            onClick={() => {
+              const arcs: ArcGroup[] = []
+              store.activeNodes.map((nodeId) => {
+                arcs.push({
+                  ...store.arcGroups["nnn"],
+                  pos: {
+                    x: store.nodes[nodeId].pos.x + store.activeDisplacement.x,
+                    y: store.nodes[nodeId].pos.y + store.activeDisplacement.y,
+                    r: store.nodes[nodeId].pos.r + store.activeDisplacement.r,
+                  }
+                })
+              })
+              store.appendGhostNodes(arcs)
+              store.setEditorMode("normal")
+              store.clearActiveNodes()
+            }}
+          >
             <Check />
           </Button>
         </div>

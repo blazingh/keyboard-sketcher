@@ -5,43 +5,8 @@ import { rotatePoint } from "../lib/Pos-utils";
 
 export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
 
-  const {
-    switchGaps,
-    switchCounts,
-    radiuses,
-    pos,
-  } = arc
-
-  function arcs() {
-    const arcs: any[] = []
-    const tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    switchCounts.forEach((switchCount, side) => {
-      if (switchCount === 0) return
-      // calculate the arcLength
-      const arcLength = ((switchCount) * (140 + switchGaps[side]));
-      // generate the arc svg path
-      const arcPath = generateArcPath(arcLength, radiuses[side], pos, side as any)
-      // generate the switches and place them on the arc
-      const ghostNodes: Node[] = []
-      for (let index = 1; index < switchCount + 1; index++) {
-        ghostNodes.push(produce(baseNodeState, draft => {
-          const distance = index * (140 + switchGaps[side])
-          tempPath.setAttribute("d", arcPath);
-          const { x, y } = tempPath.getPointAtLength(distance)
-          draft.id = String(Math.random())
-          draft.pos.x = x
-          draft.pos.y = y
-          draft.pos.r = getOrientation(distance, tempPath)
-          draft.selectable = false
-        }))
-      }
-      arcs.push({ ghostNodes, arcPath })
-    })
-    return arcs
-  }
-
   return (
-    arcs().map((arc, index) => (
+    arcsGhostNodes(arc).map((arc, index) => (
       <g
         key={index}
         className="opacity-30"
@@ -55,6 +20,42 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
       </g>
     ))
   )
+}
+
+export function arcsGhostNodes(arc: ArcGroup): { ghostNodes: Node[], arcPath: string }[] {
+
+  const {
+    switchGaps,
+    switchCounts,
+    radiuses,
+    pos,
+  } = arc
+
+  const arcs: any[] = []
+  const tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  switchCounts.forEach((switchCount, side) => {
+    if (switchCount === 0) return
+    // calculate the arcLength
+    const arcLength = ((switchCount) * (140 + switchGaps[side]));
+    // generate the arc svg path
+    const arcPath = generateArcPath(arcLength, radiuses[side], pos, side as any)
+    // generate the switches and place them on the arc
+    const ghostNodes: Node[] = []
+    for (let index = 1; index < switchCount + 1; index++) {
+      ghostNodes.push(produce(baseNodeState, draft => {
+        const distance = index * (140 + switchGaps[side])
+        tempPath.setAttribute("d", arcPath);
+        const { x, y } = tempPath.getPointAtLength(distance)
+        draft.id = String(Math.random())
+        draft.pos.x = x
+        draft.pos.y = y
+        draft.pos.r = getOrientation(distance, tempPath)
+        draft.selectable = false
+      }))
+    }
+    arcs.push({ ghostNodes, arcPath })
+  })
+  return arcs
 }
 
 function generateArcPath(arcLength: number, radius: number, center: Pos, side: 0 | 1 | 2 | 3) {
@@ -112,6 +113,7 @@ function getOrientation(distance: number, path: any) {
   var angleDegrees = angleRadians * (180 / Math.PI);
 
   // Adjust the angle to point away from the path (if needed)
-  return angleDegrees + (angleDegrees < 0 ? 180 : -180)
+  return angleDegrees
+  // + (angleDegrees < 0 ? 180 : -180)
 }
 

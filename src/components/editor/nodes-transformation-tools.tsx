@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils"
 import { Node, useEditorStore } from "./stores/editor-store"
-import { findEnclosingBox } from "./lib/nodes-utils"
+import { findEnclosingBox, normalizeAngle } from "./lib/nodes-utils"
 import { MoveHorizontal, MoveVertical, RotateCcw, RotateCw } from "lucide-react"
 import { produce } from "immer"
 import { useViewportTransformationStore } from "./stores/viewport-transformation-store"
@@ -79,7 +79,7 @@ export default function NodesTranformationTools({
       const displacement = {
         x: 0,
         y: 0,
-        r: Math.round((newAngle - ogAngle) / 5) * 5
+        r: normalizeAngle(Math.round((newAngle - ogAngle) / 5) * 5)
       }
       store.setActiveDisplacement(displacement)
     },

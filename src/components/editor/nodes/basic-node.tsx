@@ -4,6 +4,7 @@ import { EditorStoreType, Node, useEditorStore } from '../stores/editor-store';
 import { useGesture } from "@use-gesture/react";
 import { cn } from "@/lib/utils";
 import { useViewportTransformationStore } from "../stores/viewport-transformation-store";
+import { normalizeAngle } from '../lib/nodes-utils';
 
 
 const selector = (state: EditorStoreType) => ({
@@ -15,6 +16,8 @@ const selector = (state: EditorStoreType) => ({
 
   activeDisplacement: state.activeDisplacement,
   setActiveDisplacement: state.setActiveDisplacement,
+
+  editorMode: state.editorMode,
 })
 
 export function BasicNode({
@@ -32,6 +35,8 @@ export function BasicNode({
 
     activeDisplacement,
     setActiveDisplacement,
+
+    editorMode,
   } = useEditorStore(selector)
 
   const { initViewport, transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
@@ -77,6 +82,8 @@ export function BasicNode({
     <g
       className="touch-none"
       transform={`translate(${nodeActive ? dx : 0}, ${nodeActive ? dy : 0})`}
+      style={{
+      }}
       {...binds()}
     >
       <rect
@@ -96,6 +103,18 @@ export function BasicNode({
         }}
       >
       </rect>
+      {(nodeActive && editorMode === "normal") &&
+        <text
+          x={x}
+          y={y}
+          fontSize="10"
+          fill="white"
+          dominantBaseline="middle"
+          textAnchor="middle"
+        >
+          {normalizeAngle(node.pos.r + dr)}°
+        </text>
+      }
       {false && (<>
         {/*
         <text x={x} y={(y || 0) - 25} fontSize="10" fill="white">

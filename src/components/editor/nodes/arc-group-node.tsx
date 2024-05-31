@@ -18,12 +18,12 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
     switchCounts.forEach((switchCount, side) => {
       if (switchCount === 0) return
       // calculate the arcLength
-      const arcLength = ((switchCount - 1) * (140 + switchGaps[side]));
+      const arcLength = ((switchCount) * (140 + switchGaps[side]));
       // generate the arc svg path
       const arcPath = generateArcPath(arcLength, radiuses[side], pos, side as any)
       // generate the switches and place them on the arc
       const ghostNodes: Node[] = []
-      for (let index = 1; index < switchCount; index++) {
+      for (let index = 1; index < switchCount + 1; index++) {
         ghostNodes.push(produce(baseNodeState, draft => {
           const distance = index * (140 + switchGaps[side])
           tempPath.setAttribute("d", arcPath);
@@ -64,7 +64,7 @@ function generateArcPath(arcLength: number, radius: number, center: Pos, side: 0
     if (!side || side === 2) // right
       end = rotatePoint({ x: center.x + arcLength, y: center.y, r: 0 }, { ...center, r: center.r })
     if (side === 0) //left 
-      end = rotatePoint({ x: center.x - arcLength, y: center.y, r: 0 }, { ...center, r: center.r })
+      end = rotatePoint({ x: center.x - arcLength, y: center.y, r: 0 }, { ...center, r: -center.r })
     const path = `M ${center.x},${center.y} L ${end.x},${end.y}`;
     return path
   }
@@ -89,7 +89,7 @@ function generateArcPath(arcLength: number, radius: number, center: Pos, side: 0
   if (!side || side === 2) // right
     end = rotatePoint({ x: center.x + length, y: center.y, r: 0 }, { ...center, r: arcAngle / 2 + center.r })
   if (side === 0) //left 
-    end = rotatePoint({ x: center.x - length, y: center.y, r: 0 }, { ...center, r: arcAngle / -2 - center.r })
+    end = rotatePoint({ x: center.x - length, y: center.y, r: 0 }, { ...center, r: arcAngle / -2 + center.r })
 
   const largArcFlag = angle <= Math.PI ? 0 : 1;
   const sweepFlag = side === 2 ? 1 : 0

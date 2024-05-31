@@ -22,7 +22,7 @@ export default function SimpleNumberInput(props: { onValueChange?: (v: number) =
           props.className,
           "pointer-events-none px-12 text-center",
         )}
-        value={props.defaultValue}
+        defaultValue={props.defaultValue}
       />
 
       <Button

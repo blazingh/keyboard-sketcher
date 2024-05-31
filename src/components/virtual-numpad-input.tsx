@@ -82,6 +82,7 @@ export default function InputWithKeypad(props: { onValueChange?: (v: string) => 
             open && "ring-2 ring-ring ring-offset-2"
           )}
           defaultValue={value}
+          readOnly
         />
 
       </PopoverTrigger>

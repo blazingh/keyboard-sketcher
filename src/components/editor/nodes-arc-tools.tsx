@@ -10,12 +10,16 @@ import { Button } from "../ui/button";
 import { ArrowLeftSquare, ArrowRightSquare, Check, X } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import InputWithKeypad from "../virtual-numpad-input";
+import { Slider } from "../ui/slider";
+import { useState } from "react";
 
 export default function NodesArcTools({
 }: {
   }) {
   const store = useEditorStore()
   const { transformMatrix } = useViewportTransformationStore()
+
+  const [sliderVal, setSliderVal] = useState<number>(0)
 
   const { x: dx, y: dy, r: dr } = store.activeDisplacement
   const { x: tx, y: ty, s: ts } = transformMatrix
@@ -130,6 +134,25 @@ export default function NodesArcTools({
                     }}
                   />
                 </div>
+
+                <Slider
+                  value={[sliderVal]}
+                  min={-1000}
+                  max={1000}
+                  step={10}
+                  onValueChange={(v) => {
+                    store.updateArcGroup(produce(arc, draft => {
+                      draft.radiuses[index] = Math.max(
+                        0,
+                        (draft.radiuses[index] - sliderVal) + v[0]
+                      )
+                      setSliderVal(v[0])
+                    }))
+                  }}
+                  onValueCommit={() => {
+                    setSliderVal(0)
+                  }}
+                />
 
               </div>
             </TabsContent>

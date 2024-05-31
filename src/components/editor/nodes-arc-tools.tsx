@@ -97,7 +97,7 @@ export default function NodesArcTools({
                     defaultValue={arc.switchCounts[index]}
                     onValueChange={(v) => {
                       store.updateArcGroup(produce(arc, draft => {
-                        draft.switchCounts[index] = v
+                        draft.switchCounts[index] = Math.max(0, v + draft.switchCounts[index])
                       }))
                     }}
                   />
@@ -113,7 +113,7 @@ export default function NodesArcTools({
                     defaultValue={arc.switchGaps[index]}
                     onValueChange={(v) => {
                       store.updateArcGroup(produce(arc, draft => {
-                        draft.switchGaps[index] = parseInt(v)
+                        draft.switchGaps[index] = Math.max(0, parseInt(v) + draft.switchGaps[index])
                       }))
                     }}
                   />
@@ -129,7 +129,7 @@ export default function NodesArcTools({
                     defaultValue={arc.radiuses[index]}
                     onValueChange={(v) => {
                       store.updateArcGroup(produce(arc, draft => {
-                        draft.radiuses[index] = parseInt(v)
+                        draft.radiuses[index] = Math.max(0, parseInt(v) + draft.radiuses[index])
                       }))
                     }}
                   />

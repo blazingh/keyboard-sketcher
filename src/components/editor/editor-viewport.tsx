@@ -34,7 +34,7 @@ function isInsideSelectionBox(box: any, node: Node) {
 
 export default function EditorViewPort() {
   return (
-    <div className='w-svw h-svh relative'>
+    <div className='w-svw h-svh relative overflow-hidden'>
       <EditorToolbar />
       <ParentSize>
         {({ width, height }) => <EditorViewPortContent width={width} height={height} />}

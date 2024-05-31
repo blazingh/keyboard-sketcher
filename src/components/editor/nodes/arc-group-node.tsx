@@ -64,7 +64,7 @@ function generateArcPath(arcLength: number, radius: number, center: Pos, side: 0
     if (!side || side === 2) // right
       end = rotatePoint({ x: center.x + arcLength, y: center.y, r: 0 }, { ...center, r: center.r })
     if (side === 0) //left 
-      end = rotatePoint({ x: center.x - arcLength, y: center.y, r: 0 }, { ...center, r: -center.r })
+      end = rotatePoint({ x: center.x - arcLength, y: center.y, r: 0 }, { ...center, r: center.r })
     const path = `M ${center.x},${center.y} L ${end.x},${end.y}`;
     return path
   }
@@ -73,18 +73,16 @@ function generateArcPath(arcLength: number, radius: number, center: Pos, side: 0
   const angle = (arcLength / circumference) * (2 * Math.PI); // Convert arc length to radians
   const arcAngle = angle * (180 / Math.PI);   // convert radians to degrees
 
-  // Calculate the starting and ending points of the arcs
-  const initStart = { x: radius, y: 0 };
+  // Calculate the ending points of the arcs
   const initEnd = { x: radius * Math.cos(angle), y: radius * Math.sin(angle) };
 
   // calculate the distance between the start and the end
   const length = Math.sqrt(
-    Math.pow(initStart.x - initEnd.x, 2) +
-    Math.pow(initStart.y - initEnd.y, 2)
+    Math.pow(radius - initEnd.x, 2) +
+    Math.pow(0 - initEnd.y, 2)
   );
 
-  // rotato the arc
-  const start = center
+  // rotate the arc
   let end: any = null
   if (!side || side === 2) // right
     end = rotatePoint({ x: center.x + length, y: center.y, r: 0 }, { ...center, r: arcAngle / 2 + center.r })
@@ -95,7 +93,7 @@ function generateArcPath(arcLength: number, radius: number, center: Pos, side: 0
   const sweepFlag = side === 2 ? 1 : 0
 
   // Construct the SVG path string
-  const path = `M ${start.x},${start.y} A ${radius},${radius} 0 ${largArcFlag} ${sweepFlag} ${end.x},${end.y}`;
+  const path = `M ${center.x},${center.y} A ${radius},${radius} 0 ${largArcFlag} ${sweepFlag} ${end.x},${end.y}`;
 
   return path
 }

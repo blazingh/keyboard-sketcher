@@ -142,10 +142,11 @@ export default function NodesArcTools({
                   step={10}
                   onValueChange={(v) => {
                     store.updateArcGroup(produce(arc, draft => {
-                      draft.radiuses[index] = Math.max(
-                        0,
-                        (draft.radiuses[index] - sliderVal) + v[0]
-                      )
+                      if (!(draft.radiuses[index] === 0 && v[0] < 0))
+                        draft.radiuses[index] = Math.max(
+                          0,
+                          (draft.radiuses[index] - sliderVal) + v[0]
+                        )
                       setSliderVal(v[0])
                     }))
                   }}

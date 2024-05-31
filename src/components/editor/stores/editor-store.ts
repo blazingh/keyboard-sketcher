@@ -292,6 +292,7 @@ export const useEditorStore = create<EditorStoreType>()(
         set(produce((draft: State) => {
           for (const node of nodes) {
             draft.nodes[node.id].pos.x = centerX - (node.pos.x - centerX);
+            draft.nodes[node.id].pos.r = 180 - draft.nodes[node.id].pos.r;
           }
         }))
       },
@@ -306,6 +307,7 @@ export const useEditorStore = create<EditorStoreType>()(
         set(produce((draft: State) => {
           for (const node of nodes) {
             draft.nodes[node.id].pos.y = centerY - (node.pos.y - centerY);
+            draft.nodes[node.id].pos.r = 180 - draft.nodes[node.id].pos.r;
           }
         }))
       },

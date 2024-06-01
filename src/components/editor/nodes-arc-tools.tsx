@@ -6,12 +6,10 @@ import isDeepEqual from 'fast-deep-equal';
 import { useViewportTransformationStore } from "./stores/viewport-transformation-store"
 import SimpleNumberInput from "../simple-number-input"
 import { HelperTooltip } from "../helper-tooltip"
-import { Button } from "../ui/button";
 import { ArrowLeftSquare, ArrowRightSquare, Check, X } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import InputWithKeypad from "../virtual-numpad-input";
-import { Slider } from "../ui/slider";
 import { useState } from "react";
+import { Tabs, Tab, Button, Slider } from "@nextui-org/react";
 
 export default function NodesArcTools({
 }: {
@@ -19,7 +17,8 @@ export default function NodesArcTools({
   const store = useEditorStore()
   const { transformMatrix } = useViewportTransformationStore()
 
-  const [sliderVal, setSliderVal] = useState<number>(0)
+  const [slider1Val, setSlider1Val] = useState<number>(0)
+  const [slider2Val, setSlider2Val] = useState<number>(0)
 
   const { x: dx, y: dy, r: dr } = store.activeDisplacement
   const { x: tx, y: ty, s: ts } = transformMatrix
@@ -64,28 +63,23 @@ export default function NodesArcTools({
           scale: `${ts + 0.1}`
         }}
       >
-        <Tabs defaultValue="left" className="w-full">
-          <TabsList className="w-full grid grid-cols-2 py-0">
-            <TabsTrigger value="left">
-              <ArrowLeftSquare />
-            </TabsTrigger>
-            {/*
-            <TabsTrigger value="up">
-              <ArrowUpFromLine />
-            </TabsTrigger>
-            */}
-            <TabsTrigger value="right">
-              <ArrowRightSquare />
-            </TabsTrigger>
-            {/*
-            <TabsTrigger value="down">
-              <ArrowDownFromLine />
-            </TabsTrigger>
-            */}
-          </TabsList>
-          {["left", "up", "right", "down"].map((side, index) => (
-            <TabsContent value={side} key={side} >
-              <div className="flex flex-col gap-4 mt-4">
+        <Tabs
+          aria-label="sides"
+          color="primary"
+          classNames={{
+            panel: "p-0 m-0"
+          }}
+          fullWidth
+        >
+          {["left", "up", "right", "down"].map((side, index) => [0, 2].includes(index) && (
+            <Tab
+              key={side}
+              title={function() {
+                if (side === "left") return <ArrowLeftSquare />
+                if (side === "right") return <ArrowRightSquare />
+                return "A"
+              }()}>
+              <div className="flex flex-col gap-4">
 
                 {/* nodes count */}
                 <div className="flex flex-col gap-2">
@@ -117,6 +111,27 @@ export default function NodesArcTools({
                       }))
                     }}
                   />
+                  <Slider
+                    value={slider2Val}
+                    minValue={-100}
+                    maxValue={100}
+                    fillOffset={0}
+                    step={5}
+                    size="sm"
+                    onChange={(v: any) => {
+                      store.updateArcGroup(produce(arc, draft => {
+                        if (!(draft.switchGaps[index] === 0 && v < 0))
+                          draft.switchGaps[index] = Math.max(
+                            0,
+                            (draft.switchGaps[index] - slider2Val) + v
+                          )
+                        setSlider2Val(v)
+                      }))
+                    }}
+                    onChangeEnd={() => {
+                      setSlider2Val(0)
+                    }}
+                  />
                 </div>
 
                 {/* arc radius */}
@@ -133,30 +148,31 @@ export default function NodesArcTools({
                       }))
                     }}
                   />
+                  <Slider
+                    value={[slider1Val]}
+                    minValue={-1000}
+                    maxValue={1000}
+                    fillOffset={0}
+                    step={10}
+                    size="sm"
+                    onChange={(v: any) => {
+                      store.updateArcGroup(produce(arc, draft => {
+                        if (!(draft.radiuses[index] === 0 && v < 0))
+                          draft.radiuses[index] = Math.max(
+                            0,
+                            (draft.radiuses[index] - slider1Val) + v
+                          )
+                        setSlider1Val(v)
+                      }))
+                    }}
+                    onChangeEnd={() => {
+                      setSlider1Val(0)
+                    }}
+                  />
                 </div>
 
-                <Slider
-                  value={[sliderVal]}
-                  min={-1000}
-                  max={1000}
-                  step={10}
-                  onValueChange={(v) => {
-                    store.updateArcGroup(produce(arc, draft => {
-                      if (!(draft.radiuses[index] === 0 && v[0] < 0))
-                        draft.radiuses[index] = Math.max(
-                          0,
-                          (draft.radiuses[index] - sliderVal) + v[0]
-                        )
-                      setSliderVal(v[0])
-                    }))
-                  }}
-                  onValueCommit={() => {
-                    setSliderVal(0)
-                  }}
-                />
-
               </div>
-            </TabsContent>
+            </Tab>
           ))}
         </Tabs>
 
@@ -164,8 +180,8 @@ export default function NodesArcTools({
 
           {/* cancel button */}
           <Button
-            variant={"destructive"}
-            size={"xs"}
+            color="danger"
+            isIconOnly
             onClick={() => {
               store.setEditorMode("normal")
               store.clearActiveNodes()
@@ -176,7 +192,8 @@ export default function NodesArcTools({
 
           {/* confirm button */}
           <Button
-            size={"xs"}
+            color="primary"
+            isIconOnly
             onClick={() => {
               const arcs: ArcGroup[] = []
               store.activeNodes.map((nodeId) => {

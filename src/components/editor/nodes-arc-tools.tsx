@@ -144,12 +144,12 @@ export default function NodesArcTools({
                     defaultValue={arc.radiuses[index]}
                     onValueChange={(v) => {
                       store.updateArcGroup(produce(arc, draft => {
-                        draft.radiuses[index] = Math.max(0, parseInt(v) + draft.radiuses[index])
+                        draft.radiuses[index] = Math.max(0, parseInt(v))
                       }))
                     }}
                   />
                   <Slider
-                    value={[slider1Val]}
+                    value={slider1Val}
                     minValue={-1000}
                     maxValue={1000}
                     fillOffset={0}

@@ -2,30 +2,30 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Button, ButtonProps } from "./ui/button";
 import { Check, Delete, Trash, Trash2, X } from "lucide-react";
-import { Input, InputProps } from "./ui/input";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils";
+import { Input, InputProps } from "@nextui-org/react";
 
-export default function InputWithKeypad(props: { onValueChange?: (v: string) => void } & InputProps) {
+export default function InputWithKeypad({ onValueChange, defaultValue, ...props }: { onValueChange?: (v: string) => void } & InputProps) {
 
   const [open, setOpen] = useState(false)
   const [value, setValue] = useState("")
 
   useEffect(() => {
-    setValue(String(props.defaultValue))
-  }, [props.defaultValue])
+    setValue(String(defaultValue))
+  }, [defaultValue])
 
   function handleCancel() {
-    setValue(String(props.defaultValue))
+    setValue(String(defaultValue))
     setOpen(false)
   }
 
   function handleDone() {
-    props.onValueChange?.(value)
+    onValueChange?.(value)
     setOpen(false)
   }
 
@@ -75,13 +75,18 @@ export default function InputWithKeypad(props: { onValueChange?: (v: string) => 
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger>
 
-        <Input {...props}
+        <Input
+          /* @ts-ignore */
+          {...props}
+          /* @ts-ignore */
+          classNames={{
+            inputWrapper: open && "ring-2 ring-ring"
+          }}
           className={cn(
             props.className,
             "pointer-events-none",
-            open && "ring-2 ring-ring ring-offset-2"
           )}
-          defaultValue={value}
+          value={value}
           readOnly
         />
 

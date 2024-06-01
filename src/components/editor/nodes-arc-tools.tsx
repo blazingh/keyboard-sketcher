@@ -56,7 +56,7 @@ export default function NodesArcTools({
       }}
     >
       <div
-        className='absolute -right-8 -bottom-8 translate-x-full translate-y-full flex flex-col p-4 gap-8 bg-secondary rounded w-[300px]'
+        className='absolute -right-8 -bottom-8 translate-x-full translate-y-full flex flex-col p-4 gap-6 bg-secondary rounded w-[300px]'
         style={{
           transformBox: "fill-box",
           transformOrigin: "bottom right ",
@@ -83,13 +83,10 @@ export default function NodesArcTools({
 
                 {/* nodes count */}
                 <div className="flex flex-col gap-2">
-                  <div className="flex items-end justify-between">
-                    <label className="text-sm">switches count</label>
-                    <HelperTooltip desc={""} />
-                  </div>
                   <SimpleNumberInput
-                    defaultValue={arc.switchCounts[index]}
-                    onValueChange={(v) => {
+                    label={"Switches count"}
+                    defaultValue={String(arc.switchCounts[index])}
+                    onNumberChange={(v) => {
                       store.updateArcGroup(produce(arc, draft => {
                         draft.switchCounts[index] = Math.max(0, v)
                       }))
@@ -98,13 +95,10 @@ export default function NodesArcTools({
                 </div>
 
                 {/* nodes spacing */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-end justify-between">
-                    <label className="text-sm">Swithes gap</label>
-                    <HelperTooltip desc={""} />
-                  </div>
+                <div >
                   <InputWithKeypad
-                    defaultValue={arc.switchGaps[index]}
+                    label="Swtiches spacing"
+                    defaultValue={String(arc.switchGaps[index])}
                     onValueChange={(v) => {
                       store.updateArcGroup(produce(arc, draft => {
                         draft.switchGaps[index] = Math.max(0, parseInt(v))
@@ -135,13 +129,10 @@ export default function NodesArcTools({
                 </div>
 
                 {/* arc radius */}
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-end justify-between">
-                    <label className="text-sm">Arc radius</label>
-                    <HelperTooltip desc={""} />
-                  </div>
+                <div >
                   <InputWithKeypad
-                    defaultValue={arc.radiuses[index]}
+                    label="Arc radius"
+                    defaultValue={String(arc.radiuses[index])}
                     onValueChange={(v) => {
                       store.updateArcGroup(produce(arc, draft => {
                         draft.radiuses[index] = Math.max(0, parseInt(v))

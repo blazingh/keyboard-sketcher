@@ -4,9 +4,9 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import localFont from 'next/font/local'
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme_provider";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
+import { Providers } from "./provider";
 
 const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
@@ -31,15 +31,10 @@ export default function RootLayout({
       <body className={cn(poppins.variable, typoDraft.variable)}>
         <SpeedInsights />
         <Analytics />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          disableTransitionOnChange
-          enableSystem
-        >
+        <Providers>
           {children}
-          <Toaster expand={false} richColors />
-        </ThemeProvider>
+        </Providers>
+        <Toaster expand={false} richColors />
       </body>
     </html>
   );

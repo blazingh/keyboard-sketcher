@@ -65,6 +65,7 @@ export default function NodesArcTools({
       >
         <Tabs
           aria-label="sides"
+          defaultSelectedKey="left"
           color="primary"
           classNames={{
             panel: "p-0 m-0"

@@ -56,11 +56,8 @@ function ModelGeneratorOptions() {
           if (option.type === "number")
             return (
               <div key={option.id} className="flex flex-col gap-2">
-                <div className="flex items-end justify-between">
-                  <label className="text-sm">{option.label}</label>
-                  <HelperTooltip desc={option.description} />
-                </div>
                 <InputWithKeypad
+                  label={option.label}
                   defaultValue={String(store.params[option.key])}
                   onValueChange={(v) => {
                     store.updateParam(option.key, v)

@@ -33,16 +33,16 @@ export function EditorFloatButtons() {
               Generate 3D model
             </DropdownItem>
             <DropdownItem
-              key="pcb"
-              startContent={<CircuitBoard className="mr-2" />}
-            >
-              Generate pcb
-            </DropdownItem>
-            <DropdownItem
               key="2dSketch"
               startContent={<Printer className="mr-2" />}
             >
               Print 2D sketch
+            </DropdownItem>
+            <DropdownItem
+              key="pcb"
+              startContent={<CircuitBoard className="mr-2" />}
+            >
+              Generate pcb
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>

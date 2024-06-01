@@ -11,7 +11,7 @@ export default function ThreeDModelGeneratorDialog({ isOpen, onOpenChange }: { i
       hideCloseButton
       size="5xl"
       classNames={{
-        base: "max-w-[90svw] max-h-[90svh]"
+        base: "max-w-[95svw] max-h-[95svh]"
       }}
     >
       <ModalContent>

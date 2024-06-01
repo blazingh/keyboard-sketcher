@@ -1,45 +1,54 @@
 
 "use client"
 import { useEffect, useState } from "react";
-import { Button } from "./ui/button";
-import { Input, InputProps } from "./ui/input";
 import { cn } from "@/lib/utils";
 import { Minus, Plus } from "lucide-react";
+import { Button, Input, InputProps } from "@nextui-org/react";
 
-export default function SimpleNumberInput(props: { onValueChange?: (v: number) => void } & InputProps) {
+export default function SimpleNumberInput({ onNumberChange, defaultValue, ...props }: InputProps & { onNumberChange?: (v: number) => void }) {
 
   const [value, setValue] = useState(0)
 
   useEffect(() => {
-    setValue(parseInt(String(props.defaultValue)))
-  }, [props.defaultValue])
+    setValue(parseInt(defaultValue || "0"))
+  }, [defaultValue])
+
 
   return (
     <div className="relative">
-      <Input {...props}
-        readOnly
+      <Input
+        /* @ts-ignore */
+        {...props}
+        /* @ts-ignore */
+        classNames={{
+          input: "w-full text-center",
+          label: "w-full text-center ml-2.5"
+        }}
         className={cn(
           props.className,
-          "pointer-events-none px-12 text-center",
+          "pointer-events-none",
         )}
-        defaultValue={props.defaultValue}
+        value={String(value)}
+        readOnly
       />
 
       <Button
-        variant={"white"}
-        className="absolute top-2 right-2 p-0 w-6 h-6"
+        color="default"
+        isIconOnly
+        className="absolute bottom-2 right-2"
         onClick={() => {
-          props.onValueChange?.(value + 1)
+          onNumberChange?.(value + 1)
         }}
       >
         <Plus className="shrink-0" />
       </Button>
 
       <Button
-        variant={"white"}
-        className="absolute top-2 left-2 p-0 w-6 h-6"
+        color="default"
+        isIconOnly
+        className="absolute bottom-2 left-2"
         onClick={() => {
-          props.onValueChange?.(value - 1)
+          onNumberChange?.(value - 1)
         }}
       >
         <Minus className="shrink-0" />

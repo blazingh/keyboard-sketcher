@@ -3,10 +3,7 @@ import { Select, SelectValue, SelectItem, SelectContent, SelectTrigger } from "@
 import { HelpCircle, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { modelAOptionsList } from "@/workers/model-a-options";
-import { HelperTooltip } from "@/components/helper-tooltip";
-import { Input } from "@/components/ui/input";
 import { useThreeDModelGeneratorStore } from "../stores/3d-model-generator-store";
-import { Button } from "@/components/ui/button";
 import InputWithKeypad from "@/components/virtual-numpad-input";
 import { useEditorStore } from "../stores/editor-store";
 import { GeomsStlPreview } from "@/components/geoms-stl-preview";

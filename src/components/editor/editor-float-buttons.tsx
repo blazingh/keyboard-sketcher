@@ -8,7 +8,7 @@ export function EditorFloatButtons() {
   return (
     <>
 
-      <ThreeDModelGeneratorDialog open={open} onOpenChange={(state) => setOpen(state)} />
+      <ThreeDModelGeneratorDialog isOpen={open} onOpenChange={(state) => setOpen(state)} />
 
       {/* model generation popup trigger */}
       <div className="absolute bottom-5 right-5">
@@ -26,7 +26,9 @@ export function EditorFloatButtons() {
             <DropdownItem
               key="3dModel"
               startContent={<Box className="mr-2" />}
-              onPress={() => { setOpen(true) }}
+              onPress={() => {
+                setOpen(true)
+              }}
             >
               Generate 3D model
             </DropdownItem>

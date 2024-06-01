@@ -1,28 +1,34 @@
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { DialogProps } from "@radix-ui/react-alert-dialog"
+import { Button, Modal, ModalContent, ModalProps } from "@nextui-org/react"
 import ThreeDModelGenerator from "../genarators/3d-model-generator"
 import { X } from "lucide-react"
 
 
-export default function ThreeDModelGeneratorDialog({ children, ...props }: DialogProps & { children?: any }) {
+export default function ThreeDModelGeneratorDialog({ isOpen, onOpenChange }: { isOpen: boolean, onOpenChange: ModalProps["onOpenChange"] }) {
   return (
-    <Dialog {...props}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
-      <DialogContent className="max-w-[95svw] w-full">
-        <DialogClose className="absolute top-0.5 right-0.5 z-20">
-          <X />
-        </DialogClose>
-
-        <ThreeDModelGenerator />
-
-      </DialogContent>
-    </Dialog>
+    <Modal
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      hideCloseButton
+      size="5xl"
+      classNames={{
+        base: "max-w-[90svw] max-h-[90svh]"
+      }}
+    >
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ThreeDModelGenerator />
+            <Button
+              isIconOnly
+              onPress={onClose}
+              size={"sm"}
+              className="absolute top-2 right-2"
+            >
+              <X className="w-5 h-5" />
+            </Button>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
   )
 }

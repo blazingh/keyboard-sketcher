@@ -56,7 +56,7 @@ export default function NodesArcTools({
       }}
     >
       <div
-        className='absolute -right-8 -bottom-8 translate-x-full translate-y-full flex flex-col p-4 gap-6 bg-secondary rounded w-[300px]'
+        className='absolute -right-8 -bottom-8 translate-x-full translate-y-full flex flex-col p-4 gap-6 bg-secondary w-[300px] rounded-xl'
         style={{
           transformBox: "fill-box",
           transformOrigin: "bottom right ",

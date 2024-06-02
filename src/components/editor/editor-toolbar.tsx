@@ -4,7 +4,7 @@ import { useEditorStore } from './stores/editor-store';
 import { BoxSelect, Copy, DraftingCompass, FlipHorizontal, FlipVertical, Move, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Divider } from "@nextui-org/react";
 import { Toggle } from '../ui/toggle';
 
 export default function EditorToolbar() {
@@ -31,7 +31,6 @@ export default function EditorToolbar() {
 
           <Button
             variant={"light"}
-            size='sm'
             isIconOnly
             onClick={() => {
               store.clearActiveNodes()
@@ -45,7 +44,6 @@ export default function EditorToolbar() {
 
           <Button
             variant={"light"}
-            size='sm'
             isIconOnly
             onClick={() => redo()}
             disabled={!futureStates.length}
@@ -53,35 +51,54 @@ export default function EditorToolbar() {
             <Redo2 className='shrink-0' />
           </Button>
 
-          <Separator orientation='vertical' className='h-6 mx-2' />
+          <Divider orientation='vertical' className='h-8' />
 
-          <Toggle variant={"default"} pressed={store.editorMode === "normal"} onPressedChange={(state) => state && store.setEditorMode("normal")} >
-            <Move className='shrink-0' />
-          </Toggle>
+          <Button
+            variant={"light"}
+            isIconOnly
+            onPress={() => store.setEditorMode("normal")}
+          >
+            <Move className={cn(store.editorMode === "normal" && "text-primary")} />
+          </Button>
 
-          <Toggle variant={"default"} pressed={store.editorMode === "copy"} onPressedChange={(state) => state && store.setEditorMode("copy")} >
-            <Copy className='shrink-0' />
-          </Toggle>
+          <Button
+            variant={"light"}
+            isIconOnly
+            onPress={() => store.setEditorMode("copy")}
+          >
+            <Copy className={cn(store.editorMode === "copy" && "text-primary")} />
+          </Button>
 
-          <Toggle variant={"default"} pressed={store.editorMode === "arc"} onPressedChange={(state) => state && store.setEditorMode("arc")} >
-            <DraftingCompass className='shrink-0' />
-          </Toggle>
+          <Button
+            variant={"light"}
+            isIconOnly
+            onPress={() => store.setEditorMode("arc")}
+          >
+            <DraftingCompass className={cn(store.editorMode === "arc" && "text-primary")} />
+          </Button>
 
-          <Separator orientation='vertical' className='h-6 mx-2' />
+          <Divider orientation='vertical' className='h-8' />
 
-          <Toggle variant={"default"} pressed={store.editorMode === "select"} onPressedChange={(state) => state && store.setEditorMode("select")} >
-            <BoxSelect className='shrink-0' />
-          </Toggle>
+          <Button
+            variant={"light"}
+            isIconOnly
+            onPress={() => store.setEditorMode("select")}
+          >
+            <BoxSelect className={cn(store.editorMode === "select" && "text-primary")} />
+          </Button>
 
-          <Toggle variant={"default"} pressed={store.editorMode === "ruler"} onPressedChange={(state) => state && store.setEditorMode("ruler")} >
-            <Ruler className='shrink-0' />
-          </Toggle>
+          <Button
+            variant={"light"}
+            isIconOnly
+            onPress={() => store.setEditorMode("ruler")}
+          >
+            <Ruler className={cn(store.editorMode === "ruler" && "text-primary")} />
+          </Button>
 
           <Dropdown>
             <DropdownTrigger>
               <Button
                 variant={"light"}
-                size='sm'
                 isIconOnly
                 className={cn(store.editorMode === "addition" && "bg-accent text-primary")}
               >
@@ -109,7 +126,6 @@ export default function EditorToolbar() {
 
           <Button
             variant={"light"}
-            size='sm'
             isIconOnly
             onClick={() => store.flipActiveNodesHorizontally()}
             disabled={!store.activeNodes.length}
@@ -119,7 +135,6 @@ export default function EditorToolbar() {
 
           <Button
             variant={"light"}
-            size='sm'
             isIconOnly
             onClick={() => store.flipActiveNodesVertically()}
             disabled={!store.activeNodes.length}
@@ -129,7 +144,6 @@ export default function EditorToolbar() {
 
           <Button
             variant={"light"}
-            size='sm'
             isIconOnly
             onClick={() => store.deleteActiveNodes()}
             disabled={!store.activeNodes.length}

@@ -39,7 +39,7 @@ export default function EditorToolbar() {
             }}
             disabled={!pastStates.length}
           >
-            <Undo2 className='shrink-0' />
+            <Undo2 />
           </Button>
 
           <Button
@@ -48,7 +48,7 @@ export default function EditorToolbar() {
             onClick={() => redo()}
             disabled={!futureStates.length}
           >
-            <Redo2 className='shrink-0' />
+            <Redo2 />
           </Button>
 
           <Divider orientation='vertical' className='h-8' />
@@ -130,7 +130,7 @@ export default function EditorToolbar() {
             onClick={() => store.flipActiveNodesHorizontally()}
             disabled={!store.activeNodes.length}
           >
-            <FlipHorizontal className='shrink-0 cursor-copy' />
+            <FlipHorizontal />
           </Button>
 
           <Button
@@ -139,7 +139,7 @@ export default function EditorToolbar() {
             onClick={() => store.flipActiveNodesVertically()}
             disabled={!store.activeNodes.length}
           >
-            <FlipVertical className='shrink-0 cursor-copy' />
+            <FlipVertical />
           </Button>
 
           <Button
@@ -148,7 +148,7 @@ export default function EditorToolbar() {
             onClick={() => store.deleteActiveNodes()}
             disabled={!store.activeNodes.length}
           >
-            <Trash2 className='shrink-0 text-red-500 ' />
+            <Trash2 className=' text-red-500 ' />
           </Button>
 
         </div>

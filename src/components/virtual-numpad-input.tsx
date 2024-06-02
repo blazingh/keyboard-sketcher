@@ -73,7 +73,7 @@ export default function InputWithKeypad({ onValueChange, defaultValue, ...props 
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger>
+      <PopoverTrigger className="w-full">
 
         <Input
           /* @ts-ignore */

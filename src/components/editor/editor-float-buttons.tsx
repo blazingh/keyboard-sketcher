@@ -11,7 +11,7 @@ export function EditorFloatButtons() {
       <ThreeDModelGeneratorDialog isOpen={open} onOpenChange={(state) => setOpen(state)} />
 
       {/* model generation popup trigger */}
-      <div className="absolute bottom-5 right-5">
+      <div className="absolute bottom-2 right-2">
         <Dropdown        >
           <DropdownTrigger>
             <Button

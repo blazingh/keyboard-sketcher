@@ -1,16 +1,10 @@
 "use client"
 
 import { useEditorStore } from './stores/editor-store';
-import { Button } from '@/components/ui/button';
 import { BoxSelect, Copy, DraftingCompass, FlipHorizontal, FlipVertical, Move, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from "@nextui-org/react";
 import { Toggle } from '../ui/toggle';
 
 export default function EditorToolbar() {
@@ -19,10 +13,10 @@ export default function EditorToolbar() {
   return (
     <div className='absolute w-full p-2 z-20'>
       <div className={cn(
-        'w-full shadow bg-secondary border px-2 flex items-center justify-between rounded-xl',
+        'w-full shadow bg-accent border  px-2 flex items-center justify-between rounded-xl',
       )}
       >
-        <div className='flex items-center [&>button]:w-10 [&>button]:h-10'>
+        <div className='flex items-center gap-1 '>
 
           {/*
         <span className='font-draft text-2xl hidden lg:block'>
@@ -35,16 +29,27 @@ export default function EditorToolbar() {
         <Separator orientation='vertical' className='h-6 mx-2' />
         */}
 
-          <Button variant={"ghost"} onClick={() => {
-            store.clearActiveNodes()
-            store.clearRulerNodes()
-            undo()
-          }}
-            disabled={!pastStates.length}>
+          <Button
+            variant={"light"}
+            size='sm'
+            isIconOnly
+            onClick={() => {
+              store.clearActiveNodes()
+              store.clearRulerNodes()
+              undo()
+            }}
+            disabled={!pastStates.length}
+          >
             <Undo2 className='shrink-0' />
           </Button>
 
-          <Button variant={"ghost"} onClick={() => redo()} disabled={!futureStates.length}>
+          <Button
+            variant={"light"}
+            size='sm'
+            isIconOnly
+            onClick={() => redo()}
+            disabled={!futureStates.length}
+          >
             <Redo2 className='shrink-0' />
           </Button>
 
@@ -72,36 +77,63 @@ export default function EditorToolbar() {
             <Ruler className='shrink-0' />
           </Toggle>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant={"ghost"} className={cn(store.editorMode === "addition" && "bg-accent text-primary")}>
+          <Dropdown>
+            <DropdownTrigger>
+              <Button
+                variant={"light"}
+                size='sm'
+                isIconOnly
+                className={cn(store.editorMode === "addition" && "bg-accent text-primary")}
+              >
                 <PlusIcon className='shrink-0' />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem
-                onClick={() => {
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Static Actions" disabledKeys={["controller"]}>
+              <DropdownItem
+                key="switch"
+                onPress={() => {
                   store.setEditorMode("addition")
-                }}
-              >
+                }}>
                 switch
-              </DropdownMenuItem>
-              <DropdownMenuItem disabled>constroller</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownItem>
+              <DropdownItem
+                key="controller"
+              >
+                controller
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
 
         </div>
-        <div className='flex items-center [&>button]:w-10 [&>button]:h-10'>
+        <div className='flex items-center gap-2'>
 
-          <Button variant={"ghost"} onClick={() => store.flipActiveNodesHorizontally()} disabled={!store.activeNodes.length}>
+          <Button
+            variant={"light"}
+            size='sm'
+            isIconOnly
+            onClick={() => store.flipActiveNodesHorizontally()}
+            disabled={!store.activeNodes.length}
+          >
             <FlipHorizontal className='shrink-0 cursor-copy' />
           </Button>
 
-          <Button variant={"ghost"} onClick={() => store.flipActiveNodesVertically()} disabled={!store.activeNodes.length}>
+          <Button
+            variant={"light"}
+            size='sm'
+            isIconOnly
+            onClick={() => store.flipActiveNodesVertically()}
+            disabled={!store.activeNodes.length}
+          >
             <FlipVertical className='shrink-0 cursor-copy' />
           </Button>
 
-          <Button variant={"ghost"} onClick={() => store.deleteActiveNodes()} disabled={!store.activeNodes.length}>
+          <Button
+            variant={"light"}
+            size='sm'
+            isIconOnly
+            onClick={() => store.deleteActiveNodes()}
+            disabled={!store.activeNodes.length}
+          >
             <Trash2 className='shrink-0 text-red-500 ' />
           </Button>
 

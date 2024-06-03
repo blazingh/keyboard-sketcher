@@ -2,13 +2,16 @@ import { Box, CircuitBoard, Info, Menu, Printer, Settings2, Share, Share2, Spark
 import ThreeDModelGeneratorDialog from "./dialogs/3d-model-generator";
 import { useState } from "react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Popover, PopoverTrigger, PopoverContent, Listbox, ListboxItem } from "@nextui-org/react";
+import ShareWebsiteDialog from "./dialogs/share-website-dialog";
 
 export function EditorFloatButtons() {
   const [open, setOpen] = useState(false)
+  const [open2, setOpen2] = useState(false)
   return (
     <>
 
       <ThreeDModelGeneratorDialog isOpen={open} onOpenChange={(state) => setOpen(state)} />
+      <ShareWebsiteDialog isOpen={open2} onOpenChange={(state) => setOpen2(state)} />
 
       {/* model generation popup trigger */}
       <div className="absolute right-2 top-2">
@@ -60,7 +63,11 @@ export function EditorFloatButtons() {
           <PopoverContent>
             <Listbox
               aria-label="Actions"
-              onAction={(key) => alert(key)}
+              onAction={(key) => {
+                if (key === "share") {
+                  setOpen2(true)
+                }
+              }}
               className="w-full"
             >
               <ListboxItem
@@ -71,7 +78,7 @@ export function EditorFloatButtons() {
                 Website Info
               </ListboxItem>
               <ListboxItem
-                key="info"
+                key="share"
                 startContent={<Share2 />}
                 description="sahring is caring"
               >

@@ -17,7 +17,7 @@ const selector = (state: EditorStoreType) => ({
   activeDisplacement: state.activeDisplacement,
   setActiveDisplacement: state.setActiveDisplacement,
 
-  editorMode: state.editorMode,
+  pointeAction: state.pointerAction,
 })
 
 export function BasicNode({
@@ -36,7 +36,7 @@ export function BasicNode({
     activeDisplacement,
     setActiveDisplacement,
 
-    editorMode,
+    pointeAction,
   } = useEditorStore(selector)
 
   const { initViewport, transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
@@ -103,7 +103,7 @@ export function BasicNode({
         }}
       >
       </rect>
-      {(nodeActive && editorMode === "normal") &&
+      {(nodeActive && pointeAction === "normal") &&
         <text
           x={x}
           y={y}

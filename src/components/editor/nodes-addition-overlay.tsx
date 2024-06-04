@@ -26,7 +26,7 @@ export default function NodesAdditionOverlay({ width, height }: { width: number,
       store.addNodes([produce(node, (draft: Node) => {
         draft.pos = pos
       })])
-      store.setEditorMode("normal")
+      store.setPointerAction("normal")
     },
   })
 

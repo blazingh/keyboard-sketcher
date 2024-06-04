@@ -103,7 +103,7 @@ function EditorContent({
     onContextMenu: (e) => e.event.preventDefault(),
     onDragStart: () => { },
     onDragEnd: () => {
-      if (store.editorMode === "select") {
+      if (store.pointerAction === "selectionBox") {
         const box = {
           x: (Math.min(0, boxSize[0]) + boxOrigin[0] - transformMatrix.x) / transformMatrix.s,
           y: (Math.min(0, boxSize[1]) + boxOrigin[1] - transformMatrix.y) / transformMatrix.s,
@@ -116,7 +116,7 @@ function EditorContent({
           }
         })
         setBoxSize([0, 0])
-        store.setEditorMode("normal")
+        store.setPointerAction("normal")
       }
     },
     onDoubleClick: () => handleViewPortTap(),
@@ -141,7 +141,7 @@ function EditorContent({
       setTransformMatrix(transformation)
     },
     onDrag: ({ first, last, buttons, touches, movement, event, ...e }) => {
-      if (store.editorMode !== "select" || buttons === 2) {
+      if (store.pointerAction !== "selectionBox" || buttons === 2) {
         const transformation = {
           s: 0,
           x: e.delta[0],
@@ -149,7 +149,7 @@ function EditorContent({
         }
         setTransformMatrix(transformation)
       }
-      if (buttons === 1 && touches === 1 && store.editorMode === "select") {
+      if (buttons === 1 && touches === 1 && store.pointerAction === "selectionBox") {
         first && setBoxOrigin(e.xy)
         !first && setBoxSize(movement)
       }
@@ -160,15 +160,15 @@ function EditorContent({
     <div>
 
       {/* nodes duplication toolbar */}
-      {store.editorMode === "copy" &&
+      {store.selectionAction === "duplicate" &&
         <NodesDuplicationTools />
       }
       {/* nodes transformation toolbar */}
-      {store.editorMode === "normal" &&
+      {store.selectionAction === "move" &&
         <NodesTranformationTools />
       }
       {/* nodes arc toolbar */}
-      {store.editorMode === "arc" &&
+      {store.selectionAction === "arc" &&
         <NodesArcTools />
       }
 
@@ -209,7 +209,7 @@ function EditorContent({
         </g>
 
         {/* arc ghost nodes */}
-        {(store.editorMode === "arc" && store.arcGroups["nnn"] && store.activeNodes.length > 0) && (
+        {(store.selectionAction === "arc" && store.arcGroups["nnn"] && store.activeNodes.length > 0) && (
           <g transform={TransformMatrixStyle()}>
             {store.activeNodes.map((nodeId) => (
               <ArcGroupNode
@@ -260,7 +260,7 @@ function EditorContent({
         }
 
         {/* node addition overlay */}
-        {store.editorMode === "addition" && (
+        {store.pointerAction === "addition" && (
           <NodesAdditionOverlay width={width} height={height} />
         )}
 

@@ -175,7 +175,7 @@ export default function NodesArcTools({
             color="danger"
             isIconOnly
             onClick={() => {
-              store.setEditorMode("normal")
+              store.setPointerAction("normal")
               store.clearActiveNodes()
             }}
           >
@@ -199,7 +199,7 @@ export default function NodesArcTools({
                 })
               })
               store.appendGhostNodes(arcs)
-              store.setEditorMode("normal")
+              store.setPointerAction("normal")
               store.clearActiveNodes()
             }}
           >

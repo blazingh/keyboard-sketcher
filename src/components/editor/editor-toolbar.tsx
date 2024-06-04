@@ -1,7 +1,7 @@
 "use client"
 
 import { useEditorStore } from './stores/editor-store';
-import { BoxSelect, Copy, DraftingCompass, FlipHorizontal, FlipVertical, Move, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
+import { BoxSelect, Copy, DraftingCompass, FlipHorizontal, FlipVertical, Mouse, MousePointer, Move, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Divider } from "@nextui-org/react";
 
@@ -56,47 +56,27 @@ export default function EditorToolbar() {
           variant={"light"}
           isIconOnly
           size='sm'
-          onPress={() => store.setEditorMode("normal")}
+          onPress={() => store.setPointerAction("normal")}
         >
-          <Move className={cn(store.editorMode === "normal" && "text-primary", "w-5 h-5")} />
+          <MousePointer className={cn(store.pointerAction === "normal" && "text-primary", "w-5 h-5")} />
         </Button>
 
         <Button
           variant={"light"}
           isIconOnly
           size='sm'
-          onPress={() => store.setEditorMode("copy")}
+          onPress={() => store.setPointerAction("selectionBox")}
         >
-          <Copy className={cn(store.editorMode === "copy" && "text-primary", "w-5 h-5")} />
+          <BoxSelect className={cn(store.pointerAction === "selectionBox" && "text-primary", "w-5 h-5")} />
         </Button>
 
         <Button
           variant={"light"}
           isIconOnly
           size='sm'
-          onPress={() => store.setEditorMode("arc")}
+          onPress={() => store.setPointerAction("ruler")}
         >
-          <DraftingCompass className={cn(store.editorMode === "arc" && "text-primary", "w-5 h-5")} />
-        </Button>
-
-        <Divider orientation='vertical' className='h-5 mx-2' />
-
-        <Button
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onPress={() => store.setEditorMode("select")}
-        >
-          <BoxSelect className={cn(store.editorMode === "select" && "text-primary", "w-5 h-5")} />
-        </Button>
-
-        <Button
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onPress={() => store.setEditorMode("ruler")}
-        >
-          <Ruler className={cn(store.editorMode === "ruler" && "text-primary", "w-5 h-5")} />
+          <Ruler className={cn(store.pointerAction === "ruler" && "text-primary", "w-5 h-5")} />
         </Button>
 
         <Dropdown>
@@ -106,14 +86,14 @@ export default function EditorToolbar() {
               isIconOnly
               size='sm'
             >
-              <PlusIcon className={cn(store.editorMode === "addition" && "bg-accent text-primary", "w-6 h-6")} />
+              <PlusIcon className={cn(store.pointerAction === "addition" && "bg-accent text-primary", "w-6 h-6")} />
             </Button>
           </DropdownTrigger>
           <DropdownMenu aria-label="Static Actions" disabledKeys={["controller"]}>
             <DropdownItem
               key="switch"
               onPress={() => {
-                store.setEditorMode("addition")
+                store.setPointerAction("addition")
               }}>
               switch
             </DropdownItem>
@@ -125,8 +105,34 @@ export default function EditorToolbar() {
           </DropdownMenu>
         </Dropdown>
 
-
         <Divider orientation='vertical' className='h-5 mx-2' />
+
+        <Button
+          variant={"light"}
+          isIconOnly
+          size='sm'
+          onPress={() => store.setSelectionAction("move")}
+        >
+          <Move className={cn(store.selectionAction === "move" && "text-primary", "w-5 h-5")} />
+        </Button>
+
+        <Button
+          variant={"light"}
+          isIconOnly
+          size='sm'
+          onPress={() => store.setSelectionAction("duplicate")}
+        >
+          <Copy className={cn(store.selectionAction === "duplicate" && "text-primary", "w-5 h-5")} />
+        </Button>
+
+        <Button
+          variant={"light"}
+          isIconOnly
+          size='sm'
+          onPress={() => store.setSelectionAction("arc")}
+        >
+          <DraftingCompass className={cn(store.selectionAction === "arc" && "text-primary", "w-5 h-5")} />
+        </Button>
 
         <Button
           isDisabled={store.activeNodes.length === 0}

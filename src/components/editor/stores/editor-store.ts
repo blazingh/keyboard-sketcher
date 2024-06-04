@@ -57,7 +57,16 @@ type State = {
    * ruler: allows user to select points to measure distances
    * addition: draws an overlay and lets the user add a node
    */
-  editorMode: "normal" | "copy" | "select" | "ruler" | "addition" | "arc"
+  pointerAction: "normal" | "selectionBox" | "ruler" | "addition"
+
+  /* diferent modes to handle different actions 
+   * normal: allows user to pan the viewport, select nodes and move selected nodes
+   * copy: allows user to pan the viewport, select nodes and copy selected nodes
+   * select: allows user to use selection box
+   * ruler: allows user to select points to measure distances
+   * addition: draws an overlay and lets the user add a node
+   */
+  selectionAction: "move" | "duplicate" | "arc"
 
   /* snapLines position */
   snapLines?: GetSnapLinesResult,
@@ -81,7 +90,8 @@ type Action = {
   updateArcGroup: (arc: ArcGroup) => void,
   appendGhostNodes: (arcs: ArcGroup[]) => void,
 
-  setEditorMode: (mode: State["editorMode"]) => void
+  setPointerAction: (action: State["pointerAction"]) => void
+  setSelectionAction: (action: State["selectionAction"]) => void
 
   addActiveNode: (id: Node["id"]) => void
   removeActiveNode: (id: Node["id"]) => void
@@ -118,7 +128,8 @@ const initialNodes: { [key: Node["id"]]: Node } = {
 
 export const initialStoreState: State = {
   nodes: initialNodes,
-  editorMode: "normal",
+  pointerAction: "normal",
+  selectionAction: "move",
   arcGroups: {
     "nnn": {
       id: "nnn",
@@ -160,8 +171,11 @@ export const useEditorStore = create<EditorStoreType>()(
           })
         })
       },
-      setEditorMode: (mode) => {
-        set({ editorMode: mode })
+      setPointerAction: (action) => {
+        set({ pointerAction: action })
+      },
+      setSelectionAction: (action) => {
+        set({ selectionAction: action })
       },
       addNodes: (nodes) => {
         const ids: Node["id"][] = []

@@ -19,18 +19,25 @@ type State = {
 }
 
 type Action = {
-  initViewport: (viewport: State["viewportSize"]) => void
+  initViewport: (viewport: State["viewportSize"], force?: boolean) => void
   setTransformMatrix: (transformation: TransformMatrix) => void
   TransformMatrixStyle: () => string
+  resetState: () => void
+}
+
+export const initiatStoreState: State = {
+  transformMatrix: { x: 0, y: 0, s: 1 },
+  viewportSize: { w: 0, h: 0 },
 }
 
 export type ViewportTransformationStoreType = State & Action
 export const useViewportTransformationStore = create<ViewportTransformationStoreType>()(
   persist((set, get) => ({
-    initViewport: (viewport) => {
+    ...initiatStoreState,
+    initViewport: (viewport, force) => {
       set(produce((state: State) => {
         state.viewportSize = viewport
-        if (state.transformMatrix.x === 0 && state.transformMatrix.y === 0)
+        if (force || (state.transformMatrix.x === 0 && state.transformMatrix.y === 0))
           state.transformMatrix = {
             s: 1,
             x: viewport.w / 2,
@@ -38,8 +45,9 @@ export const useViewportTransformationStore = create<ViewportTransformationStore
           }
       }))
     },
-    transformMatrix: { x: 0, y: 0, s: 1 },
-    viewportSize: { w: 0, h: 0 },
+    resetState: () => {
+      get().initViewport(get().viewportSize, true)
+    },
     TransformMatrixStyle: () => {
       const { x, y, s } = get().transformMatrix
       return `matrix(${s}, ${0}, ${0}, ${s}, ${x}, ${y})`

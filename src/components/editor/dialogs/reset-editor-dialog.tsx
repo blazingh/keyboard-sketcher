@@ -2,15 +2,20 @@
 import { Button, Modal, ModalBody, ModalContent, ModalHeader, ModalProps } from "@nextui-org/react"
 import { X } from "lucide-react"
 import { EditorStoreType, useEditorStore } from "../stores/editor-store";
+import { ViewportTransformationStoreType, useViewportTransformationStore } from "../stores/viewport-transformation-store";
 
 
 const editorStoreSelector = (state: EditorStoreType) => ({
   resetState: state.resetState
 })
+const viewportStoreSelector = (state: ViewportTransformationStoreType) => ({
+  resetState: state.resetState
+})
 
 export default function ResetEditorDialog({ isOpen, onOpenChange }: { isOpen: boolean, onOpenChange: ModalProps["onOpenChange"] }) {
 
-  const { resetState } = useEditorStore(editorStoreSelector)
+  const editor = useEditorStore(editorStoreSelector)
+  const viewport = useViewportTransformationStore(viewportStoreSelector)
 
   return (
     <Modal
@@ -56,7 +61,8 @@ export default function ResetEditorDialog({ isOpen, onOpenChange }: { isOpen: bo
                   <Button
                     color="danger"
                     onPress={() => {
-                      resetState()
+                      editor.resetState()
+                      viewport.resetState()
                       onClose()
                     }}
                   >

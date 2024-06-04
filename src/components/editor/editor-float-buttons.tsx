@@ -4,15 +4,17 @@ import { useState } from "react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Popover, PopoverTrigger, PopoverContent, Listbox, ListboxItem } from "@nextui-org/react";
 import ShareWebsiteDialog from "./dialogs/share-website-dialog";
 import ResetEditorDialog from "./dialogs/reset-editor-dialog";
+import WebsiteInfoDialog from "./dialogs/website-info-dialog";
 
 export function EditorFloatButtons() {
-  const [openModal, setOpenModal] = useState<0 | 1 | 2 | 3>(0)
+  const [openModal, setOpenModal] = useState<0 | 1 | 2 | 3 | 4>(0)
   return (
     <>
 
       <ThreeDModelGeneratorDialog isOpen={openModal === 1} onOpenChange={(state) => setOpenModal(state ? 1 : 0)} />
       <ShareWebsiteDialog isOpen={openModal === 2} onOpenChange={(state) => setOpenModal(state ? 2 : 0)} />
       <ResetEditorDialog isOpen={openModal === 3} onOpenChange={(state) => setOpenModal(state ? 3 : 0)} />
+      <WebsiteInfoDialog isOpen={openModal === 4} onOpenChange={(state) => setOpenModal(state ? 4 : 0)} />
 
       {/* model generation popup trigger */}
       <div className="absolute right-2 top-2">
@@ -71,6 +73,9 @@ export function EditorFloatButtons() {
                     break;
                   case "reset":
                     setOpenModal(3)
+                    break;
+                  case "info":
+                    setOpenModal(4)
                     break;
                   default:
                     break;

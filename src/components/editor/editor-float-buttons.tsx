@@ -1,17 +1,18 @@
-import { Box, CircuitBoard, Info, Menu, Printer, Settings2, Share, Share2, Sparkles, Trash } from "lucide-react";
+import { Box, CircuitBoard, Info, Menu, Printer, Settings2, Share2, Sparkles, Trash } from "lucide-react";
 import ThreeDModelGeneratorDialog from "./dialogs/3d-model-generator";
 import { useState } from "react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Popover, PopoverTrigger, PopoverContent, Listbox, ListboxItem } from "@nextui-org/react";
 import ShareWebsiteDialog from "./dialogs/share-website-dialog";
+import ResetEditorDialog from "./dialogs/reset-editor-dialog";
 
 export function EditorFloatButtons() {
-  const [open, setOpen] = useState(false)
-  const [open2, setOpen2] = useState(false)
+  const [openModal, setOpenModal] = useState<0 | 1 | 2 | 3>(0)
   return (
     <>
 
-      <ThreeDModelGeneratorDialog isOpen={open} onOpenChange={(state) => setOpen(state)} />
-      <ShareWebsiteDialog isOpen={open2} onOpenChange={(state) => setOpen2(state)} />
+      <ThreeDModelGeneratorDialog isOpen={openModal === 1} onOpenChange={(state) => setOpenModal(state ? 1 : 0)} />
+      <ShareWebsiteDialog isOpen={openModal === 2} onOpenChange={(state) => setOpenModal(state ? 2 : 0)} />
+      <ResetEditorDialog isOpen={openModal === 3} onOpenChange={(state) => setOpenModal(state ? 3 : 0)} />
 
       {/* model generation popup trigger */}
       <div className="absolute right-2 top-2">
@@ -29,7 +30,7 @@ export function EditorFloatButtons() {
               key="3dModel"
               startContent={<Box className="mr-2" />}
               onPress={() => {
-                setOpen(true)
+                setOpenModal(1)
               }}
             >
               Generate 3D model
@@ -64,8 +65,15 @@ export function EditorFloatButtons() {
             <Listbox
               aria-label="Actions"
               onAction={(key) => {
-                if (key === "share") {
-                  setOpen2(true)
+                switch (key) {
+                  case "share":
+                    setOpenModal(2)
+                    break;
+                  case "reset":
+                    setOpenModal(3)
+                    break;
+                  default:
+                    break;
                 }
               }}
               className="w-full"

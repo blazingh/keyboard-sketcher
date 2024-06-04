@@ -41,11 +41,9 @@ export type ArcGroup = {
 type State = {
   /* nodes include switch, controllers or any newly added item to the viewport */
   nodes: { [key: Node["id"]]: Node },
-  nodesArray: () => Node[],
 
   /* arcGroup contain nodes spanned along the arc */
   arcGroups: { [key: ArcGroup["id"]]: ArcGroup },
-  arcGroupsArray: () => ArcGroup[],
 
   /* selected Node */
   activeNodes: Node["id"][],
@@ -70,6 +68,9 @@ type State = {
 }
 
 type Action = {
+  arcGroupsArray: () => ArcGroup[],
+  nodesArray: () => Node[],
+
   updateNodes: (newNodes: Node[]) => void
   addNodes: (nodes: Node[]) => Node["id"][]
   deleteNode: (id: Node["id"]) => void
@@ -101,6 +102,7 @@ type Action = {
   flipActiveNodesHorizontally: () => void
   flipActiveNodesVertically: () => void
 
+  resetState: () => void
 }
 
 export const baseNodeState: Node = {
@@ -114,25 +116,37 @@ const initialNodes: { [key: Node["id"]]: Node } = {
   "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: -160, y: 30, r: 0 }, selectable: true }
 }
 
+export const initialStoreState: State = {
+  nodes: initialNodes,
+  editorMode: "normal",
+  arcGroups: {
+    "nnn": {
+      id: "nnn",
+      pos: { x: 0, y: 0, r: 0 },
+      switchCounts: [3, 0, 3, 0],
+      switchGaps: [50, 0, 50, 0],
+      radiuses: [0, 0, 0, 0]
+    }
+  },
+  activeNodes: [],
+  rulerNodes: [],
+  snapLines: { ...defaultSnapLinesResult },
+  activeDxy: { x: 0, y: 0 },
+  activeDisplacement: { x: 0, y: 0, r: 0 },
+}
+
 export type EditorStoreType = State & Action
 export const useEditorStore = create<EditorStoreType>()(
   persist(
     temporal((set, get) => ({
-      nodes: initialNodes,
-      editorMode: "normal",
-      activeNodeAddition: null,
+      ...initialStoreState,
 
-      arcGroups: {
-        "nnn": {
-          id: "nnn",
-          pos: { x: 0, y: 0, r: 0 },
-          switchCounts: [3, 0, 3, 0],
-          switchGaps: [50, 0, 50, 0],
-          radiuses: [0, 0, 0, 0]
-        }
+      resetState: () => {
+        set(initialStoreState)
       },
-      arcGroupsArray: () => Object.values(get().arcGroups),
 
+      nodesArray: () => Object.values(get().nodes),
+      arcGroupsArray: () => Object.values(get().arcGroups),
       updateArcGroup: (arc) => {
         set(produce((state: State) => {
           state.arcGroups[arc.id] = arc
@@ -146,11 +160,9 @@ export const useEditorStore = create<EditorStoreType>()(
           })
         })
       },
-
       setEditorMode: (mode) => {
         set({ editorMode: mode })
       },
-
       addNodes: (nodes) => {
         const ids: Node["id"][] = []
         set(produce((state: State) => {
@@ -169,15 +181,6 @@ export const useEditorStore = create<EditorStoreType>()(
           delete state.nodes[id]
         }))
       },
-
-      nodesArray: () => Object.values(get().nodes),
-      activeNodes: [],
-      rulerNodes: [],
-
-      snapLines: { ...defaultSnapLinesResult },
-      activeDxy: { x: 0, y: 0 },
-      activeDisplacement: { x: 0, y: 0, r: 0 },
-
       setActiveDxy: (xy) => {
         set(produce((state) => {
           state.activeDxy = xy
@@ -188,7 +191,6 @@ export const useEditorStore = create<EditorStoreType>()(
           state.activeDisplacement = displacement
         }))
       },
-
       updateNodes: (newNodes) => {
         set(produce((state: State) => {
           newNodes.forEach(newNode => {
@@ -196,7 +198,6 @@ export const useEditorStore = create<EditorStoreType>()(
           })
         }))
       },
-
       addActiveNode: (id) => {
         set(produce((state: State) => {
           const index = state.activeNodes.findIndex((a: string) => a === id)
@@ -219,7 +220,6 @@ export const useEditorStore = create<EditorStoreType>()(
       clearActiveNodes: () => {
         set({ activeNodes: [] })
       },
-
       addRulerNode: (id) => {
         set(produce((state: State) => {
           const index = state.rulerNodes.findIndex((a: string) => a === id)
@@ -252,14 +252,12 @@ export const useEditorStore = create<EditorStoreType>()(
       clearRulerNodes: () => {
         set({ rulerNodes: [] })
       },
-
       updateSnapLines: (target) => {
         set({ snapLines: getSnapLines(target, get().nodesArray()) })
       },
       resetSnapLines: () => {
         set({ snapLines: undefined })
       },
-
       moveActiveNodes: (displacement) => {
         const { x, y, r } = displacement
         set(produce((state: State) => {
@@ -321,7 +319,6 @@ export const useEditorStore = create<EditorStoreType>()(
           }
         }))
       },
-
     }),
       {
         partialize: (state) => ({ nodes: state.nodes }),

@@ -113,7 +113,7 @@ export function EditorFloatButtons() {
 
       {/* selected tool options */}
       <div className="absolute bottom-2 left-2">
-        <Popover placement="top-start">
+        <Popover placement="top-start" shouldCloseOnInteractOutside={() => false}>
           <PopoverTrigger>
             <Button
               isIconOnly
@@ -122,7 +122,8 @@ export function EditorFloatButtons() {
             </Button>
           </PopoverTrigger>
           <PopoverContent>
-            any
+            <div className="w-[280px] h-[380px]">
+            </div>
           </PopoverContent>
         </Popover>
       </div>

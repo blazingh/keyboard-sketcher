@@ -93,7 +93,7 @@ export function EditorFloatButtons() {
               <ListboxItem
                 key="share"
                 startContent={<Share2 />}
-                description="sahring is caring"
+                description="sharing is caring"
               >
                 Share Website
               </ListboxItem>

@@ -1,13 +1,24 @@
-import { Box, CircuitBoard, Info, Menu, Printer, Settings2, Share2, Sparkles, Trash } from "lucide-react";
+import { Box, CircuitBoard, Info, Menu, Printer, Redo2, Settings2, Share2, Sparkles, Trash, Undo2 } from "lucide-react";
 import ThreeDModelGeneratorDialog from "./dialogs/3d-model-generator";
 import { useState } from "react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Popover, PopoverTrigger, PopoverContent, Listbox, ListboxItem } from "@nextui-org/react";
 import ShareWebsiteDialog from "./dialogs/share-website-dialog";
 import ResetEditorDialog from "./dialogs/reset-editor-dialog";
 import WebsiteInfoDialog from "./dialogs/website-info-dialog";
+import { cn } from "@/lib/utils";
+import { EditorStoreType, useEditorStore } from "./stores/editor-store";
+
+const selector = (state: EditorStoreType) => ({
+  clearRulerNodes: state.clearRulerNodes,
+  clearActiveNodes: state.clearActiveNodes
+});
+
 
 export function EditorFloatButtons() {
   const [openModal, setOpenModal] = useState<0 | 1 | 2 | 3 | 4>(0)
+  const { clearRulerNodes, clearActiveNodes } = useEditorStore(selector)
+  const { undo, redo, pastStates, futureStates } = useEditorStore.temporal.getState();
+
   return (
     <>
 
@@ -112,7 +123,7 @@ export function EditorFloatButtons() {
       </div>
 
       {/* selected tool options */}
-      <div className="absolute bottom-2 left-2">
+      <div className="absolute bottom-2 right-2">
         <Popover placement="top-start" shouldCloseOnInteractOutside={() => false}>
           <PopoverTrigger>
             <Button
@@ -127,6 +138,36 @@ export function EditorFloatButtons() {
           </PopoverContent>
         </Popover>
       </div>
+
+      <div className={cn(
+        ' absolute bottom-2 left-2 bg-default border px-1 py-1 flex items-center justify-center rounded-xl',
+      )}
+      >
+        <Button
+          variant={"light"}
+          isIconOnly
+          size='sm'
+          onClick={() => {
+            clearActiveNodes()
+            clearRulerNodes()
+            undo()
+          }}
+          isDisabled={!pastStates.length}
+        >
+          <Undo2 className='w-5 h-5' />
+        </Button>
+
+        <Button
+          variant={"light"}
+          isIconOnly
+          size='sm'
+          onClick={() => redo()}
+          isDisabled={!futureStates.length}
+        >
+          <Redo2 className='w-5 h-5' />
+        </Button>
+      </div>
+
 
     </>
   )

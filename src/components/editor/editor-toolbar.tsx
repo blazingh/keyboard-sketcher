@@ -7,11 +7,10 @@ import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Divider 
 
 export default function EditorToolbar() {
   const store = useEditorStore()
-  const { undo, redo, pastStates, futureStates } = useEditorStore.temporal.getState();
   return (
-    <div className='absolute w-full p-2 z-20 flex items-center justify-center gap-4 pointer-events-none'>
+    <div className='absolute w-full p-2 z-20 flex items-center justify-center gap-2 pointer-events-none'>
       <div className={cn(
-        'shadow bg-default border px-3 py-1 flex items-center justify-center rounded-xl *:pointer-events-auto',
+        'bg-default border px-1 py-1 flex items-center justify-center rounded-xl *:pointer-events-auto',
       )}
       >
 
@@ -25,32 +24,6 @@ export default function EditorToolbar() {
 
         <Separator orientation='vertical' className='h-6 mx-2' />
         */}
-
-        <Button
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onClick={() => {
-            store.clearActiveNodes()
-            store.clearRulerNodes()
-            undo()
-          }}
-          disabled={!pastStates.length}
-        >
-          <Undo2 className='w-5 h-5' />
-        </Button>
-
-        <Button
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onClick={() => redo()}
-          disabled={!futureStates.length}
-        >
-          <Redo2 className='w-5 h-5' />
-        </Button>
-
-        <Divider orientation='vertical' className='h-5 mx-2' />
 
         <Button
           variant={"light"}

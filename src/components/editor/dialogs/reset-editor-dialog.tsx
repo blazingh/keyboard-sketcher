@@ -40,7 +40,7 @@ export default function ResetEditorDialog({ isOpen, onOpenChange }: { isOpen: bo
               <div className="mb-2 flex flex-col gap-6">
                 <div className="flex flex-col gap-2">
                   <p>
-                    all your changes will be gone. you woun't be able to undo this action.
+                    all your changes will be gone. you woun&#39t be able to undo this action.
                   </p>
                   <p>
                     are you sure you want to reset the editor ?

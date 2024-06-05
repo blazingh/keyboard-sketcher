@@ -167,10 +167,6 @@ function EditorContent({
       {store.selectionAction === "move" &&
         <NodesTranformationTools />
       }
-      {/* nodes arc toolbar */}
-      {store.selectionAction === "arc" &&
-        <NodesArcTools />
-      }
 
       <svg width={width} height={height}  >
 

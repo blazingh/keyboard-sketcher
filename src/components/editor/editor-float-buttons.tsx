@@ -1,22 +1,24 @@
 import { Box, CircuitBoard, Info, Menu, Printer, Redo2, Settings2, Share2, Sparkles, Trash, Undo2 } from "lucide-react";
 import ThreeDModelGeneratorDialog from "./dialogs/3d-model-generator";
 import { useState } from "react";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Popover, PopoverTrigger, PopoverContent, Listbox, ListboxItem } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Popover, PopoverTrigger, PopoverContent, Listbox, ListboxItem, ScrollShadow } from "@nextui-org/react";
 import ShareWebsiteDialog from "./dialogs/share-website-dialog";
 import ResetEditorDialog from "./dialogs/reset-editor-dialog";
 import WebsiteInfoDialog from "./dialogs/website-info-dialog";
 import { cn } from "@/lib/utils";
 import { EditorStoreType, useEditorStore } from "./stores/editor-store";
+import NodesArcTools from "./nodes-arc-tools";
 
 const selector = (state: EditorStoreType) => ({
   clearRulerNodes: state.clearRulerNodes,
-  clearActiveNodes: state.clearActiveNodes
+  clearActiveNodes: state.clearActiveNodes,
+  selectionAction: state.selectionAction,
 });
 
 
 export function EditorFloatButtons() {
   const [openModal, setOpenModal] = useState<0 | 1 | 2 | 3 | 4>(0)
-  const { clearRulerNodes, clearActiveNodes } = useEditorStore(selector)
+  const { clearRulerNodes, clearActiveNodes, selectionAction } = useEditorStore(selector)
   const { undo, redo, pastStates, futureStates } = useEditorStore.temporal.getState();
 
   return (
@@ -133,8 +135,12 @@ export function EditorFloatButtons() {
             </Button>
           </PopoverTrigger>
           <PopoverContent>
-            <div className="w-[280px] h-[380px]">
-            </div>
+            <ScrollShadow className="w-[280px] max-h-[380px] relative">
+              {/* nodes arc toolbar */}
+              {selectionAction === "arc" &&
+                <NodesArcTools />
+              }
+            </ScrollShadow>
           </PopoverContent>
         </Popover>
       </div>

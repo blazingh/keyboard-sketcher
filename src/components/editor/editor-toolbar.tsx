@@ -1,7 +1,7 @@
 "use client"
 
 import { useEditorStore } from './stores/editor-store';
-import { BoxSelect, Copy, DraftingCompass, FlipHorizontal, FlipVertical, Mouse, MousePointer, Move, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
+import { BookTemplate, BoxSelect, Copy, DraftingCompass, FlipHorizontal, FlipVertical, Mouse, MousePointer, Move, PlusIcon, Redo2, Ruler, Trash2, Undo2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Divider } from "@nextui-org/react";
 
@@ -10,7 +10,28 @@ export default function EditorToolbar() {
   return (
     <div className='absolute w-full p-2 z-20 flex items-center justify-center gap-2 pointer-events-none'>
       <div className={cn(
-        'bg-default border px-1 py-1 flex items-center justify-center rounded-xl *:pointer-events-auto',
+        'bg-default border px-1 py-1 items-center justify-center rounded-xl *:pointer-events-auto flex sm:hidden',
+      )}
+      >
+        <Dropdown>
+          <DropdownTrigger>
+            <Button
+              variant="bordered"
+              size='sm'
+              isIconOnly
+            >
+              <BookTemplate />
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu aria-label="Static Actions">
+            <DropdownItem key="new">
+              New file
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      </div>
+      <div className={cn(
+        'bg-default border px-1 py-1 items-center justify-center rounded-xl *:pointer-events-auto hidden sm:flex',
       )}
       >
 

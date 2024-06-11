@@ -18,6 +18,8 @@ import NodesDuplicationTools from './nodes-duplication-tools';
 import { normalizeAngle } from './lib/nodes-utils';
 import { ArcGroupNode } from './nodes/arc-group-node';
 import NodesArcTools from './nodes-arc-tools';
+import { SelectionAcitonStore } from './stores/selection-actions-store';
+import { PointerAcitonStore } from './stores/pointer-actions-store';
 
 
 const editorWidth = 1500
@@ -79,6 +81,9 @@ function EditorContent({
 }) {
 
   const store = useEditorStore()
+  const selectionAction = SelectionAcitonStore()
+  const pointerAction = PointerAcitonStore()
+
   const { initViewport, transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
 
   useEffect(() => {
@@ -93,7 +98,6 @@ function EditorContent({
 
   function handleViewPortTap() {
     store.clearActiveNodes()
-    store.clearRulerNodes()
   }
 
   const [boxOrigin, setBoxOrigin] = useState([0, 0])
@@ -103,7 +107,7 @@ function EditorContent({
     onContextMenu: (e) => e.event.preventDefault(),
     onDragStart: () => { },
     onDragEnd: () => {
-      if (store.pointerAction === "selectionBox") {
+      if (pointerAction.selectedMode === "selectionBox") {
         const box = {
           x: (Math.min(0, boxSize[0]) + boxOrigin[0] - transformMatrix.x) / transformMatrix.s,
           y: (Math.min(0, boxSize[1]) + boxOrigin[1] - transformMatrix.y) / transformMatrix.s,
@@ -116,7 +120,7 @@ function EditorContent({
           }
         })
         setBoxSize([0, 0])
-        store.setPointerAction("normal")
+        pointerAction.setSelectedMode("normal")
       }
     },
     onDoubleClick: () => handleViewPortTap(),
@@ -141,7 +145,7 @@ function EditorContent({
       setTransformMatrix(transformation)
     },
     onDrag: ({ first, last, buttons, touches, movement, event, ...e }) => {
-      if (store.pointerAction !== "selectionBox" || buttons === 2) {
+      if (pointerAction.selectedMode !== "selectionBox" || buttons === 2) {
         const transformation = {
           s: 0,
           x: e.delta[0],
@@ -149,7 +153,7 @@ function EditorContent({
         }
         setTransformMatrix(transformation)
       }
-      if (buttons === 1 && touches === 1 && store.pointerAction === "selectionBox") {
+      if (buttons === 1 && touches === 1 && pointerAction.selectedMode === "selectionBox") {
         first && setBoxOrigin(e.xy)
         !first && setBoxSize(movement)
       }
@@ -160,11 +164,11 @@ function EditorContent({
     <div>
 
       {/* nodes duplication toolbar */}
-      {store.selectionAction === "duplicate" &&
+      {selectionAction.selectedMode === "copy" &&
         <NodesDuplicationTools />
       }
       {/* nodes transformation toolbar */}
-      {store.selectionAction === "move" &&
+      {selectionAction.selectedMode === "move" &&
         <NodesTranformationTools />
       }
 
@@ -205,13 +209,13 @@ function EditorContent({
         </g>
 
         {/* arc ghost nodes */}
-        {(store.selectionAction === "arc" && store.arcGroups["nnn"] && store.activeNodes.length > 0) && (
+        {(selectionAction.selectedMode === "arc" && store.activeNodes.length > 0) && (
           <g transform={TransformMatrixStyle()}>
             {store.activeNodes.map((nodeId) => (
               <ArcGroupNode
                 key={nodeId}
                 arc={{
-                  ...store.arcGroups["nnn"],
+                  ...store.arcState,
                   pos: {
                     x: store.nodes[nodeId].pos.x + store.activeDisplacement.x,
                     y: store.nodes[nodeId].pos.y + store.activeDisplacement.y,
@@ -256,14 +260,10 @@ function EditorContent({
         }
 
         {/* node addition overlay */}
-        {store.pointerAction === "addition" && (
+        {pointerAction.selectedMode === "addition" && (
           <NodesAdditionOverlay width={width} height={height} />
         )}
 
-        {/* measure ruler */}
-        {store.rulerNodes.length === 2 && (
-          <EditorRuler />
-        )}
 
       </svg>
 

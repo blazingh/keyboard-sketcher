@@ -1,4 +1,4 @@
-import { ArcGroup, useEditorStore } from "./stores/editor-store"
+import { useEditorStore } from "./stores/editor-store"
 import { produce } from "immer"
 import isDeepEqual from 'fast-deep-equal';
 import SimpleNumberInput from "../simple-number-input"
@@ -21,8 +21,7 @@ export default function NodesArcTools({
     || !isDeepEqual(store.activeDxy, { x: 0, y: 0 })
   ) return null
 
-  const arc = store.arcGroupsArray()[0]
-  if (!arc) return null
+  const arc = store.arcState
 
   return (
     <div
@@ -53,7 +52,7 @@ export default function NodesArcTools({
                   label={"Switches count"}
                   defaultValue={String(arc.switchCounts[index])}
                   onNumberChange={(v) => {
-                    store.updateArcGroup(produce(arc, draft => {
+                    store.updateArcState(produce(arc, draft => {
                       draft.switchCounts[index] = Math.max(0, v)
                     }))
                   }}
@@ -66,7 +65,7 @@ export default function NodesArcTools({
                   label="Swtiches spacing"
                   defaultValue={String(arc.switchGaps[index])}
                   onValueChange={(v) => {
-                    store.updateArcGroup(produce(arc, draft => {
+                    store.updateArcState(produce(arc, draft => {
                       draft.switchGaps[index] = Math.max(0, parseInt(v))
                     }))
                   }}
@@ -79,7 +78,7 @@ export default function NodesArcTools({
                   step={5}
                   size="sm"
                   onChange={(v: any) => {
-                    store.updateArcGroup(produce(arc, draft => {
+                    store.updateArcState(produce(arc, draft => {
                       if (!(draft.switchGaps[index] === 0 && v < 0))
                         draft.switchGaps[index] = Math.max(
                           0,
@@ -100,7 +99,7 @@ export default function NodesArcTools({
                   label="Arc radius"
                   defaultValue={String(arc.radiuses[index])}
                   onValueChange={(v) => {
-                    store.updateArcGroup(produce(arc, draft => {
+                    store.updateArcState(produce(arc, draft => {
                       draft.radiuses[index] = Math.max(0, parseInt(v))
                     }))
                   }}
@@ -113,7 +112,7 @@ export default function NodesArcTools({
                   step={10}
                   size="sm"
                   onChange={(v: any) => {
-                    store.updateArcGroup(produce(arc, draft => {
+                    store.updateArcState(produce(arc, draft => {
                       if (!(draft.radiuses[index] === 0 && v < 0))
                         draft.radiuses[index] = Math.max(
                           0,
@@ -140,7 +139,6 @@ export default function NodesArcTools({
           color="danger"
           isIconOnly
           onClick={() => {
-            store.setPointerAction("normal")
             store.clearActiveNodes()
           }}
         >
@@ -152,20 +150,7 @@ export default function NodesArcTools({
           color="primary"
           isIconOnly
           onClick={() => {
-            const arcs: ArcGroup[] = []
-            store.activeNodes.map((nodeId) => {
-              arcs.push({
-                ...store.arcGroups["nnn"],
-                pos: {
-                  x: store.nodes[nodeId].pos.x + store.activeDisplacement.x,
-                  y: store.nodes[nodeId].pos.y + store.activeDisplacement.y,
-                  r: store.nodes[nodeId].pos.r + store.activeDisplacement.r,
-                }
-              })
-            })
-            store.appendGhostNodes(arcs)
-            store.setPointerAction("normal")
-            store.setSelectionAction("move")
+            store.appendGhostNodes()
             store.clearActiveNodes()
           }}
         >

@@ -8,17 +8,17 @@ import WebsiteInfoDialog from "./dialogs/website-info-dialog";
 import { cn } from "@/lib/utils";
 import { EditorStoreType, useEditorStore } from "./stores/editor-store";
 import NodesArcTools from "./nodes-arc-tools";
+import { SelectionAcitonStore } from "./stores/selection-actions-store";
 
 const selector = (state: EditorStoreType) => ({
-  clearRulerNodes: state.clearRulerNodes,
   clearActiveNodes: state.clearActiveNodes,
-  selectionAction: state.selectionAction,
 });
 
 
 export function EditorFloatButtons() {
   const [openModal, setOpenModal] = useState<0 | 1 | 2 | 3 | 4>(0)
-  const { clearRulerNodes, clearActiveNodes, selectionAction } = useEditorStore(selector)
+  const { clearActiveNodes } = useEditorStore(selector)
+  const selectionAction = SelectionAcitonStore()
   const { undo, redo, pastStates, futureStates } = useEditorStore.temporal.getState();
 
   return (
@@ -137,7 +137,7 @@ export function EditorFloatButtons() {
           <PopoverContent>
             <ScrollShadow className="w-[280px] max-h-[380px] relative">
               {/* nodes arc toolbar */}
-              {selectionAction === "arc" &&
+              {selectionAction.selectedMode === "arc" &&
                 <NodesArcTools />
               }
             </ScrollShadow>
@@ -155,7 +155,6 @@ export function EditorFloatButtons() {
           size='sm'
           onClick={() => {
             clearActiveNodes()
-            clearRulerNodes()
             undo()
           }}
           isDisabled={!pastStates.length}

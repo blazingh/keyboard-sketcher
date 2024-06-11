@@ -1,4 +1,4 @@
-import { Box, CircuitBoard, Info, Menu, Printer, Redo2, Settings2, Share2, Sparkles, Trash, Undo2 } from "lucide-react";
+import { Box, CircuitBoard, Copy, DraftingCompass, FlipHorizontal, FlipVertical, Info, Menu, Move, Printer, Redo2, Settings2, Share2, Sparkles, Trash, Trash2, Undo2 } from "lucide-react";
 import ThreeDModelGeneratorDialog from "./dialogs/3d-model-generator";
 import { useState } from "react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Popover, PopoverTrigger, PopoverContent, Listbox, ListboxItem, ScrollShadow } from "@nextui-org/react";
@@ -12,12 +12,13 @@ import { SelectionAcitonStore } from "./stores/selection-actions-store";
 
 const selector = (state: EditorStoreType) => ({
   clearActiveNodes: state.clearActiveNodes,
+  activeNodes: state.activeNodes,
 });
 
 
 export function EditorFloatButtons() {
   const [openModal, setOpenModal] = useState<0 | 1 | 2 | 3 | 4>(0)
-  const { clearActiveNodes } = useEditorStore(selector)
+  const { clearActiveNodes, activeNodes } = useEditorStore(selector)
   const selectionAction = SelectionAcitonStore()
   const { undo, redo, pastStates, futureStates } = useEditorStore.temporal.getState();
 
@@ -125,17 +126,22 @@ export function EditorFloatButtons() {
       </div>
 
       {/* selected tool options */}
-      <div className="absolute bottom-2 right-2">
-        <Popover placement="top-start" shouldCloseOnInteractOutside={() => false}>
+      <div
+        className={cn(
+          ' absolute bottom-2 right-2 bg-default p-1 flex flex-col items-center justify-center rounded-xl',
+        )}
+      >
+        <Popover placement="left-start" shouldCloseOnInteractOutside={() => false}>
           <PopoverTrigger>
             <Button
               isIconOnly
+              size='sm'
             >
               <Settings2 className="w-5 h-5" />
             </Button>
           </PopoverTrigger>
           <PopoverContent>
-            <ScrollShadow className="w-[280px] max-h-[380px] relative">
+            <ScrollShadow className="w-[260px] max-h-[380px] relative">
               {/* nodes arc toolbar */}
               {selectionAction.selectedMode === "arc" &&
                 <NodesArcTools />
@@ -143,6 +149,59 @@ export function EditorFloatButtons() {
             </ScrollShadow>
           </PopoverContent>
         </Popover>
+        <Button
+          variant={"light"}
+          isIconOnly
+          size='sm'
+          onPress={() => selectionAction.setSelectedMode("move")}
+        >
+          <Move className={cn(selectionAction.selectedMode === "move" && "text-primary", "w-5 h-5")} />
+        </Button>
+
+        <Button
+          variant={"light"}
+          isIconOnly
+          size='sm'
+          onPress={() => selectionAction.setSelectedMode("copy")}
+        >
+          <Copy className={cn(selectionAction.selectedMode === "copy" && "text-primary", "w-5 h-5")} />
+        </Button>
+
+        <Button
+          variant={"light"}
+          isIconOnly
+          size='sm'
+          onPress={() => selectionAction.setSelectedMode("arc")}
+        >
+          <DraftingCompass className={cn(selectionAction.selectedMode === "arc" && "text-primary", "w-5 h-5")} />
+        </Button>
+
+        <Button
+          variant={"light"}
+          isIconOnly
+          size='sm'
+          onClick={() => selectionAction.handleMirrorHor()}
+        >
+          <FlipHorizontal className='w-5 h-5' />
+        </Button>
+
+        <Button
+          variant={"light"}
+          isIconOnly
+          size='sm'
+          onClick={() => selectionAction.handleMirrorVer()}
+        >
+          <FlipVertical className='w-5 h-5' />
+        </Button>
+        <Button
+          variant={"light"}
+          isIconOnly
+          size='sm'
+          onClick={() => /*store.deleteActiveNodes()*/null}
+        >
+          <Trash2 className=' text-red-500 w-5 h-5 ' />
+        </Button>
+
       </div>
 
       <div className={cn(

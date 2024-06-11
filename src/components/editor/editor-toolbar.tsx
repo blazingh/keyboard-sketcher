@@ -15,28 +15,7 @@ export default function EditorToolbar() {
   return (
     <div className='absolute w-full p-2 z-20 flex items-center justify-center gap-2 pointer-events-none'>
       <div className={cn(
-        'bg-default border px-1 py-1 items-center justify-center rounded-xl *:pointer-events-auto flex sm:hidden',
-      )}
-      >
-        <Dropdown>
-          <DropdownTrigger>
-            <Button
-              variant="bordered"
-              size='sm'
-              isIconOnly
-            >
-              <BookTemplate />
-            </Button>
-          </DropdownTrigger>
-          <DropdownMenu aria-label="Static Actions">
-            <DropdownItem key="new">
-              New file
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
-      </div>
-      <div className={cn(
-        'bg-default border px-1 py-1 items-center justify-center rounded-xl *:pointer-events-auto hidden sm:flex',
+        'bg-default p-1 items-center justify-center rounded-xl *:pointer-events-auto',
       )}
       >
 
@@ -52,30 +31,33 @@ export default function EditorToolbar() {
         */}
 
         <Button
-          variant={"light"}
+          variant={pointerAction.selectedMode === "normal" ? "bordered" : "light"}
+          color={pointerAction.selectedMode === "normal" ? "primary" : "default"}
           isIconOnly
           size='sm'
           onPress={() => pointerAction.setSelectedMode("normal")}
         >
-          <MousePointer className={cn(pointerAction.selectedMode === "normal" && "text-primary", "w-5 h-5")} />
+          <MousePointer className={cn("w-5 h-5")} />
         </Button>
 
         <Button
-          variant={"light"}
+          variant={pointerAction.selectedMode === "selectionBox" ? "bordered" : "light"}
+          color={pointerAction.selectedMode === "selectionBox" ? "primary" : "default"}
           isIconOnly
           size='sm'
           onPress={() => pointerAction.setSelectedMode("selectionBox")}
         >
-          <BoxSelect className={cn(pointerAction.selectedMode === "selectionBox" && "text-primary", "w-5 h-5")} />
+          <BoxSelect className={cn("w-5 h-5")} />
         </Button>
 
         <Button
-          variant={"light"}
+          variant={pointerAction.selectedMode === "ruler" ? "bordered" : "light"}
+          color={pointerAction.selectedMode === "ruler" ? "primary" : "default"}
           isIconOnly
           size='sm'
           onPress={() => pointerAction.setSelectedMode("ruler")}
         >
-          <Ruler className={cn(pointerAction.selectedMode === "ruler" && "text-primary", "w-5 h-5")} />
+          <Ruler className={cn("w-5 h-5")} />
         </Button>
 
         <Dropdown>
@@ -103,68 +85,6 @@ export default function EditorToolbar() {
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
-
-        <Divider orientation='vertical' className='h-5 mx-2' />
-
-        <Button
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onPress={() => selectionAction.setSelectedMode("move")}
-        >
-          <Move className={cn(selectionAction.selectedMode === "move" && "text-primary", "w-5 h-5")} />
-        </Button>
-
-        <Button
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onPress={() => selectionAction.setSelectedMode("copy")}
-        >
-          <Copy className={cn(selectionAction.selectedMode === "copy" && "text-primary", "w-5 h-5")} />
-        </Button>
-
-        <Button
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onPress={() => selectionAction.setSelectedMode("arc")}
-        >
-          <DraftingCompass className={cn(selectionAction.selectedMode === "arc" && "text-primary", "w-5 h-5")} />
-        </Button>
-
-        <Button
-          isDisabled={store.activeNodes.length === 0}
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onClick={() => selectionAction.handleMirrorHor()}
-          disabled={!store.activeNodes.length}
-        >
-          <FlipHorizontal className='w-5 h-5' />
-        </Button>
-
-        <Button
-          isDisabled={store.activeNodes.length === 0}
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onClick={() => selectionAction.handleMirrorVer()}
-          disabled={!store.activeNodes.length}
-        >
-          <FlipVertical className='w-5 h-5' />
-        </Button>
-
-        <Button
-          isDisabled={store.activeNodes.length === 0}
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onClick={() => store.deleteActiveNodes()}
-          disabled={!store.activeNodes.length}
-        >
-          <Trash2 className=' text-red-500 w-5 h-5 ' />
-        </Button>
 
       </div>
     </div >

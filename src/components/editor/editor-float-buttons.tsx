@@ -9,6 +9,9 @@ import { cn } from "@/lib/utils";
 import { EditorStoreType, useEditorStore } from "./stores/editor-store";
 import NodesArcTools from "./nodes-arc-tools";
 import { SelectionAcitonStore } from "./stores/selection-actions-store";
+import { selectionActionsOptions } from "./constants/actions";
+import { actionAsyncStorage } from "next/dist/client/components/action-async-storage-instance";
+import SelectionActionFloatButtons from "./floatingButtons/selection-action";
 
 const selector = (state: EditorStoreType) => ({
   clearActiveNodes: state.clearActiveNodes,
@@ -125,88 +128,19 @@ export function EditorFloatButtons() {
         </Popover>
       </div>
 
-      {/* selected tool options */}
+      {/* selection options buttons */}
       <div
         className={cn(
-          ' absolute bottom-2 right-2 bg-default p-1 flex flex-col items-center justify-center rounded-xl',
+          "absolute bottom-2 right-2 bg-default p-1 rounded-xl",
         )}
       >
-        <Popover placement="left-start" shouldCloseOnInteractOutside={() => false}>
-          <PopoverTrigger>
-            <Button
-              isIconOnly
-              size='sm'
-            >
-              <Settings2 className="w-5 h-5" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent>
-            <ScrollShadow className="w-[260px] max-h-[380px] relative">
-              {/* nodes arc toolbar */}
-              {selectionAction.selectedMode === "arc" &&
-                <NodesArcTools />
-              }
-            </ScrollShadow>
-          </PopoverContent>
-        </Popover>
-        <Button
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onPress={() => selectionAction.setSelectedMode("move")}
-        >
-          <Move className={cn(selectionAction.selectedMode === "move" && "text-primary", "w-5 h-5")} />
-        </Button>
-
-        <Button
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onPress={() => selectionAction.setSelectedMode("copy")}
-        >
-          <Copy className={cn(selectionAction.selectedMode === "copy" && "text-primary", "w-5 h-5")} />
-        </Button>
-
-        <Button
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onPress={() => selectionAction.setSelectedMode("arc")}
-        >
-          <DraftingCompass className={cn(selectionAction.selectedMode === "arc" && "text-primary", "w-5 h-5")} />
-        </Button>
-
-        <Button
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onClick={() => selectionAction.handleMirrorHor()}
-        >
-          <FlipHorizontal className='w-5 h-5' />
-        </Button>
-
-        <Button
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onClick={() => selectionAction.handleMirrorVer()}
-        >
-          <FlipVertical className='w-5 h-5' />
-        </Button>
-        <Button
-          variant={"light"}
-          isIconOnly
-          size='sm'
-          onClick={() => /*store.deleteActiveNodes()*/null}
-        >
-          <Trash2 className=' text-red-500 w-5 h-5 ' />
-        </Button>
-
+        <SelectionActionFloatButtons />
       </div>
 
-      <div className={cn(
-        ' absolute bottom-2 left-2 bg-default border px-1 py-1 flex items-center justify-center rounded-xl',
-      )}
+      <div
+        className={cn(
+          "absolute bottom-2 left-2 bg-default p-1 flex items-center justify-center rounded-xl",
+        )}
       >
         <Button
           variant={"light"}

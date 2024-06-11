@@ -25,7 +25,7 @@ export default function NodesArcTools({
 
   return (
     <div
-      className='flex flex-col gap-6'
+      className='flex flex-col gap-4'
     >
       <Tabs
         aria-label="sides"
@@ -35,6 +35,7 @@ export default function NodesArcTools({
           panel: "p-0 m-0"
         }}
         fullWidth
+        size="sm"
       >
         {["left", "up", "right", "down"].map((side, index) => [0, 2].includes(index) && (
           <Tab
@@ -44,11 +45,12 @@ export default function NodesArcTools({
               if (side === "right") return <ArrowRightSquare />
               return "A"
             }()}>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
 
               {/* nodes count */}
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1 mb-1">
                 <SimpleNumberInput
+                  size="sm"
                   label={"Switches count"}
                   defaultValue={String(arc.switchCounts[index])}
                   onNumberChange={(v) => {
@@ -62,6 +64,7 @@ export default function NodesArcTools({
               {/* nodes spacing */}
               <div >
                 <InputWithKeypad
+                  size="sm"
                   label="Swtiches spacing"
                   defaultValue={String(arc.switchGaps[index])}
                   onValueChange={(v) => {
@@ -96,6 +99,7 @@ export default function NodesArcTools({
               {/* arc radius */}
               <div >
                 <InputWithKeypad
+                  size="sm"
                   label="Arc radius"
                   defaultValue={String(arc.radiuses[index])}
                   onValueChange={(v) => {
@@ -136,6 +140,7 @@ export default function NodesArcTools({
 
         {/* cancel button */}
         <Button
+          size="sm"
           color="danger"
           isIconOnly
           onClick={() => {
@@ -147,6 +152,7 @@ export default function NodesArcTools({
 
         {/* confirm button */}
         <Button
+          size="sm"
           color="primary"
           isIconOnly
           onClick={() => {

@@ -33,6 +33,7 @@ export default function SimpleNumberInput({ onNumberChange, defaultValue, ...pro
       />
 
       <Button
+        size={props.size}
         color="default"
         isIconOnly
         className="absolute bottom-2 right-2"
@@ -44,6 +45,7 @@ export default function SimpleNumberInput({ onNumberChange, defaultValue, ...pro
       </Button>
 
       <Button
+        size={props.size}
         color="default"
         isIconOnly
         className="absolute bottom-2 left-2"

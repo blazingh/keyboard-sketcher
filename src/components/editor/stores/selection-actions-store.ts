@@ -2,7 +2,7 @@ import { create } from "zustand"
 
 
 type State = {
-  selectedMode: "move" | "copy" | "arc"
+  selectedMode: "move" | "copy" | "arc" | "flipH" | "flipV" | "delete"
 }
 type Action = {
   setSelectedMode: (mode: State["selectedMode"]) => void

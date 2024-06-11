@@ -2,13 +2,8 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Button, ButtonProps } from "./ui/button";
 import { Check, Delete, Trash, Trash2, X } from "lucide-react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
 import { cn } from "@/lib/utils";
-import { Input, InputProps } from "@nextui-org/react";
+import { Input, InputProps, Popover, PopoverContent, PopoverTrigger } from "@nextui-org/react";
 
 export default function InputWithKeypad({ onValueChange, defaultValue, ...props }: { onValueChange?: (v: string) => void } & InputProps) {
 
@@ -72,26 +67,26 @@ export default function InputWithKeypad({ onValueChange, defaultValue, ...props 
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger className="w-full">
-
-        <Input
-          /* @ts-ignore */
-          {...props}
-          /* @ts-ignore */
-          classNames={{
-            inputWrapper: open && "ring-2 ring-ring"
-          }}
-          className={cn(
-            props.className,
-            "pointer-events-none",
-          )}
-          value={value}
-          readOnly
-        />
-
+    <Popover isOpen={open} onOpenChange={setOpen} placement="right" >
+      <PopoverTrigger>
+        <div>
+          <Input
+            /* @ts-ignore */
+            {...props}
+            /* @ts-ignore */
+            classNames={{
+              inputWrapper: open && "ring-2 ring-ring"
+            }}
+            className={cn(
+              props.className,
+              "pointer-events-none",
+            )}
+            value={value}
+            readOnly
+          />
+        </div>
       </PopoverTrigger>
-      <PopoverContent className="w-fit h-fit p-2" align="end">
+      <PopoverContent className="w-fit h-fit p-2">
 
         <div className="grid grid-cols-4 *:w-8 *:h-8 w-fit gap-1">
           {buttons.map((key) => (

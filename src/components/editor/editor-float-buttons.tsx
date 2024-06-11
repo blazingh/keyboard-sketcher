@@ -1,23 +1,20 @@
-import { Box, CircuitBoard, Copy, DraftingCompass, FlipHorizontal, FlipVertical, Info, Menu, Move, Printer, Redo2, Settings2, Share2, Sparkles, Trash, Trash2, Undo2 } from "lucide-react";
+import { Box, CircuitBoard, Info, Menu, Printer, Redo2, Share2, Sparkles, Trash, Undo2 } from "lucide-react";
 import ThreeDModelGeneratorDialog from "./dialogs/3d-model-generator";
 import { useState } from "react";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Popover, PopoverTrigger, PopoverContent, Listbox, ListboxItem, ScrollShadow } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Popover, PopoverTrigger, PopoverContent, Listbox, ListboxItem } from "@nextui-org/react";
 import ShareWebsiteDialog from "./dialogs/share-website-dialog";
 import ResetEditorDialog from "./dialogs/reset-editor-dialog";
 import WebsiteInfoDialog from "./dialogs/website-info-dialog";
 import { cn } from "@/lib/utils";
 import { EditorStoreType, useEditorStore } from "./stores/editor-store";
-import NodesArcTools from "./nodes-arc-tools";
 import { SelectionAcitonStore } from "./stores/selection-actions-store";
-import { selectionActionsOptions } from "./constants/actions";
-import { actionAsyncStorage } from "next/dist/client/components/action-async-storage-instance";
 import SelectionActionFloatButtons from "./floatingButtons/selection-action";
+
 
 const selector = (state: EditorStoreType) => ({
   clearActiveNodes: state.clearActiveNodes,
   activeNodes: state.activeNodes,
 });
-
 
 export function EditorFloatButtons() {
   const [openModal, setOpenModal] = useState<0 | 1 | 2 | 3 | 4>(0)

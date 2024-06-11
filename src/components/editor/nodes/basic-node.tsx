@@ -5,6 +5,7 @@ import { useGesture } from "@use-gesture/react";
 import { cn } from "@/lib/utils";
 import { useViewportTransformationStore } from "../stores/viewport-transformation-store";
 import { normalizeAngle } from '../lib/nodes-utils';
+import { PointerAcitonStore } from '../stores/pointer-actions-store';
 
 
 const selector = (state: EditorStoreType) => ({
@@ -17,7 +18,6 @@ const selector = (state: EditorStoreType) => ({
   activeDisplacement: state.activeDisplacement,
   setActiveDisplacement: state.setActiveDisplacement,
 
-  pointeAction: state.pointerAction,
 })
 
 export function BasicNode({
@@ -36,8 +36,9 @@ export function BasicNode({
     activeDisplacement,
     setActiveDisplacement,
 
-    pointeAction,
   } = useEditorStore(selector)
+
+  const pointerAction = PointerAcitonStore()
 
   const { initViewport, transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
 
@@ -103,7 +104,7 @@ export function BasicNode({
         }}
       >
       </rect>
-      {(nodeActive && pointeAction === "normal") &&
+      {(nodeActive && pointerAction.selectedMode === "normal") &&
         <text
           x={x}
           y={y}

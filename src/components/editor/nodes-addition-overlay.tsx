@@ -3,11 +3,13 @@ import { useGesture } from "@use-gesture/react";
 import { produce } from "immer";
 import { useEffect, useRef } from "react";
 import { useViewportTransformationStore } from "./stores/viewport-transformation-store";
+import { PointerAcitonStore } from "./stores/pointer-actions-store";
 
 export default function NodesAdditionOverlay({ width, height }: { width: number, height: number }) {
 
   const store = useEditorStore()
   const { transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
+  const pointerAction = PointerAcitonStore()
 
   const ref = useRef<any>(!null)
 
@@ -26,7 +28,7 @@ export default function NodesAdditionOverlay({ width, height }: { width: number,
       store.addNodes([produce(node, (draft: Node) => {
         draft.pos = pos
       })])
-      store.setPointerAction("normal")
+      pointerAction.setSelectedMode("normal")
     },
   })
 

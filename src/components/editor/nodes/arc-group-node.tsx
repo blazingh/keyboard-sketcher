@@ -1,9 +1,9 @@
-import { ArcGroup, Node, Pos, baseNodeState } from "../stores/editor-store"
+import { ArcState, Node, Pos, baseNodeState } from "../stores/editor-store"
 import { produce } from "immer"
 import { BasicNode } from "./basic-node";
 import { rotatePoint } from "../lib/Pos-utils";
 
-export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
+export function ArcGroupNode({ arc }: { arc: ArcState }) {
 
   return (
     arcsGhostNodes(arc).map((arc, index) => (
@@ -22,7 +22,7 @@ export function ArcGroupNode({ arc }: { arc: ArcGroup }) {
   )
 }
 
-export function arcsGhostNodes(arc: ArcGroup): { ghostNodes: Node[], arcPath: string }[] {
+export function arcsGhostNodes(arc: ArcState): { ghostNodes: Node[], arcPath: string }[] {
 
   const {
     switchGaps,

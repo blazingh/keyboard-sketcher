@@ -1,6 +1,6 @@
 import { ReactNode } from "react"
 import { EditorStoreType } from "../stores/editor-store"
-import { BoxSelect, Copy, DraftingCompass, Hand, MousePointer, Move, Plus, Ruler } from "lucide-react"
+import { BoxSelect, Copy, DraftingCompass, FlipHorizontal, FlipVertical, Hand, MousePointer, Move, Plus, Ruler, Trash2 } from "lucide-react"
 import { SelectionActionStoreType } from "../stores/selection-actions-store"
 import { PointerActionStoreType } from "../stores/pointer-actions-store"
 
@@ -11,7 +11,7 @@ type selectionAction = {
   icon: ReactNode
 }
 
-export const selcetionActionsOptions: selectionAction[] = [
+export const selectionActionsOptions: selectionAction[] = [
   {
     label: "move",
     description: "translate and rotate items",
@@ -32,21 +32,21 @@ export const selcetionActionsOptions: selectionAction[] = [
   },
   {
     label: "flip H",
-    description: "flip items horizontaly",
-    value: "arc",
-    icon: <DraftingCompass className="w-5 h-5" />
+    description: "flip items horizontally",
+    value: "flipH",
+    icon: <FlipHorizontal className="w-5 h-5" />
   },
   {
-    label: "arc",
-    description: "create nodes on an arc path",
-    value: "arc",
-    icon: <DraftingCompass className="w-5 h-5" />
+    label: "flip V",
+    description: "flip items vertically",
+    value: "flipV",
+    icon: <FlipVertical className="w-5 h-5" />
   },
   {
-    label: "arc",
-    description: "create nodes on an arc path",
-    value: "arc",
-    icon: <DraftingCompass className="w-5 h-5" />
+    label: "delete",
+    description: "delete selected items",
+    value: "delete",
+    icon: <Trash2 className="w-5 h-5 text-red-500" />
   },
 ]
 

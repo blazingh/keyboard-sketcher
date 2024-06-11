@@ -1,6 +1,6 @@
 import { ReactNode } from "react"
 import { EditorStoreType } from "../stores/editor-store"
-import { BoxSelect, Copy, DraftingCompass, MousePointer, Move, Plus, Ruler } from "lucide-react"
+import { BoxSelect, Copy, DraftingCompass, Hand, MousePointer, Move, Plus, Ruler } from "lucide-react"
 import { SelectionActionStoreType } from "../stores/selection-actions-store"
 import { PointerActionStoreType } from "../stores/pointer-actions-store"
 
@@ -62,7 +62,7 @@ export const pointerActionsOptions: PointerAction[] = [
     label: "normal",
     description: "pan viewport and select items",
     value: "normal",
-    icon: <MousePointer className="w-5 h-5" />
+    icon: <Hand className="w-5 h-5" />
   },
   {
     label: "selection box",

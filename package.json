@@ -91,6 +91,7 @@
     "react-hotkeys-hook": "^4.5.0",
     "react-resizable-panels": "^2.0.19",
     "react-share": "^5.1.0",
+    "react-zoom-pan-pinch": "^3.4.4",
     "reactflow": "^11.10.2",
     "sonner": "^1.4.3",
     "tailwind-merge": "^2.2.0",

@@ -104,7 +104,7 @@ function EditorContent({
   })
 
   return (
-    <div onContextMenu={(e) => e.preventDefault()} >
+    <div onContextMenu={(e) => e.preventDefault()} className='touch-none' >
       {/* nodes transformation toolbar */}
       {selectionAction.selectedMode === "move" &&
         <NodesTranformationTools />

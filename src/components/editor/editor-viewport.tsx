@@ -185,7 +185,7 @@ function EditorContent({
           ))}
         </g>
 
-        {/* selection box */}
+        {/* selection box perview */}
         {(boxSize[0] !== 0 || boxSize[1] !== 0) &&
           <rect
             x={Math.min(0, boxSize[0]) + boxOrigin[0]}
@@ -198,6 +198,7 @@ function EditorContent({
           />
         }
 
+        {/* selection box drag overlay */}
         {pointerAction.selectedMode === "selectionBox" && (
           <rect
             className='no-pan touch-none'

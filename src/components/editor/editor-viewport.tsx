@@ -42,6 +42,7 @@ export default function EditorViewPort() {
         panning={{
           excluded: ["no-pan"],
           velocityDisabled: true,
+          wheelPanning: true,
         }}
         doubleClick={{
           disabled: true
@@ -66,7 +67,7 @@ function EditorContent({
   const selectionAction = SelectionAcitonStore()
   const pointerAction = PointerAcitonStore()
 
-  const { transformState: { scale } } = useTransformContext()
+  const { transformState: { scale, positionX, positionY } } = useTransformContext()
 
   useHotkeys(Key.ArrowUp, () => store.moveActiveNodes({ x: 0, y: -10, r: 0 }))
   useHotkeys(Key.ArrowDown, () => store.moveActiveNodes({ x: 0, y: 10, r: 0 }))
@@ -78,7 +79,12 @@ function EditorContent({
   const [boxSize, setBoxSize] = useState([0, 0])
 
   const selectionBoxBind = useGesture({
-    onDragStart: ({ xy }) => { setBoxOrigin([xy[0] / scale, xy[1] / scale]) },
+    onDragStart: ({ xy }) => {
+      setBoxOrigin([
+        (xy[0] - positionX) / scale,
+        (xy[1] - positionY) / scale
+      ])
+    },
     onDragEnd: () => {
       const box = {
         x: (Math.min(0, boxSize[0]) + boxOrigin[0]),
@@ -180,18 +186,6 @@ function EditorContent({
           ))}
         </g>
 
-        {pointerAction.selectedMode === "selectionBox" && (
-          <rect
-            className='no-pan touch-none'
-            x={0}
-            y={0}
-            width={editorWidth}
-            height={editorHeight}
-            fill='transparent'
-            {...selectionBoxBind()}
-          />
-        )}
-
         {/* selection box */}
         {(boxSize[0] !== 0 || boxSize[1] !== 0) &&
           <rect
@@ -204,6 +198,18 @@ function EditorContent({
             stroke='#E0FFFF'
           />
         }
+
+        {pointerAction.selectedMode === "selectionBox" && (
+          <rect
+            className='no-pan touch-none'
+            x={0}
+            y={0}
+            width={editorWidth}
+            height={editorHeight}
+            fill='transparent'
+            {...selectionBoxBind()}
+          />
+        )}
 
         {/* node addition overlay */}
         {pointerAction.selectedMode === "addition" && (

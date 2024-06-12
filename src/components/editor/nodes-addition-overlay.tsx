@@ -2,14 +2,14 @@ import { Node, baseNodeState, useEditorStore } from "./stores/editor-store";
 import { useGesture } from "@use-gesture/react";
 import { produce } from "immer";
 import { useEffect, useRef } from "react";
-import { useViewportTransformationStore } from "./stores/viewport-transformation-store";
 import { PointerAcitonStore } from "./stores/pointer-actions-store";
+import { useTransformContext } from "react-zoom-pan-pinch";
 
 export default function NodesAdditionOverlay({ width, height }: { width: number, height: number }) {
 
   const store = useEditorStore()
-  const { transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
   const pointerAction = PointerAcitonStore()
+  const { transformState: { scale, positionX, positionY } } = useTransformContext()
 
   const ref = useRef<any>(!null)
 
@@ -21,8 +21,8 @@ export default function NodesAdditionOverlay({ width, height }: { width: number,
     onDragEnd: (e) => {
       const node = baseNodeState
       const pos = {
-        x: Math.round((e.xy[0] - transformMatrix.x) / transformMatrix.s / 10) * 10 - node.size.w / 2,
-        y: Math.round((e.xy[1] - transformMatrix.y) / transformMatrix.s / 10) * 10 - node.size.h / 2,
+        x: Math.round((e.xy[0] - positionX) / scale / 10) * 10,
+        y: Math.round((e.xy[1] - positionY) / scale / 10) * 10,
         r: 0
       }
       store.addNodes([produce(node, (draft: Node) => {
@@ -34,17 +34,6 @@ export default function NodesAdditionOverlay({ width, height }: { width: number,
 
   return (
     <g>
-      <text
-        x={width / 2}
-        y={height / 2}
-        dominantBaseline="middle"
-        textAnchor="middle"
-        fontSize={"2rem"}
-        fill='white'
-        className='select-none touch-none'
-      >
-        Click anywhere to add
-      </text>
       <rect
         ref={ref}
         x={0}

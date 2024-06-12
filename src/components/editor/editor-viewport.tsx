@@ -41,7 +41,6 @@ export default function EditorViewPort() {
       <TransformWrapper
         panning={{
           excluded: ["no-pan"],
-          velocityDisabled: true,
           wheelPanning: true,
         }}
         doubleClick={{

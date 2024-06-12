@@ -19,9 +19,30 @@ export default function SelectionActionFloatButtons() {
     <div
       className={cn(
         "flex flex-col items-center justify-center",
-        activeNodes.length === 0 && "opacity-45 pointer-events-none"
       )}
     >
+
+      <Popover
+        key={selectionAction.selectedMode}
+        placement="right-start"
+        shouldCloseOnInteractOutside={() => false}
+        isOpen={activeNodes.length === 0 ? false : open}
+        onOpenChange={setOpen}
+        offset={14}
+      >
+        <PopoverTrigger>
+          <div className="w-full">
+          </div>
+        </PopoverTrigger>
+        <PopoverContent>
+          <ScrollShadow className="w-[220px] max-h-[380px] relative">
+            {/* nodes arc toolbar */}
+            {selectionAction.selectedMode === "arc" &&
+              <NodesArcTools />
+            }
+          </ScrollShadow>
+        </PopoverContent>
+      </Popover>
 
       {selectionActionsOptions.map((action) => (
         <Button
@@ -49,29 +70,6 @@ export default function SelectionActionFloatButtons() {
           {action.icon}
         </Button>
       ))}
-
-      <Popover
-        key={selectionAction.selectedMode}
-        placement="left-end"
-        shouldCloseOnInteractOutside={() => false}
-        isOpen={activeNodes.length === 0 ? false : open}
-        onOpenChange={setOpen}
-        offset={14}
-      >
-        <PopoverTrigger>
-          <div className="w-full">
-          </div>
-        </PopoverTrigger>
-        <PopoverContent>
-          <ScrollShadow className="w-[260px] max-h-[380px] relative">
-            {/* nodes arc toolbar */}
-            {selectionAction.selectedMode === "arc" &&
-              <NodesArcTools />
-            }
-          </ScrollShadow>
-        </PopoverContent>
-      </Popover>
-
 
     </div>
   )

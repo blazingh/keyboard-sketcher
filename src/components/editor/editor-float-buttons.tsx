@@ -1,4 +1,4 @@
-import { Box, CircuitBoard, Info, Menu, Printer, Redo2, Scan, Share2, Sparkles, Trash, Undo2 } from "lucide-react";
+import { Box, CircuitBoard, Fullscreen, Info, Menu, Printer, Redo2, Scan, Share2, Sparkles, Trash, Undo2, ZoomIn, ZoomOut } from "lucide-react";
 import ThreeDModelGeneratorDialog from "./dialogs/3d-model-generator";
 import { useState } from "react";
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Popover, PopoverTrigger, PopoverContent, Listbox, ListboxItem, Divider } from "@nextui-org/react";
@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 import { EditorStoreType, useEditorStore } from "./stores/editor-store";
 import { SelectionAcitonStore } from "./stores/selection-actions-store";
 import SelectionActionFloatButtons from "./floatingButtons/selection-action";
-import { useControls } from "react-zoom-pan-pinch";
+import { useControls, useTransformContext } from "react-zoom-pan-pinch";
 
 
 const selector = (state: EditorStoreType) => ({
@@ -131,7 +131,7 @@ export function EditorFloatButtons() {
       {/* selection options buttons */}
       <div
         className={cn(
-          "absolute bottom-2 right-2 bg-default p-1 rounded-xl z-20",
+          "absolute top-1/2 left-2 bg-default p-1 rounded-xl z-20 -translate-y-1/2",
         )}
       >
         <SelectionActionFloatButtons />
@@ -150,7 +150,31 @@ export function EditorFloatButtons() {
             zoomCntrl.zoomToElement("nodes-outline")
           }}
         >
-          <Scan className='w-5 h-5' />
+          <Fullscreen className='w-5 h-5' />
+        </Button>
+
+        <Divider orientation="vertical" className="h-6 mx-2" />
+
+        <Button
+          variant={"light"}
+          isIconOnly
+          size='sm'
+          onClick={() => {
+            zoomCntrl.zoomOut()
+          }}
+        >
+          <ZoomOut className='w-5 h-5' />
+        </Button>
+
+        <Button
+          variant={"light"}
+          isIconOnly
+          size='sm'
+          onClick={() => {
+            zoomCntrl.zoomIn()
+          }}
+        >
+          <ZoomIn className='w-5 h-5' />
         </Button>
 
         <Divider orientation="vertical" className="h-6 mx-2" />

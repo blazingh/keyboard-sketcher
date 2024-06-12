@@ -37,11 +37,11 @@ export default function EditorViewPort() {
     useEditorStore.persist.rehydrate()
   }, [])
   return (
-    <div className='w-svw h-svh relative overflow-hidden '>
+    <div className='w-svw h-svh relative overflow-hidden'>
       <TransformWrapper
         panning={{
           excluded: ["no-pan"],
-          velocityDisabled: true
+          velocityDisabled: true,
         }}
         doubleClick={{
           disabled: true
@@ -66,6 +66,8 @@ function EditorContent({
   const selectionAction = SelectionAcitonStore()
   const pointerAction = PointerAcitonStore()
 
+  const { transformState: { scale } } = useTransformContext()
+
   useHotkeys(Key.ArrowUp, () => store.moveActiveNodes({ x: 0, y: -10, r: 0 }))
   useHotkeys(Key.ArrowDown, () => store.moveActiveNodes({ x: 0, y: 10, r: 0 }))
   useHotkeys(Key.ArrowLeft, () => store.moveActiveNodes({ x: -10, y: 0, r: 0 }))
@@ -75,40 +77,28 @@ function EditorContent({
   const [boxOrigin, setBoxOrigin] = useState([0, 0])
   const [boxSize, setBoxSize] = useState([0, 0])
 
-  const bind = useGesture({
-    onContextMenu: (e) => e.event.preventDefault(),
-    onDragStart: () => { },
+  const selectionBoxBind = useGesture({
+    onDragStart: ({ xy }) => { setBoxOrigin([xy[0] / scale, xy[1] / scale]) },
     onDragEnd: () => {
-      return null
-      /*
-      if (pointerAction.selectedMode === "selectionBox") {
-        const box = {
-          x: (Math.min(0, boxSize[0]) + boxOrigin[0] - transformMatrix.x) / transformMatrix.s,
-          y: (Math.min(0, boxSize[1]) + boxOrigin[1] - transformMatrix.y) / transformMatrix.s,
-          w: (Math.max(boxSize[0], -boxSize[0])) / transformMatrix.s,
-          h: (Math.max(boxSize[1], -boxSize[1])) / transformMatrix.s,
+      const box = {
+        x: (Math.min(0, boxSize[0]) + boxOrigin[0]),
+        y: (Math.min(0, boxSize[1]) + boxOrigin[1]),
+        w: (Math.max(boxSize[0], -boxSize[0])),
+        h: (Math.max(boxSize[1], -boxSize[1])),
+      }
+      store.nodesArray().map((node) => {
+        if (isInsideSelectionBox(box, node)) {
+          store.addActiveNode(node.id)
         }
-        store.nodesArray().map((node) => {
-          if (isInsideSelectionBox(box, node)) {
-            store.addActiveNode(node.id)
-          }
-        })
-        setBoxSize([0, 0])
-        pointerAction.setSelectedMode("normal")
-      }
-      */
+      })
+      setBoxSize([0, 0])
+      pointerAction.setSelectedMode("normal")
     },
-    onDrag: ({ first, last, buttons, touches, movement, event, ...e }) => {
-      return null
-      if (buttons === 1 && touches === 1 && pointerAction.selectedMode === "selectionBox") {
-        first && setBoxOrigin(e.xy)
-        !first && setBoxSize(movement)
-      }
-    },
+    onDrag: ({ movement }) => { setBoxSize([movement[0] / scale, movement[1] / scale]) },
   })
 
   return (
-    <div onContextMenu={(e) => e.preventDefault()}>
+    <div onContextMenu={(e) => e.preventDefault()} >
       {/* nodes transformation toolbar */}
       {selectionAction.selectedMode === "move" &&
         <NodesTranformationTools />
@@ -189,6 +179,18 @@ function EditorContent({
             />
           ))}
         </g>
+
+        {pointerAction.selectedMode === "selectionBox" && (
+          <rect
+            className='no-pan touch-none'
+            x={0}
+            y={0}
+            width={editorWidth}
+            height={editorHeight}
+            fill='transparent'
+            {...selectionBoxBind()}
+          />
+        )}
 
         {/* selection box */}
         {(boxSize[0] !== 0 || boxSize[1] !== 0) &&

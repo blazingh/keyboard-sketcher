@@ -89,10 +89,10 @@ export const baseNodeState: Node = {
 }
 
 const initialNodes: { [key: Node["id"]]: Node } = {
-  "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 30, y: 30, r: 0 }, selectable: true },
-  "2": { id: "2", size: { w: 140, h: 140 }, pos: { x: -160, y: -160, r: 0 }, selectable: true },
-  "4": { id: "4", size: { w: 140, h: 140 }, pos: { x: 30, y: -160, r: 0 }, selectable: true },
-  "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: -160, y: 30, r: 0 }, selectable: true }
+  "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 750, y: 750, r: 0 }, selectable: true },
+  "2": { id: "2", size: { w: 140, h: 140 }, pos: { x: 750, y: 850, r: 0 }, selectable: true },
+  "4": { id: "4", size: { w: 140, h: 140 }, pos: { x: 850, y: 850, r: 0 }, selectable: true },
+  "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: 850, y: 750, r: 0 }, selectable: true }
 }
 
 export const initialStoreState: State = {
@@ -259,7 +259,7 @@ export const useEditorStore = create<EditorStoreType>()(
     {
       name: 'sketcher-nodes',
       skipHydration: true,
-      version: 6,
+      version: 7,
       partialize: (state) => ({ nodes: state.nodes }),
     }
   )

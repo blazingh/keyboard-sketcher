@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { useViewportTransformationStore } from "../stores/viewport-transformation-store";
 import { normalizeAngle } from '../lib/nodes-utils';
 import { PointerAcitonStore } from '../stores/pointer-actions-store';
+import { useTransformContext } from 'react-zoom-pan-pinch';
 
 
 const selector = (state: EditorStoreType) => ({
@@ -38,9 +39,9 @@ export function BasicNode({
 
   } = useEditorStore(selector)
 
-  const pointerAction = PointerAcitonStore()
+  const { transformState: { scale } } = useTransformContext()
 
-  const { initViewport, transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
+  const pointerAction = PointerAcitonStore()
 
   const nodeActive = activeNodes.includes(node.id)
   const { x, y } = node.pos
@@ -61,8 +62,8 @@ export function BasicNode({
     onDrag: (({ movement, tap }) => {
       tap && nodeClick()
       const displacement = {
-        x: Math.round((movement[0] / transformMatrix.s) / 10) * 10,
-        y: Math.round((movement[1] / transformMatrix.s) / 10) * 10,
+        x: Math.round((movement[0] / scale) / 10) * 10,
+        y: Math.round((movement[1] / scale) / 10) * 10,
         r: 0
       }
       setActiveDisplacement(displacement)
@@ -81,7 +82,7 @@ export function BasicNode({
 
   return (
     <g
-      className="touch-none"
+      className="touch-none no-pan"
       transform={`translate(${nodeActive ? dx : 0}, ${nodeActive ? dy : 0})`}
       style={{
       }}

@@ -2,19 +2,16 @@ import { cn } from "@/lib/utils"
 import { Node, useEditorStore } from "./stores/editor-store"
 import { findEnclosingBox } from "./lib/nodes-utils"
 import { Button } from "../ui/button"
-import { ArrowLeft, ArrowLeftFromLine, Plus, PlusSquare } from "lucide-react"
+import { PlusSquare } from "lucide-react"
 import { produce } from "immer"
 import isDeepEqual from 'fast-deep-equal';
-import { useViewportTransformationStore } from "./stores/viewport-transformation-store"
 
 export default function NodesDuplicationTools({
 }: {
   }) {
   const store = useEditorStore()
-  const { transformMatrix } = useViewportTransformationStore()
 
   const { x: dx, y: dy, r: dr } = store.activeDisplacement
-  const { x: tx, y: ty, s: ts } = transformMatrix
 
   if (false
     || !store.activeNodes
@@ -36,16 +33,13 @@ export default function NodesDuplicationTools({
   return (
     <div
       className={cn(
-        'absolute pointer-events-none *:pointer-events-auto ',
+        'absolute pointer-events-none *:pointer-events-auto transition-all',
       )}
       style={{
-        left: x * ts + tx,
-        top: y * ts + ty,
+        left: x,
+        top: y,
         width: w,
         height: h,
-        transformBox: "fill-box",
-        transformOrigin: "top left",
-        scale: `${ts}`
       }}
     >
       {/* left toolbar */}

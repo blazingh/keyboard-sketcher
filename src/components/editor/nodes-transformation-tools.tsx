@@ -3,15 +3,15 @@ import { Node, useEditorStore } from "./stores/editor-store"
 import { findEnclosingBox, normalizeAngle } from "./lib/nodes-utils"
 import { MoveHorizontal, MoveVertical, RotateCcw, RotateCw } from "lucide-react"
 import { produce } from "immer"
-import { useViewportTransformationStore } from "./stores/viewport-transformation-store"
 import { useGesture } from "@use-gesture/react"
 import { Button } from "../ui/button"
+import { useTransformContext } from "react-zoom-pan-pinch"
 
 export default function NodesTranformationTools({
 }: {
   }) {
   const store = useEditorStore()
-  const { transformMatrix } = useViewportTransformationStore()
+  const { transformState: { scale } } = useTransformContext()
 
   const nodes: Node[] = store.activeNodes.map((nodeId) => {
     return produce(store.nodes[nodeId], draft => {
@@ -23,13 +23,12 @@ export default function NodesTranformationTools({
   const toolbarBox = findEnclosingBox(nodes)
 
   const { x: dx, y: dy, r: dr } = store.activeDisplacement
-  const { x: tx, y: ty, s: ts } = transformMatrix
 
   const bindsDragY = useGesture({
     onDrag: ({ movement }) => {
       const displacement = {
-        x: Math.round((movement[0] / ts) / 10) * 10,
-        y: Math.round((movement[1] / ts) / 10) * 10,
+        x: Math.round((movement[0] / scale) / 10) * 10,
+        y: Math.round((movement[1] / scale) / 10) * 10,
         r: 0
       }
       store.setActiveDisplacement(displacement)
@@ -45,8 +44,8 @@ export default function NodesTranformationTools({
   const bindsDragX = useGesture({
     onDrag: ({ movement }) => {
       const displacement = {
-        x: Math.round((movement[0] / ts) / 10) * 10,
-        y: Math.round((movement[1] / ts) / 10) * 10,
+        x: Math.round((movement[0] / scale) / 10) * 10,
+        y: Math.round((movement[1] / scale) / 10) * 10,
         r: 0
       }
       store.setActiveDisplacement(displacement)
@@ -98,8 +97,8 @@ export default function NodesTranformationTools({
   const { x, y, width: w, height: h } = toolbarBox
 
   const pos = {
-    left: x * ts + tx,
-    top: y * ts + ty,
+    left: x,
+    top: y,
     width: w,
     height: h
   }
@@ -107,16 +106,13 @@ export default function NodesTranformationTools({
   return (
     <div
       className={cn(
-        'absolute pointer-events-none *:pointer-events-auto',
+        'absolute pointer-events-none *:pointer-events-auto transition-all',
       )}
       style={{
         ...pos,
-        transformBox: "fill-box",
-        transformOrigin: "top left",
-        transform: `scale(${ts})`
       }}
     >
-      {/* Vertical translation handel */}
+      {/* Vertical translation handle} */}
       <div
         className={cn(
           'absolute top-1/2 -left-5',

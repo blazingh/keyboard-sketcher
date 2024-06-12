@@ -1,7 +1,7 @@
-import { Box, CircuitBoard, Info, Menu, Printer, Redo2, Share2, Sparkles, Trash, Undo2 } from "lucide-react";
+import { Box, CircuitBoard, Info, Menu, Printer, Redo2, Scan, Share2, Sparkles, Trash, Undo2 } from "lucide-react";
 import ThreeDModelGeneratorDialog from "./dialogs/3d-model-generator";
 import { useState } from "react";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Popover, PopoverTrigger, PopoverContent, Listbox, ListboxItem } from "@nextui-org/react";
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Popover, PopoverTrigger, PopoverContent, Listbox, ListboxItem, Divider } from "@nextui-org/react";
 import ShareWebsiteDialog from "./dialogs/share-website-dialog";
 import ResetEditorDialog from "./dialogs/reset-editor-dialog";
 import WebsiteInfoDialog from "./dialogs/website-info-dialog";
@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { EditorStoreType, useEditorStore } from "./stores/editor-store";
 import { SelectionAcitonStore } from "./stores/selection-actions-store";
 import SelectionActionFloatButtons from "./floatingButtons/selection-action";
+import { useControls } from "react-zoom-pan-pinch";
 
 
 const selector = (state: EditorStoreType) => ({
@@ -21,6 +22,8 @@ export function EditorFloatButtons() {
   const { clearActiveNodes, activeNodes } = useEditorStore(selector)
   const selectionAction = SelectionAcitonStore()
   const { undo, redo, pastStates, futureStates } = useEditorStore.temporal.getState();
+
+  const zoomCntrl = useControls()
 
   return (
     <>
@@ -128,7 +131,7 @@ export function EditorFloatButtons() {
       {/* selection options buttons */}
       <div
         className={cn(
-          "absolute bottom-2 right-2 bg-default p-1 rounded-xl",
+          "absolute bottom-2 right-2 bg-default p-1 rounded-xl z-20",
         )}
       >
         <SelectionActionFloatButtons />
@@ -136,9 +139,22 @@ export function EditorFloatButtons() {
 
       <div
         className={cn(
-          "absolute bottom-2 left-2 bg-default p-1 flex items-center justify-center rounded-xl",
+          "absolute bottom-2 left-2 bg-default p-1 flex items-center justify-center rounded-xl z-20",
         )}
       >
+        <Button
+          variant={"light"}
+          isIconOnly
+          size='sm'
+          onClick={() => {
+            zoomCntrl.zoomToElement("nodes-outline")
+          }}
+        >
+          <Scan className='w-5 h-5' />
+        </Button>
+
+        <Divider orientation="vertical" className="h-6 mx-2" />
+
         <Button
           variant={"light"}
           isIconOnly

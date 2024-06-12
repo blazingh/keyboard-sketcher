@@ -106,7 +106,8 @@ export default function NodesTranformationTools({
   return (
     <div
       className={cn(
-        'absolute pointer-events-none *:pointer-events-auto transition-all',
+        'absolute pointer-events-none *:pointer-events-auto no-pan',
+        (dx === 0 && dy === 0 && dr === 0) && "transition-all"
       )}
       style={{
         ...pos,

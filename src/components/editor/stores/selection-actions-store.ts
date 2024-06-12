@@ -1,4 +1,5 @@
 import { create } from "zustand"
+import { useEditorStore } from "./editor-store"
 
 
 type State = {
@@ -23,7 +24,16 @@ export const SelectionAcitonStore = create<SelectionActionStoreType>((set, get) 
   setSelectedMode: (mode) => {
     set({ selectedMode: mode })
   },
-  handleMirrorVer: () => { },
-  handleMirrorHor: () => { },
-  handleDelete: () => { }
+  handleMirrorVer: () => {
+    const editor = useEditorStore()
+    editor.flipActiveNodesVertically()
+  },
+  handleMirrorHor: () => {
+    const editor = useEditorStore()
+    editor.flipActiveNodesHorizontally()
+  },
+  handleDelete: () => {
+    const editor = useEditorStore()
+    editor.deleteActiveNodes()
+  }
 }))

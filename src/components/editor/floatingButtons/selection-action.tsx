@@ -8,11 +8,14 @@ import { cn } from "@/lib/utils"
 
 const selector = (state: EditorStoreType) => ({
   activeNodes: state.activeNodes,
+  deleteActiveNodes: state.deleteActiveNodes,
+  flipActiveNodesHorizontally: state.flipActiveNodesHorizontally,
+  flipActiveNodesVertically: state.flipActiveNodesVertically
 });
 
 export default function SelectionActionFloatButtons() {
   const selectionAction = SelectionAcitonStore()
-  const { activeNodes } = useEditorStore(selector)
+  const { activeNodes, deleteActiveNodes, flipActiveNodesVertically, flipActiveNodesHorizontally } = useEditorStore(selector)
   const [open, setOpen] = useState(false)
 
   return (
@@ -60,11 +63,11 @@ export default function SelectionActionFloatButtons() {
               selectionAction.setSelectedMode(action.value)
             }
             if (action.value === "delete")
-              selectionAction.handleDelete
+              deleteActiveNodes()
             if (action.value === "flipV")
-              selectionAction.handleMirrorVer
+              flipActiveNodesVertically()
             if (action.value === "flipH")
-              selectionAction.handleMirrorHor
+              flipActiveNodesHorizontally()
           }}
         >
           {action.icon}

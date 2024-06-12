@@ -77,6 +77,12 @@ function EditorContent({
   const [boxOrigin, setBoxOrigin] = useState([0, 0])
   const [boxSize, setBoxSize] = useState([0, 0])
 
+  const backgroundBind = useGesture({
+    onDoubleClick: () => {
+      store.clearActiveNodes()
+    }
+  })
+
   const selectionBoxBind = useGesture({
     onDragStart: ({ xy }) => {
       setBoxOrigin([
@@ -115,7 +121,9 @@ function EditorContent({
       <svg width={editorWidth} height={editorHeight}>
 
         {/* background */}
-        <g>
+        <g
+          {...backgroundBind()}
+        >
           <pattern id="pattern-circles" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse">
             {[{ cx: 0, cy: 0 }, { cx: 10, cy: 0 }, { cx: 0, cy: 10 }, { cx: 10, cy: 10 }].map(({ cx, cy }) => (
               <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="0.5" fill="#fff" fillOpacity={0.5} />

@@ -4,26 +4,24 @@ import { Node, useEditorStore } from './stores/editor-store';
 import { useGesture } from "@use-gesture/react";
 import { BasicNode } from "./nodes/basic-node";
 import { useEffect, useState } from 'react';
-import ParentSize from '@visx/responsive/lib/components/ParentSize';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Key } from 'ts-key-enum';
 import { NodesOutline } from './nodes-outline';
 import NodesAdditionOverlay from './nodes-addition-overlay';
 import EditorToolbar from './editor-toolbar';
 import { EditorFloatButtons } from './editor-float-buttons';
-import { EditorRuler } from './editor-ruler';
 import { useViewportTransformationStore } from './stores/viewport-transformation-store';
 import NodesTranformationTools from './nodes-transformation-tools';
 import NodesDuplicationTools from './nodes-duplication-tools';
 import { normalizeAngle } from './lib/nodes-utils';
 import { ArcGroupNode } from './nodes/arc-group-node';
-import NodesArcTools from './nodes-arc-tools';
 import { SelectionAcitonStore } from './stores/selection-actions-store';
 import { PointerAcitonStore } from './stores/pointer-actions-store';
+import { TransformWrapper, TransformComponent, useTransformEffect, useTransformContext, useControls } from "react-zoom-pan-pinch";
 
 
-const editorWidth = 1500
-const editorHeight = 1000
+const editorWidth = 5000
+const editorHeight = 3500
 
 function isInsideSelectionBox(box: any, node: Node) {
   return (
@@ -35,70 +33,44 @@ function isInsideSelectionBox(box: any, node: Node) {
 }
 
 export default function EditorViewPort() {
+  useEffect(() => {
+    useEditorStore.persist.rehydrate()
+  }, [])
   return (
-    <div className='w-svw h-svh relative overflow-hidden'>
-      <EditorToolbar />
-      <ParentSize>
-        {({ width, height }) => <EditorViewPortContent width={width} height={height} />}
-      </ParentSize>
+    <div className='w-svw h-svh relative overflow-hidden '>
+      <TransformWrapper
+        panning={{
+          excluded: ["no-pan"],
+          velocityDisabled: true
+        }}
+        doubleClick={{
+          disabled: true
+        }}
+        minScale={0.3}
+      >
+        <EditorToolbar />
+        <EditorFloatButtons />
+        <TransformComponent wrapperStyle={{ maxWidth: "100%", maxHeight: "100%" }}>
+          <EditorContent />
+        </TransformComponent>
+      </TransformWrapper>
     </div>
   )
 }
 
-export function EditorViewPortContent({
-  width,
-  height,
-}: {
-  width: number,
-  height: number,
-}) {
-
-  useEffect(() => {
-    useEditorStore.persist.rehydrate()
-    useViewportTransformationStore.persist.rehydrate()
-  }, [])
-
-  if (!useEditorStore.persist?.hasHydrated() || !useViewportTransformationStore.persist.hasHydrated()) return null
-
-  return (
-    <div className="" style={{ touchAction: 'none' }}>
-      <div className='relative' style={{ width, height }}>
-        <EditorFloatButtons />
-        {(width && height) &&
-          <EditorContent width={width} height={height} />
-        }
-      </div>
-    </div>
-  );
-}
-
 function EditorContent({
-  width,
-  height,
 }: {
-  width: number,
-  height: number
-}) {
+  }) {
 
   const store = useEditorStore()
   const selectionAction = SelectionAcitonStore()
   const pointerAction = PointerAcitonStore()
-
-  const { initViewport, transformMatrix, setTransformMatrix, TransformMatrixStyle } = useViewportTransformationStore()
-
-  useEffect(() => {
-    initViewport({ w: width, h: height })
-  }, [width, height])
 
   useHotkeys(Key.ArrowUp, () => store.moveActiveNodes({ x: 0, y: -10, r: 0 }))
   useHotkeys(Key.ArrowDown, () => store.moveActiveNodes({ x: 0, y: 10, r: 0 }))
   useHotkeys(Key.ArrowLeft, () => store.moveActiveNodes({ x: -10, y: 0, r: 0 }))
   useHotkeys(Key.ArrowRight, () => store.moveActiveNodes({ x: 10, y: 0, r: 0 }))
   useHotkeys(Key.Delete, () => store.deleteActiveNodes())
-
-  function handleViewPortTap() {
-    store.clearActiveNodes()
-  }
 
   const [boxOrigin, setBoxOrigin] = useState([0, 0])
   const [boxSize, setBoxSize] = useState([0, 0])
@@ -107,6 +79,8 @@ function EditorContent({
     onContextMenu: (e) => e.event.preventDefault(),
     onDragStart: () => { },
     onDragEnd: () => {
+      return null
+      /*
       if (pointerAction.selectedMode === "selectionBox") {
         const box = {
           x: (Math.min(0, boxSize[0]) + boxOrigin[0] - transformMatrix.x) / transformMatrix.s,
@@ -122,71 +96,50 @@ function EditorContent({
         setBoxSize([0, 0])
         pointerAction.setSelectedMode("normal")
       }
-    },
-    onDoubleClick: () => handleViewPortTap(),
-    onPinchStart: ({ origin }) => { },
-    onPinchEnd: ({ origin }) => { },
-    onPinch: ({ delta, first, last }) => {
-      if (first || last) return
-      const transformation = {
-        s: delta[0],
-        x: 0,
-        y: 0,
-      }
-      setTransformMatrix(transformation)
-    },
-    onWheel: ({ last, ...e }) => {
-      if (last) return
-      const transformation = {
-        s: 0.1 * (e.event.deltaY > 0 ? -transformMatrix.s : transformMatrix.s),
-        x: 0,
-        y: 0,
-      }
-      setTransformMatrix(transformation)
+      */
     },
     onDrag: ({ first, last, buttons, touches, movement, event, ...e }) => {
-      if (pointerAction.selectedMode !== "selectionBox" || buttons === 2) {
-        const transformation = {
-          s: 0,
-          x: e.delta[0],
-          y: e.delta[1],
-        }
-        setTransformMatrix(transformation)
-      }
+      return null
       if (buttons === 1 && touches === 1 && pointerAction.selectedMode === "selectionBox") {
         first && setBoxOrigin(e.xy)
         !first && setBoxSize(movement)
       }
     },
-  }, { drag: { filterTaps: true, threshold: 10, pointer: { buttons: [1, 2, 4] } } })
+  })
 
   return (
-    <div>
-
-      {/* nodes duplication toolbar */}
-      {selectionAction.selectedMode === "copy" &&
-        <NodesDuplicationTools />
-      }
+    <div onContextMenu={(e) => e.preventDefault()}>
       {/* nodes transformation toolbar */}
       {selectionAction.selectedMode === "move" &&
         <NodesTranformationTools />
       }
-
-      <svg width={width} height={height}  >
+      {/* nodes duplication toolbar */}
+      {selectionAction.selectedMode === "copy" &&
+        <NodesDuplicationTools />
+      }
+      <svg width={editorWidth} height={editorHeight}>
 
         {/* background */}
-        <g transform={TransformMatrixStyle()}>
+        <g>
           <pattern id="pattern-circles" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse" patternContentUnits="userSpaceOnUse">
-            <circle id="pattern-circle" cx="0" cy="0" r="0.5" fill="#fff" fillOpacity={0.5}></circle>
-            <circle id="pattern-circle" cx="10" cy="0" r="0.5" fill="#fff" fillOpacity={0.5}></circle>
-            <circle id="pattern-circle" cx="0" cy="10" r="0.5" fill="#fff" fillOpacity={0.5}></circle>
-            <circle id="pattern-circle" cx="10" cy="10" r="0.5" fill="#fff" fillOpacity={0.5}></circle>
+            {[{ cx: 0, cy: 0 }, { cx: 10, cy: 0 }, { cx: 0, cy: 10 }, { cx: 10, cy: 10 }].map(({ cx, cy }) => (
+              <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="0.5" fill="#fff" fillOpacity={0.5} />
+            ))}
           </pattern>
-          <rect id="rect" x={-editorWidth} y={-editorHeight} width={editorWidth * 2} height={editorHeight * 2} fill="url(#pattern-circles)" stroke='white' strokeWidth={2}></rect>
+          <rect
+            id="rect"
+            x={0}
+            y={0}
+            width={editorWidth}
+            height={editorHeight}
+            fill="url(#pattern-circles)"
+            stroke="white"
+            strokeWidth={2}
+          />
         </g>
 
         {/* nodes outline */}
-        <g transform={TransformMatrixStyle()}>
+        <g id="nodes-outline">
           <defs>
             <NodesOutline nodes={function(nodes) {
               return nodes.map(node => {
@@ -210,7 +163,7 @@ function EditorContent({
 
         {/* arc ghost nodes */}
         {(selectionAction.selectedMode === "arc" && store.activeNodes.length > 0) && (
-          <g transform={TransformMatrixStyle()}>
+          <g>
             {store.activeNodes.map((nodeId) => (
               <ArcGroupNode
                 key={nodeId}
@@ -227,17 +180,8 @@ function EditorContent({
           </g>
         )}
 
-        {/* viewport guestures controlles */}
-        <rect
-          width={width}
-          height={height}
-          fill="transparent"
-          className='touch-none'
-          {...bind()}
-        />
-
         {/* nodes */}
-        <g transform={TransformMatrixStyle()}>
+        <g >
           {store.nodesArray().map((node) => (
             <BasicNode
               key={node.id}
@@ -261,12 +205,10 @@ function EditorContent({
 
         {/* node addition overlay */}
         {pointerAction.selectedMode === "addition" && (
-          <NodesAdditionOverlay width={width} height={height} />
+          <NodesAdditionOverlay width={editorWidth} height={editorHeight} />
         )}
 
-
       </svg>
-
     </div>
   )
 }

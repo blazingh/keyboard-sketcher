@@ -160,7 +160,7 @@ function EditorContent({
         </g>
 
         {/* nodes outline */}
-        <g id="nodes-outline">
+        <g id="nodes-outline" className='pointer-events-none'>
           <defs>
             <NodesOutline nodes={function(nodes) {
               return nodes.map(node => {

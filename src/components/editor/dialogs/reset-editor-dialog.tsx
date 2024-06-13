@@ -2,20 +2,17 @@
 import { Button, Modal, ModalBody, ModalContent, ModalHeader, ModalProps } from "@nextui-org/react"
 import { X } from "lucide-react"
 import { EditorStoreType, useEditorStore } from "../stores/editor-store";
-import { ViewportTransformationStoreType, useViewportTransformationStore } from "../stores/viewport-transformation-store";
+import { useControls } from "react-zoom-pan-pinch";
 
 
 const editorStoreSelector = (state: EditorStoreType) => ({
-  resetState: state.resetState
-})
-const viewportStoreSelector = (state: ViewportTransformationStoreType) => ({
   resetState: state.resetState
 })
 
 export default function ResetEditorDialog({ isOpen, onOpenChange }: { isOpen: boolean, onOpenChange: ModalProps["onOpenChange"] }) {
 
   const editor = useEditorStore(editorStoreSelector)
-  const viewport = useViewportTransformationStore(viewportStoreSelector)
+  const zoomControll = useControls()
 
   return (
     <Modal
@@ -62,7 +59,7 @@ export default function ResetEditorDialog({ isOpen, onOpenChange }: { isOpen: bo
                     color="danger"
                     onPress={() => {
                       editor.resetState()
-                      viewport.resetState()
+                      zoomControll.zoomToElement("nodes-outline")
                       onClose()
                     }}
                   >

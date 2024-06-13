@@ -97,6 +97,7 @@
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animated": "^1.0.1",
     "three": "^0.163.0",
+    "three-stdlib": "^2.30.3",
     "ts-key-enum": "^2.0.12",
     "uuid": "^9.0.1",
     "zundo": "^2.1.0",

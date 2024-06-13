@@ -18,6 +18,8 @@ import { SelectionAcitonStore } from './stores/selection-actions-store';
 import { PointerAcitonStore } from './stores/pointer-actions-store';
 import { TransformWrapper, TransformComponent, useTransformContext } from "react-zoom-pan-pinch";
 import { Skeleton } from '@nextui-org/react';
+import { cn } from '@/lib/utils';
+import NodesRulerPoints from './nodes-ruler-points';
 
 
 const editorWidth = 7000
@@ -202,7 +204,11 @@ function EditorContent({
         )}
 
         {/* nodes */}
-        <g >
+        <g
+          className={cn(
+            pointerAction.selectedMode === "ruler" && "opacity-50"
+          )}
+        >
           {store.nodesArray().map((node) => (
             <BasicNode
               key={node.id}
@@ -235,6 +241,11 @@ function EditorContent({
             fill='transparent'
             {...selectionBoxBind()}
           />
+        )}
+
+        {/* ruller points */}
+        {pointerAction.selectedMode === "ruler" && (
+          <NodesRulerPoints />
         )}
 
         {/* node addition overlay */}

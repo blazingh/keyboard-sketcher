@@ -81,7 +81,10 @@ export function BasicNode({
 
   return (
     <g
-      className="touch-none no-pan"
+      className={cn(
+        "touch-none no-pan",
+        pointerAction.selectedMode !== "normal" && "pointer-events-none"
+      )}
       transform={`translate(${nodeActive ? dx : 0}, ${nodeActive ? dy : 0})`}
       style={{
       }}

@@ -9,6 +9,7 @@ import Lights from './sceneElements/light'
 import Camera, { CameraPosition, polarToCartesian } from './sceneElements/camera'
 import OrbitControls from './sceneElements/orbitControlls'
 import * as BufferGeometryUtils from "three-stdlib"
+import { initial } from 'lodash'
 
 
 const INITIAL_LATITUDE = Math.PI / 8
@@ -117,9 +118,12 @@ const SceneSetup: React.FC<SceneSetupProps> = (
 
   const [modelCenter, setModelCenter] = useState<[number, number, number]>([0, 0, 0])
   const [sceneReady, setSceneReady] = useState(false)
+  const [inited, setInited] = useState(false)
+
+
   useEffect(() => {
     setSceneReady(false)
-  }, [url])
+  }, [geoms])
 
   const geometry = useMemo(
     () => BufferGeometryUtils.mergeBufferGeometries(geoms) ?? new CircleGeometry(5, 32),
@@ -209,7 +213,12 @@ const SceneSetup: React.FC<SceneSetupProps> = (
         rotation={[rotationX, rotationY, rotationZ]}
         visible={sceneReady}
         materialProps={{ color }}
-        onLoaded={onLoaded}
+        onLoaded={(a, b) => {
+          setSceneReady(true)
+          if (inited) return
+          onLoaded(a, b)
+          setInited(true)
+        }}
       />
       <Floor
         width={gridWidth ?? gridLength}

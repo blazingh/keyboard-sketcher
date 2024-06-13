@@ -125,13 +125,6 @@ const SceneSetup: React.FC<SceneSetupProps> = (
     () => BufferGeometryUtils.mergeBufferGeometries(geoms) ?? new CircleGeometry(5, 32),
     [geoms]
   )
-  /*
-  || useLoader(
-  STLLoader,
-  url,
-  (loader) => loader.setRequestHeader(extraHeaders ?? {})
-)
-*/
 
   const processedGeometry = useMemo(
     () => geometryProcessor?.(geometry) ?? geometry,

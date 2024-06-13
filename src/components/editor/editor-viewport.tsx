@@ -10,17 +10,16 @@ import { NodesOutline } from './nodes-outline';
 import NodesAdditionOverlay from './nodes-addition-overlay';
 import EditorToolbar from './editor-toolbar';
 import { EditorFloatButtons } from './editor-float-buttons';
-import { useViewportTransformationStore } from './stores/viewport-transformation-store';
 import NodesTranformationTools from './nodes-transformation-tools';
 import NodesDuplicationTools from './nodes-duplication-tools';
 import { normalizeAngle } from './lib/nodes-utils';
 import { ArcGroupNode } from './nodes/arc-group-node';
 import { SelectionAcitonStore } from './stores/selection-actions-store';
 import { PointerAcitonStore } from './stores/pointer-actions-store';
-import { TransformWrapper, TransformComponent, useTransformEffect, useTransformContext, useControls } from "react-zoom-pan-pinch";
+import { TransformWrapper, TransformComponent, useTransformContext } from "react-zoom-pan-pinch";
 
 
-const editorWidth = 5000
+const editorWidth = 7000
 const editorHeight = 3500
 
 function isInsideSelectionBox(box: any, node: Node) {

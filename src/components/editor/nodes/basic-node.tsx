@@ -3,7 +3,6 @@
 import { EditorStoreType, Node, useEditorStore } from '../stores/editor-store';
 import { useGesture } from "@use-gesture/react";
 import { cn } from "@/lib/utils";
-import { useViewportTransformationStore } from "../stores/viewport-transformation-store";
 import { normalizeAngle } from '../lib/nodes-utils';
 import { PointerAcitonStore } from '../stores/pointer-actions-store';
 import { useTransformContext } from 'react-zoom-pan-pinch';

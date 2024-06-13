@@ -17,6 +17,7 @@ import { ArcGroupNode } from './nodes/arc-group-node';
 import { SelectionAcitonStore } from './stores/selection-actions-store';
 import { PointerAcitonStore } from './stores/pointer-actions-store';
 import { TransformWrapper, TransformComponent, useTransformContext } from "react-zoom-pan-pinch";
+import { Skeleton } from '@nextui-org/react';
 
 
 const editorWidth = 7000
@@ -32,27 +33,45 @@ function isInsideSelectionBox(box: any, node: Node) {
 }
 
 export default function EditorViewPort() {
+
+  const hasHydrated = useEditorStore(state => state._hasHydrated)
   useEffect(() => {
     useEditorStore.persist.rehydrate()
   }, [])
+
   return (
     <div className='w-svw h-svh relative overflow-hidden'>
-      <TransformWrapper
-        panning={{
-          excluded: ["no-pan"],
-          wheelPanning: true,
-        }}
-        doubleClick={{
-          disabled: true
-        }}
-        minScale={0.3}
-      >
-        <EditorToolbar />
-        <EditorFloatButtons />
-        <TransformComponent wrapperStyle={{ maxWidth: "100%", maxHeight: "100%" }}>
-          <EditorContent />
-        </TransformComponent>
-      </TransformWrapper>
+      {(hasHydrated)
+        ? (
+          <TransformWrapper
+            panning={{
+              excluded: ["no-pan"],
+              wheelPanning: true,
+            }}
+            doubleClick={{
+              disabled: true
+            }}
+            minScale={0.3}
+            onInit={(ref) => {
+              ref.zoomToElement("nodes-outline")
+            }}
+          >
+            <EditorToolbar />
+            <EditorFloatButtons />
+            <TransformComponent wrapperStyle={{ maxWidth: "100%", maxHeight: "100%" }}>
+              <EditorContent />
+            </TransformComponent>
+          </TransformWrapper>
+        )
+        : (
+          <div className='w-full h-full p-8 relative'>
+            <Skeleton className='w-full h-full rounded-xl' />
+            <span className='absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 font-draft text-[3.8rem]'>
+              SKETCHER
+            </span>
+          </div>
+        )
+      }
     </div>
   )
 }

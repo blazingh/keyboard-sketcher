@@ -36,6 +36,7 @@ function isInsideSelectionBox(box: any, node: Node) {
 
 export default function EditorViewPort() {
 
+  const pointerAction = PointerAcitonStore()
   const hasHydrated = useEditorStore(state => state._hasHydrated)
   useEffect(() => {
     useEditorStore.persist.rehydrate()
@@ -60,6 +61,14 @@ export default function EditorViewPort() {
           >
             <EditorToolbar />
             <EditorFloatButtons />
+
+            {/* nodes addtion message */}
+            {pointerAction.selectedMode === "addition" &&
+              <div className='fixed z-30 bottom-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 p-4 rounded-xl font-semibold opacity-75 text-2xl'>
+                Press anywhere to add
+              </div>
+            }
+
             <TransformComponent wrapperStyle={{ maxWidth: "100%", maxHeight: "100%" }}>
               <EditorContent />
             </TransformComponent>
@@ -130,6 +139,7 @@ function EditorContent({
 
   return (
     <div onContextMenu={(e) => e.preventDefault()} className='touch-none' >
+
       {/* nodes transformation toolbar */}
       {selectionAction.selectedMode === "move" &&
         <NodesTranformationTools />
@@ -138,6 +148,7 @@ function EditorContent({
       {selectionAction.selectedMode === "copy" &&
         <NodesDuplicationTools />
       }
+
       <svg width={editorWidth} height={editorHeight}>
 
         {/* background */}

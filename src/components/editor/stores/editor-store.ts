@@ -38,6 +38,7 @@ export type ArcState = {
 }
 
 type State = {
+  _hasHydrated: boolean,
   /* nodes include switch, controllers or any newly added item to the viewport */
   nodes: { [key: Node["id"]]: Node },
 
@@ -56,7 +57,8 @@ type State = {
 }
 
 type Action = {
-  nodesArray: () => Node[],
+  setHasHydrated: (state: boolean) => void
+  nodesArray: () => Node[]
 
   updateNodes: (newNodes: Node[]) => void
   addNodes: (nodes: Node[]) => Node["id"][]
@@ -96,6 +98,7 @@ const initialNodes: { [key: Node["id"]]: Node } = {
 }
 
 export const initialStoreState: State = {
+  _hasHydrated: false,
   nodes: initialNodes,
   arcState: {
     pos: { x: 0, y: 0, r: 0 },
@@ -259,6 +262,12 @@ export const useEditorStore = create<EditorStoreType>()(
           }
         }))
       },
+      setHasHydrated: (state) => {
+        set({
+          _hasHydrated: state
+        });
+      }
+
     }),
       {
         partialize: (state) => ({ nodes: state.nodes }),
@@ -271,6 +280,9 @@ export const useEditorStore = create<EditorStoreType>()(
       skipHydration: true,
       version: 7,
       partialize: (state) => ({ nodes: state.nodes }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true)
+      }
     }
   )
 )

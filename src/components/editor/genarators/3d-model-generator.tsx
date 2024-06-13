@@ -8,6 +8,8 @@ import InputWithKeypad from "@/components/virtual-numpad-input";
 import { useEditorStore } from "../stores/editor-store";
 import { GeomsStlPreview } from "@/components/geoms-stl-preview";
 import { useEffect } from "react";
+import StlViewer from "@/components/stlViewer/stl-viewer";
+import { CSG2Geom } from "@/lib/geometries";
 
 export default function ThreeDModelGenerator() {
   return (
@@ -87,7 +89,18 @@ function ModelGeneratorPreview() {
       )}
 
       {store.generatedGeoms && (
-        <GeomsStlPreview geoms={store.generatedGeoms} />
+        <StlViewer
+          geoms={[CSG2Geom(store.generatedGeoms[0].geom), CSG2Geom(store.generatedGeoms[1].geom)]}
+          url="https://storage.googleapis.com/ucloud-v3/ccab50f18fb14c91ccca300a.stl"
+          orbitControls
+          shadows
+          style={{
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+          }}
+        />
       )}
     </>
   )

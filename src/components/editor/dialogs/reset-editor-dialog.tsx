@@ -58,8 +58,9 @@ export default function ResetEditorDialog({ isOpen, onOpenChange }: { isOpen: bo
                   <Button
                     color="danger"
                     onPress={() => {
-                      editor.resetState()
-                      zoomControll.zoomToElement("nodes-outline")
+                      editor.resetState(() => {
+                        zoomControll.zoomToElement("nodes-outline")
+                      })
                       onClose()
                     }}
                   >

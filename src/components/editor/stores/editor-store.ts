@@ -83,7 +83,7 @@ type Action = {
   flipActiveNodesHorizontally: () => void
   flipActiveNodesVertically: () => void
 
-  resetState: () => void
+  resetState: (postReset?: () => void) => void
 }
 
 export const baseNodeState: Node = {
@@ -118,8 +118,10 @@ export const useEditorStore = create<EditorStoreType>()(
     temporal((set, get) => ({
       ...initialStoreState,
 
-      resetState: () => {
-        set(initialStoreState)
+      resetState: async (postReset) => {
+        set({ ...initialStoreState, _hasHydrated: true })
+        await new Promise(resolve => setTimeout(resolve, 500));
+        if (postReset) postReset()
       },
 
       nodesArray: () => Object.values(get().nodes),

@@ -9,21 +9,33 @@ export type ModelWorkerResult = {
 }
 
 export type ModelAOptionsTypes = {
-  plateThick: string,
+  baseThickness: string,
+  switchGruveThick: string,
+
+  plateHeight: string,
+  plateThickness: string,
+
+  wallHeight: string,
+  wallThickness: string,
+  wallRadius: string,
+
+  standoffThick: string,
   wallSwitchPadding: string,
-  wallThick: string,
-  caseTopMargin: string,
-  caseBottomMargin: string,
-  caseTopRadius: string,
 }
 
 export const modelADefaultOptionsValues: ModelAOptionsTypes = {
-  plateThick: "3",
-  wallSwitchPadding: "4.5",
-  wallThick: "4",
-  caseTopMargin: "0",
-  caseBottomMargin: "10",
-  caseTopRadius: "0",
+  baseThickness: "3",
+  switchGruveThick: "1.5",
+
+  plateHeight: "9",
+  plateThickness: "3",
+
+  wallHeight: "12",
+  wallThickness: "4",
+  wallRadius: "0",
+
+  standoffThick: "3",
+  wallSwitchPadding: "4",
 }
 
 export const modelAOptionsList: {
@@ -35,44 +47,51 @@ export const modelAOptionsList: {
 }[] = [
     {
       id: 1,
-      key: "plateThick",
-      label: "Plate Thickness",
-      description: "the thickness of the switches plate",
+      key: "baseThickness",
+      label: "Case base thickness",
+      description: "case bottom thickness (min: 2mm)",
       type: "number"
     },
     {
       id: 2,
-      key: "wallThick",
-      label: "Case Walls Thickness",
-      description: "case walls thickness",
-      type: "number"
-    },
-    {
-      id: 25,
-      key: "wallSwitchPadding",
-      label: "wall switch distance",
-      description: "distance between the switches and case walls",
+      key: "plateThickness",
+      label: "Plate Thickness",
+      description: "switches plate thickness (min: 1.5mm)",
       type: "number"
     },
     {
       id: 3,
-      key: "caseTopMargin",
-      label: "Case Top height",
-      description: "how much the case will extrude above the plate",
+      key: "plateHeight",
+      label: "Plate height",
+      description: "Distance from the top of the case base to the bottom of the plate",
       type: "number"
     },
     {
       id: 4,
-      key: "caseBottomMargin",
-      label: "Case bottom height",
-      description: "how much the case will extrude under the plate and the plate standoff",
+      key: "wallThickness",
+      label: "Case Walls thickness",
+      description: "case walls thickness(min: 2mm)",
       type: "number"
     },
     {
       id: 5,
-      key: "caseTopRadius",
+      key: "wallHeight",
+      label: "Case walls height",
+      description: "Case walls height (min: base_thickness + plate_height + plate_thickness)",
+      type: "number"
+    },
+    {
+      id: 6,
+      key: "wallRadius",
       label: "Case top roundness",
-      description: "how round will the top of case walls be.the value can not be higher than the case wall thickness",
+      description: "Case walls top roundness (max: wall_thickness / 2)",
+      type: "number"
+    },
+    {
+      id: 7,
+      key: "wallSwitchPadding",
+      label: "wall switch distance",
+      description: "distance between the switches and case walls",
       type: "number"
     },
   ]

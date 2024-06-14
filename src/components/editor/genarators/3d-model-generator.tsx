@@ -68,6 +68,7 @@ function ModelGeneratorOptions() {
                 <InputWithKeypad
                   label={option.label}
                   defaultValue={String(store.params[option.key])}
+                  endContent={<span className="text-xs italic">mm</span>}
                   onValueChange={(v) => {
                     store.updateParam(option.key, v)
                   }} />

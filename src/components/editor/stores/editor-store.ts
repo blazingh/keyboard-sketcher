@@ -169,6 +169,7 @@ export const useEditorStore = create<EditorStoreType>()(
         return ids
       },
       deleteNode: (id) => {
+        get().removeRulerPoint(id)
         set(produce((state: State) => {
           const index = state.activeNodes.findIndex((a: string) => a === id)
           if (index !== -1) state.activeNodes.splice(index, 1)
@@ -189,10 +190,17 @@ export const useEditorStore = create<EditorStoreType>()(
       },
       addRulerPoint: (point) => {
         const exists = get().rulerPoints.some(item => item.nodeId === point.nodeId);
-        if (exists) return
-        set(produce((state: State) => {
-          state.rulerPoints.push(point)
-        }))
+        if (!exists)
+          set(produce((state: State) => {
+            if (state.rulerPoints.length > 2)
+              state.rulerPoints.shift()
+            state.rulerPoints.push(point)
+          }))
+        else
+          set(produce((state: State) => {
+            const index = state.rulerPoints.findIndex(item => item.nodeId === point.nodeId);
+            state.rulerPoints[index].position = point.position
+          }))
       },
       removeRulerPoint: (nodeId) => {
         set(produce((state: State) => {

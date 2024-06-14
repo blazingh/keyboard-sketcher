@@ -19,7 +19,7 @@ import { PointerAcitonStore } from './stores/pointer-actions-store';
 import { TransformWrapper, TransformComponent, useTransformContext } from "react-zoom-pan-pinch";
 import { Skeleton } from '@nextui-org/react';
 import { cn } from '@/lib/utils';
-import NodesRulerPoints from './nodes-ruler-points';
+import { NodesRulerPoints, NodesRulerLines } from './nodes-ruler-points';
 
 
 const editorWidth = 7000
@@ -257,6 +257,7 @@ function EditorContent({
         {pointerAction.selectedMode === "ruler" && (
           <NodesRulerPoints />
         )}
+        <NodesRulerLines />
 
         {/* node addition overlay */}
         {pointerAction.selectedMode === "addition" && (

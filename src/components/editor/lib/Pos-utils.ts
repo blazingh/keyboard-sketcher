@@ -22,3 +22,16 @@ export function rotatePoint(point: Pos, center: Pos): { x: number, y: number } {
 
   return rotatedPoint;
 }
+
+export function pointsDistance(point1: any, point2: any) {
+  const dx = point2.x - point1.x;
+  const dy = point2.y - point1.y;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+// Function to calculate center position (midpoint) between two points
+export function pointsCenter(point1: any, point2: any) {
+  const centerX = (point1.x + point2.x) / 2;
+  const centerY = (point1.y + point2.y) / 2;
+  return { x: centerX, y: centerY };
+}

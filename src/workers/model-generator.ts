@@ -4,24 +4,26 @@ import { ModelWorkerResult } from './model-a-options';
 import { Node } from '@/components/editor/stores/editor-store';
 import { getNodesOutinePoints } from '@/components/editor/lib/nodes-ouline-points';
 
+
 const defaultOptions = {
-  switchGruveThick: 1.5,
-  standoffThick: 3,
+  baseThickness: 3,
+  switchGruveThickness: 1.5,
 
-  plateThick: 3,
-  wallThick: 4,
+  plateHeight: 9,
+  plateThickness: 3,
+
+  wallHeight: 12,
+  wallThickness: 4,
+  wallRadius: 2,
+
+  standoffThickness: 3,
   wallSwitchPadding: 4,
-  caseTopMargin: 0,
-  caseBottomMargin: 10,
-  caseTopRadius: 0,
 }
-
 
 const tolerance = {
   tight: 0.254,
   loose: 0.508
 }
-
 
 type WorkerMessageData = {
   id: number
@@ -46,18 +48,22 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   const o: typeof defaultOptions = e.data.options ? { ...defaultOptions, ...e.data.options } : defaultOptions
 
   // make sure all data are floats numbers
-  o.plateThick = parseFloat(o.plateThick as any)
-  o.wallThick = parseFloat(o.wallThick as any)
+  o.baseThickness = parseFloat(o.baseThickness as any)
+  o.plateThickness = parseFloat(o.plateThickness as any)
+  o.plateHeight = parseFloat(o.plateHeight as any)
+  o.wallThickness = parseFloat(o.wallThickness as any)
   o.wallSwitchPadding = parseFloat(o.wallSwitchPadding as any)
-  o.caseTopMargin = parseFloat(o.caseTopMargin as any)
-  o.caseBottomMargin = parseFloat(o.caseBottomMargin as any)
-  o.caseTopRadius = parseFloat(o.caseTopRadius as any)
+  o.wallHeight = parseFloat(o.wallHeight as any)
+  o.wallRadius = parseFloat(o.wallRadius as any)
 
   // limit the options values
-  o.caseTopMargin = Math.max(o.plateThick + o.caseTopRadius, o.caseTopMargin)
-  o.caseBottomMargin = Math.max(o.standoffThick, o.caseBottomMargin)
-  o.caseTopRadius = Math.min(o.wallThick / 2, o.caseTopRadius)
+  o.baseThickness = Math.max(o.baseThickness, 2)
+  o.plateThickness = Math.max(o.plateThickness, 1.5)
+  o.wallHeight = Math.max(o.baseThickness + o.plateHeight + o.plateThickness, o.wallHeight)
+  o.wallThickness = Math.max(o.wallThickness, 2)
+  o.wallRadius = Math.min(o.wallThickness / 2, o.wallRadius)
 
+  // extract the nodes
   const nodes: SimpleNode[] = e.data.nodes.map((node: Node) => {
     return {
       type: "switch",
@@ -67,7 +73,6 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   })
 
   const switch_nodes = nodes.filter((node: any) => node.type === "switch")
-  const mcu_nodes = nodes.filter((node: any) => node.type === "mcu")
 
   const borderPoints = getNodesOutinePoints(e.data.nodes as any, o.wallSwitchPadding * 10)
   const sides: number[][][] = []
@@ -82,51 +87,43 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   let base_plate = transforms.scale([0.1, 0.1, 1], geometries.geom2.create(sides as any))
 
   // extrude the plate to a 3d geometry
-  let base_plate_3d = extrusions.extrudeLinear({ height: o.plateThick }, base_plate)
+  let base_plate_3d = extrusions.extrudeLinear({ height: o.plateThickness }, base_plate)
 
   const case_corners: Geom3[] = []
-  const case_bottoms: Geom3[] = []
+
   // generate the sides of the case from the sides of the plate
-  expansions.offset({ delta: tolerance.tight + o.wallThick / 2 }, base_plate).sides.map((points) => {
-    case_bottoms.push(
-      primitives.roundedCylinder({
-        radius: o.wallThick / 2,
-        height: 3,
-        roundRadius: 0,
-        center: [points[0][0], points[0][1], -o.caseBottomMargin - 1.5],
-        segments: 30
-      }),
-    )
+  expansions.offset({ delta: tolerance.tight + o.wallThickness / 2 }, base_plate).sides.map((points) => {
     case_corners.push(
       booleans.union(
+        //wall
         primitives.roundedCylinder({
-          radius: o.wallThick / 2,
-          height: o.caseTopMargin,
-          roundRadius: o.caseTopRadius,
-          center: [points[0][0], points[0][1], o.caseTopMargin / 2],
+          radius: o.wallThickness / 2,
+          height: o.wallHeight,
+          roundRadius: o.wallRadius,
+          center: [points[0][0], points[0][1], o.wallHeight / 2],
           segments: 30
         }),
+        // wall bottom part for flatness
         primitives.roundedCylinder({
-          radius: o.wallThick / 2,
-          height: o.caseBottomMargin,
+          radius: o.wallThickness / 2,
+          height: o.wallRadius * 2,
           roundRadius: 0,
-          center: [points[0][0], points[0][1], o.caseBottomMargin / -2],
+          center: [points[0][0], points[0][1], o.wallRadius],
           segments: 30
         }),
       )
     )
   })
   case_corners.push(case_corners[0])
-  case_bottoms.push(case_bottoms[0])
 
   const case_standoffs: Geom3[] = []
-  expansions.offset({ delta: tolerance.tight - o.standoffThick / 2 + o.wallThick / 2 }, base_plate).sides.map((points) => {
+  expansions.offset({ delta: tolerance.tight - o.standoffThickness / 2 + o.wallThickness / 2 }, base_plate).sides.map((points) => {
     case_standoffs.push(
       primitives.cylinderElliptic({
-        height: o.standoffThick,
+        height: o.standoffThickness,
         startRadius: [0, 0],
-        endRadius: [o.standoffThick * 0.75, o.standoffThick * 0.75],
-        center: [points[0][0], points[0][1], o.standoffThick / -2],
+        endRadius: [o.standoffThickness * 0.75, o.standoffThickness * 0.75],
+        center: [points[0][0], points[0][1], o.standoffThickness / -2 + o.baseThickness + o.plateHeight],
       })
     )
   })
@@ -134,27 +131,43 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
 
   // generate the walls and floor of the case from it's edges
   let base_case_3d = booleans.union(
+    // walls
     hulls.hullChain(case_corners),
+    // plate standoff
     hulls.hullChain(case_standoffs),
-    hulls.hullChain(case_bottoms),
-    transforms.translateZ(
-      -o.caseBottomMargin - o.plateThick,
-      extrusions.extrudeLinear({ height: o.plateThick },
-        expansions.offset({
-          delta: tolerance.tight + o.wallThick / 2
-        },
-          base_plate
-        )
+    //base
+    extrusions.extrudeLinear(
+      { height: o.baseThickness },
+      expansions.offset({ delta: tolerance.tight + o.wallThickness / 2 },
+        base_plate
       )
     )
   )
 
+  // switch cutout
+  switch_nodes.map((node) => {
+    base_case_3d = booleans.subtract(
+      base_case_3d,
+      transforms.translate(
+        [node.position.x, node.position.y, o.baseThickness + o.plateHeight - 4.15],
+        transforms.rotateZ(
+          utils.degToRad(node.position.r),
+          primitives.cuboid({
+            size: [node.size.w, node.size.h, 8.30],
+            center: [0, 0, 0]
+          })
+        )
+      )
+    )
+  })
+
   // cut the mcu from the case
+  /*
   mcu_nodes.map((node) => {
     base_case_3d = booleans.subtract(
       base_case_3d,
       transforms.translate(
-        [node.position.x, node.position.y, -o.caseBottomMargin + 1],
+        [node.position.x, node.position.y, 1],
         transforms.rotateZ(
           utils.degToRad(node.position.r),
           primitives.cuboid({
@@ -165,33 +178,41 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
       )
     )
   })
+  */
 
   // cut the switches holes and gruves from the plate
   switch_nodes.map((node) => {
     base_plate_3d = booleans.subtract(
       base_plate_3d,
+      // switch cutout
       transforms.translate(
-        [node.position.x, node.position.y, o.plateThick / 2],
+        [node.position.x, node.position.y, o.plateThickness / 2],
         transforms.rotateZ(
           utils.degToRad(node.position.r),
           primitives.cuboid({
-            size: [node.size.w, node.size.h, o.plateThick],
+            size: [node.size.w, node.size.h, o.plateThickness],
             center: [0, 0, 0]
           })
         )
       ),
+      // switch gruve cutout
       transforms.translate(
-        [node.position.x, node.position.y, (o.plateThick - o.switchGruveThick) / 2],
+        [node.position.x, node.position.y, (o.plateThickness - o.switchGruveThickness) / 2],
         transforms.rotateZ(
           utils.degToRad(node.position.r),
           primitives.cuboid({
-            size: [node.size.w + 2, node.size.h + 2, o.plateThick - o.switchGruveThick],
+            size: [node.size.w + 2, node.size.h + 2, o.plateThickness - o.switchGruveThickness],
             center: [0, 0, 0]
           })
         )
       )
     )
   })
+
+  base_plate_3d = transforms.translateZ(
+    o.baseThickness + o.plateHeight,
+    base_plate_3d
+  )
 
   const geoms: ModelWorkerResult["geometries"] = [
     {

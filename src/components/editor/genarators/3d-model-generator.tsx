@@ -94,7 +94,6 @@ function ModelGeneratorPreview() {
             CSG2Geom(store.generatedGeoms[0].geom),
             CSG2Geom(store.generatedGeoms[1].geom)
           ]}
-          url="https://storage.googleapis.com/ucloud-v3/ccab50f18fb14c91ccca300a.stl"
           orbitControls
           shadows
           style={{

@@ -1,6 +1,5 @@
 import React, { CSSProperties, useEffect, useMemo, useState } from 'react'
-import { useFrame, useLoader, useThree } from '@react-three/fiber'
-import { STLLoader } from 'three-stdlib'
+import { useFrame, useThree } from '@react-three/fiber'
 import { Box3, BufferGeometry, Color, Group, Mesh, CircleGeometry } from 'three'
 import { STLExporter } from './exporters'
 import Model3D, { ModelDimensions } from './sceneElements/model3d'
@@ -9,7 +8,6 @@ import Lights from './sceneElements/light'
 import Camera, { CameraPosition, polarToCartesian } from './sceneElements/camera'
 import OrbitControls from './sceneElements/orbitControlls'
 import * as BufferGeometryUtils from "three-stdlib"
-import { initial } from 'lodash'
 
 
 const INITIAL_LATITUDE = Math.PI / 8
@@ -51,10 +49,7 @@ export interface ModelProps {
 }
 
 export interface SceneSetupProps {
-  url: string
   geoms: any[]
-  /** @deprecated use cameraProps.initialPosition instead */
-  cameraInitialPosition?: Partial<CameraPosition>
   extraHeaders?: Record<string, string>
   shadows?: boolean
   showAxes?: boolean
@@ -68,17 +63,10 @@ export interface SceneSetupProps {
 const SceneSetup: React.FC<SceneSetupProps> = (
   {
     geoms,
-    url,
-    extraHeaders,
     shadows = false,
     showAxes = false,
     orbitControls = false,
     onFinishLoading = () => { },
-    cameraInitialPosition: {
-      latitude: deprecatedLatitude,
-      longitude: deprecatedLongitude,
-      distance: deprecatedDistanceFactor
-    } = {},
     cameraProps: {
       ref: cameraRef,
       initialPosition: {
@@ -145,14 +133,18 @@ const SceneSetup: React.FC<SceneSetupProps> = (
   }
 
   function onLoaded(dims: ModelDimensions, mesh: Mesh): void {
+    if (inited) {
+      setTimeout(() => setSceneReady(true), 100)
+      return
+    }
     setMesh(mesh)
     const { width, length, height, boundingRadius } = dims
     setMeshDims(dims)
     setModelCenter([positionX ?? width / 2, positionY ?? length / 2, height / 2])
     setCameraInitialPosition({
-      latitude: deprecatedLatitude ?? latitude,
-      longitude: deprecatedLongitude ?? longitude,
-      distance: calculateCameraDistance(boundingRadius, deprecatedDistanceFactor ?? distanceFactor)
+      latitude,
+      longitude,
+      distance: calculateCameraDistance(boundingRadius, distanceFactor)
     })
     onFinishLoading(dims)
     setTimeout(() => setSceneReady(true), 100) // let the three.js render loop place things
@@ -199,11 +191,18 @@ const SceneSetup: React.FC<SceneSetupProps> = (
   return (
     <>
       <scene background={BACKGROUND} />
-      {sceneReady && showAxes && <axesHelper scale={[50, 50, 50]} />}
-      {(cameraInitialPosition != null) && <Camera
-        initialPosition={cameraInitialPosition}
-        center={modelCenter}
-      />}
+
+      {(sceneReady && showAxes) && (
+        <axesHelper scale={[50, 50, 50]} />
+      )}
+
+      {(cameraInitialPosition != null) && (
+        <Camera
+          initialPosition={cameraInitialPosition}
+          center={modelCenter}
+        />
+      )}
+
       <Model3D
         name={'group'}
         meshProps={{ name: 'mesh' }}
@@ -215,11 +214,11 @@ const SceneSetup: React.FC<SceneSetupProps> = (
         materialProps={{ color }}
         onLoaded={(a, b) => {
           setSceneReady(true)
-          if (inited) return
           onLoaded(a, b)
           setInited(true)
         }}
       />
+
       <Floor
         width={gridWidth ?? gridLength}
         length={gridLength ?? gridWidth}
@@ -227,12 +226,16 @@ const SceneSetup: React.FC<SceneSetupProps> = (
         noShadow={!shadows}
         offset={FLOOR_DISTANCE}
       />
+
       <Lights
         distance={LIGHT_DISTANCE}
         offsetX={modelPosition[0]}
         offsetY={modelPosition[1]}
       />
-      {sceneReady && orbitControls && <OrbitControls target={modelCenter} />}
+
+      {(sceneReady && orbitControls) && (
+        <OrbitControls target={modelCenter} />
+      )}
     </>
   )
 }

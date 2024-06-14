@@ -73,8 +73,7 @@ export default function EditorViewPort() {
               <EditorContent />
             </TransformComponent>
           </TransformWrapper>
-        )
-        : (
+        ) : (
           <div className='w-full h-full p-8 relative'>
             <Skeleton className='w-full h-full rounded-xl' />
             <span className='absolute top-1/2 left-1/2 -translate-y-1/2 -translate-x-1/2 font-draft text-[3.8rem]'>

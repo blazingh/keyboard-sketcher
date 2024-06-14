@@ -1,5 +1,4 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { Select, SelectValue, SelectItem, SelectContent, SelectTrigger } from "@/components/ui/select";
 import { ChevronDown, FileBox, HelpCircle, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ModelWorkerResult, modelAOptionsList } from "@/workers/model-a-options";
@@ -10,7 +9,7 @@ import { GeomsStlPreview } from "@/components/geoms-stl-preview";
 import { useEffect, useState } from "react";
 import StlViewer from "@/components/stlViewer/stl-viewer";
 import { CSG2Geom } from "@/lib/geometries";
-import { Button, DropdownMenu, Switch, DropdownItem, DropdownTrigger, Dropdown } from "@nextui-org/react";
+import { Button, DropdownMenu, Switch, DropdownItem, DropdownTrigger, Dropdown, Select, SelectSection, SelectItem } from "@nextui-org/react";
 import { STLExporter } from "three-stdlib";
 import { Mesh } from "three";
 
@@ -37,25 +36,20 @@ function ModelGeneratorOptions() {
     <ScrollArea className="w-full h-full">
       <div className="w-full flex flex-col gap-4 p-4">
 
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <label className="text-sm">Base Model</label>
-            <HelpCircle className="w-5 h-5" />
-          </div>
-          <Select defaultValue={"a"} >
-            <SelectTrigger>
-              <SelectValue placeholder="base model" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="a">Model A</SelectItem>
-              <SelectItem value="soon" disabled>Model B</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Select
+          disallowEmptySelection
+          label="Base Model"
+          defaultSelectedKeys={["a"]}
+          disabledKeys={["b"]}
+        >
+          <SelectItem key={"a"} >Model A</SelectItem>
+          <SelectItem key={"b"} >Model B</SelectItem>
+        </Select>
 
         <Separator />
 
         <Button
+          color="primary"
           onPress={() => { store.generateModel(nodes()) }}
         >
           generate

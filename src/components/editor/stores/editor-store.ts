@@ -39,19 +39,25 @@ export type ArcState = {
 
 type State = {
   _hasHydrated: boolean,
-  /* nodes include switch, controllers or any newly added item to the viewport */
+  /** nodes include switch, controllers or any newly added item to the viewport */
   nodes: { [key: Node["id"]]: Node },
 
-  /* arcState contain nodes spanned along the arc */
+  /** points to mesure distance between nodes */
+  rulerPoints: {
+    nodeId: Node["id"]
+    position: "tl" | "tr" | "br" | "bl" | "c"
+  }[]
+
+  /** arcState contain nodes spanned along the arc */
   arcState: ArcState,
 
-  /* selected Node */
+  /** selected Node */
   activeNodes: Node["id"][],
 
-  /* snapLines position */
+  /** snapLines position */
   snapLines?: GetSnapLinesResult,
 
-  /* current draged node x and y displacement, used to translate the selected nodes on pointer drag */
+  /** current draged node x and y displacement, used to translate the selected nodes on pointer drag */
   activeDxy: { x: number, y: number }
   activeDisplacement: Pos
 }
@@ -73,6 +79,9 @@ type Action = {
   removeActiveNode: (id: Node["id"]) => void
   toggleActiveNode: (id: Node["id"]) => void
   clearActiveNodes: () => void
+
+  addRulerPoint: (point: State["rulerPoints"][number]) => void
+  removeRulerPoint: (nodeId: Node["id"]) => void
 
   updateSnapLines: (target: Node) => void
   resetSnapLines: () => void
@@ -100,6 +109,7 @@ const initialNodes: { [key: Node["id"]]: Node } = {
 export const initialStoreState: State = {
   _hasHydrated: false,
   nodes: initialNodes,
+  rulerPoints: [],
   arcState: {
     pos: { x: 0, y: 0, r: 0 },
     switchCounts: [3, 0, 3, 0],
@@ -175,6 +185,18 @@ export const useEditorStore = create<EditorStoreType>()(
           newNodes.forEach(newNode => {
             state.nodes[newNode.id] = newNode
           })
+        }))
+      },
+      addRulerPoint: (point) => {
+        const exists = get().rulerPoints.some(item => item.nodeId === point.nodeId);
+        if (exists) return
+        set(produce((state: State) => {
+          state.rulerPoints.push(point)
+        }))
+      },
+      removeRulerPoint: (nodeId) => {
+        set(produce((state: State) => {
+          state.rulerPoints = state.rulerPoints.filter(point => point.nodeId !== nodeId)
         }))
       },
       addActiveNode: (id) => {

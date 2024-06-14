@@ -1,6 +1,6 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Select, SelectValue, SelectItem, SelectContent, SelectTrigger } from "@/components/ui/select";
-import { HelpCircle, Loader2 } from "lucide-react";
+import { ChevronDown, FileBox, HelpCircle, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ModelWorkerResult, modelAOptionsList } from "@/workers/model-a-options";
 import { useThreeDModelGeneratorStore } from "../stores/3d-model-generator-store";
@@ -10,7 +10,9 @@ import { GeomsStlPreview } from "@/components/geoms-stl-preview";
 import { useEffect, useState } from "react";
 import StlViewer from "@/components/stlViewer/stl-viewer";
 import { CSG2Geom } from "@/lib/geometries";
-import { Switch } from "@nextui-org/react";
+import { Button, DropdownMenu, Switch, DropdownItem, DropdownTrigger, Dropdown } from "@nextui-org/react";
+import { STLExporter } from "three-stdlib";
+import { Mesh } from "three";
 
 export default function ThreeDModelGenerator() {
   return (
@@ -30,6 +32,7 @@ export default function ThreeDModelGenerator() {
 
 function ModelGeneratorOptions() {
   const store = useThreeDModelGeneratorStore()
+  const { nodes } = useEditorStore((state) => ({ nodes: state.nodesArray }))
   return (
     <ScrollArea className="w-full h-full">
       <div className="w-full flex flex-col gap-4 p-4">
@@ -51,6 +54,12 @@ function ModelGeneratorOptions() {
         </div>
 
         <Separator />
+
+        <Button
+          onPress={() => { store.generateModel(nodes()) }}
+        >
+          generate
+        </Button>
 
         {modelAOptionsList.map((option) => {
           if (option.type === "number")
@@ -106,6 +115,37 @@ function ModelGeneratorPreview() {
                 {csg.label}
               </Switch>
             ))}
+          </div>
+          <div className="absolute bottom-4 right-4">
+            <Dropdown>
+              <DropdownTrigger>
+                <Button color="primary" endContent={<ChevronDown />}>
+                  Download
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu>
+                {store.generatedGeoms.map((csg: ModelWorkerResult["geometries"][number]) => (
+                  <DropdownItem
+                    key={csg.id}
+                    onPress={() => {
+                      const exporter = new STLExporter()
+                      const buffer = exporter.parse(
+                        new Mesh(CSG2Geom(csg.geom)),
+                        { binary: true }
+                      )
+                      const link = document.createElement('a');
+                      const blob = new Blob([buffer], { type: 'application/octet-stream' })
+                      link.href = URL.createObjectURL(blob)
+                      link.download = `${csg.label}.stl`
+                      link.click()
+                    }}
+                    startContent={<FileBox className="mr-2" />}
+                  >
+                    {csg.label}.stl
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
           </div>
           <StlViewer
             geoms={

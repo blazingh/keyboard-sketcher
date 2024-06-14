@@ -113,7 +113,7 @@ const SceneSetup: React.FC<SceneSetupProps> = (
   }, [geoms])
 
   const geometry = useMemo(
-    () => geoms.length > 0 ? BufferGeometryUtils.mergeBufferGeometries(geoms) : new CircleGeometry(5, 32),
+    () => geoms.length > 0 ? BufferGeometryUtils.mergeBufferGeometries(geoms) : new CircleGeometry(0, 0),
     [geoms]
   )
 

@@ -62,6 +62,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   o.wallHeight = Math.max(o.baseThickness + o.plateHeight + o.plateThickness, o.wallHeight)
   o.wallThickness = Math.max(o.wallThickness, 2)
   o.wallRadius = Math.min(o.wallThickness / 2, o.wallRadius)
+  o.wallSwitchPadding = Math.max(o.wallSwitchPadding, 3)
 
   // extract the nodes
   const nodes: SimpleNode[] = e.data.nodes.map((node: Node) => {

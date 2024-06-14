@@ -91,7 +91,7 @@ export const modelAOptionsList: {
       id: 7,
       key: "wallSwitchPadding",
       label: "wall switch distance",
-      description: "distance between the switches and case walls",
+      description: "distance between the switches and case walls (min: 3mm)",
       type: "number"
     },
   ]

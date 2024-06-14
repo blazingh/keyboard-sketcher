@@ -108,18 +108,17 @@ const SceneSetup: React.FC<SceneSetupProps> = (
   const [sceneReady, setSceneReady] = useState(false)
   const [inited, setInited] = useState(false)
 
-
   useEffect(() => {
     setSceneReady(false)
   }, [geoms])
 
   const geometry = useMemo(
-    () => BufferGeometryUtils.mergeBufferGeometries(geoms) ?? new CircleGeometry(5, 32),
+    () => geoms.length > 0 ? BufferGeometryUtils.mergeBufferGeometries(geoms) : new CircleGeometry(5, 32),
     [geoms]
   )
 
   const processedGeometry = useMemo(
-    () => geometryProcessor?.(geometry) ?? geometry,
+    () => geometryProcessor?.(geometry as any) ?? geometry,
     [geometry, geometryProcessor]
   )
 
@@ -207,7 +206,7 @@ const SceneSetup: React.FC<SceneSetupProps> = (
         name={'group'}
         meshProps={{ name: 'mesh' }}
         scale={scale}
-        geometry={processedGeometry}
+        geometry={processedGeometry as any}
         position={modelPosition}
         rotation={[rotationX, rotationY, rotationZ]}
         visible={sceneReady}

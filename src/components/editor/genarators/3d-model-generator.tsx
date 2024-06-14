@@ -2,14 +2,15 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { Select, SelectValue, SelectItem, SelectContent, SelectTrigger } from "@/components/ui/select";
 import { HelpCircle, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { modelAOptionsList } from "@/workers/model-a-options";
+import { ModelWorkerResult, modelAOptionsList } from "@/workers/model-a-options";
 import { useThreeDModelGeneratorStore } from "../stores/3d-model-generator-store";
 import InputWithKeypad from "@/components/virtual-numpad-input";
 import { useEditorStore } from "../stores/editor-store";
 import { GeomsStlPreview } from "@/components/geoms-stl-preview";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import StlViewer from "@/components/stlViewer/stl-viewer";
 import { CSG2Geom } from "@/lib/geometries";
+import { Switch } from "@nextui-org/react";
 
 export default function ThreeDModelGenerator() {
   return (
@@ -74,7 +75,7 @@ function ModelGeneratorOptions() {
 function ModelGeneratorPreview() {
   const store = useThreeDModelGeneratorStore()
   const { nodes } = useEditorStore((state) => ({ nodes: state.nodesArray }))
-
+  const [hiddenGeoms, setHiddenGeoms] = useState<any[]>([])
   useEffect(() => {
     store.generateModel(nodes())
   }, [store.params])
@@ -89,20 +90,37 @@ function ModelGeneratorPreview() {
       )}
 
       {store.generatedGeoms.length != 0 && (
-        <StlViewer
-          geoms={[
-            CSG2Geom(store.generatedGeoms[0].geom),
-            CSG2Geom(store.generatedGeoms[1].geom)
-          ]}
-          orbitControls
-          shadows
-          style={{
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-          }}
-        />
+        <>
+          <div className="absolute top-2 left-0 flex flex-col gap-2">
+            {store.generatedGeoms.map((csg: ModelWorkerResult["geometries"][number]) => (
+              <Switch
+                isSelected={!hiddenGeoms.includes(csg.id)}
+                onValueChange={() => {
+                  setHiddenGeoms(p =>
+                    p.includes(csg.id)
+                      ? p.filter(el => el !== csg.id)
+                      : [...p, csg.id]
+                  )
+                }}
+              >
+                {csg.label}
+              </Switch>
+            ))}
+          </div>
+          <StlViewer
+            geoms={
+              store.generatedGeoms.filter(csg => !hiddenGeoms.includes(csg.id)).map(csg => CSG2Geom(csg.geom))
+            }
+            orbitControls
+            shadows
+            style={{
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+            }}
+          />
+        </>
       )}
     </>
   )

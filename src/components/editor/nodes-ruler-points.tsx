@@ -50,7 +50,7 @@ export function NodesRulerLines() {
         const distance = (Math.round(pointsDistance(pnt, pnts[index + 1]) * 100) / 100).toFixed(1);
         const center = pointsCenter(pnt, pnts[index + 1])
         return (
-          <g>
+          <g key={pnt.key}>
             <line x1={pnt.x} y1={pnt.y} x2={pnts[index + 1].x} y2={pnts[index + 1].y} className="stroke-white/50" />
             <text x={center.x} y={center.y} dominantBaseline="middle" textAnchor="middle" className="stroke-black fill-white text-xs font-bold">{distance}mm</text>
           </g>

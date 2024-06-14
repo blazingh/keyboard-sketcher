@@ -98,6 +98,7 @@ function ModelGeneratorPreview() {
           <div className="absolute top-2 left-0 flex flex-col gap-2">
             {store.generatedGeoms.map((csg: ModelWorkerResult["geometries"][number]) => (
               <Switch
+                key={csg.id}
                 isSelected={!hiddenGeoms.includes(csg.id)}
                 onValueChange={() => {
                   setHiddenGeoms(p =>

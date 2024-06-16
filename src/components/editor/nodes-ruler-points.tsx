@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { EditorStoreType, Node, useEditorStore } from "./stores/editor-store";
 import { pointsCenter, pointsDistance, rotatePoint } from "./lib/Pos-utils";
+import { useTransformContext } from "react-zoom-pan-pinch";
 
 export function nodeEdges(node: Node, noCenter: boolean = false) {
   const edges = [
@@ -23,6 +24,7 @@ export function nodeEdges(node: Node, noCenter: boolean = false) {
 
 export function NodesRulerLines() {
   const editor = useEditorStore()
+  const { transformState: { scale } } = useTransformContext()
   const pnts = function() {
     const arr: any[] = []
     editor.rulerPoints.forEach((point) => {
@@ -50,9 +52,18 @@ export function NodesRulerLines() {
         const distance = (Math.round(pointsDistance(pnt, pnts[index + 1]) * 100) / 100).toFixed(1);
         const center = pointsCenter(pnt, pnts[index + 1])
         return (
-          <g key={pnt.key}>
+          <g key={pnt.key + pnt.x + pnt.y}>
             <line x1={pnt.x} y1={pnt.y} x2={pnts[index + 1].x} y2={pnts[index + 1].y} className="stroke-white/50" />
-            <text x={center.x} y={center.y} dominantBaseline="middle" textAnchor="middle" className="stroke-black fill-white text-xs font-bold">{distance}mm</text>
+            <text
+              x={center.x}
+              y={center.y}
+              dominantBaseline="middle"
+              textAnchor="middle"
+              className="stroke-black fill-white font-bold"
+              fontSize={12}
+            >
+              {distance}mm
+            </text>
           </g>
         )
       })}

@@ -33,7 +33,7 @@ export default function EditorToolbar() {
         {pointerActionsOptions.map((action) => (
           <Button
             key={action.value}
-            variant={pointerAction.selectedMode === action.value ? "faded" : "light"}
+            variant={pointerAction.selectedMode === action.value ? "flat" : "light"}
             color={pointerAction.selectedMode === action.value ? "primary" : "default"}
             isIconOnly
             size='sm'

@@ -1,7 +1,6 @@
 import { cn } from "@/lib/utils";
 import { EditorStoreType, Node, useEditorStore } from "./stores/editor-store";
 import { pointsCenter, pointsDistance, rotatePoint } from "./lib/Pos-utils";
-import { useTransformContext } from "react-zoom-pan-pinch";
 
 export function nodeEdges(node: Node, noCenter: boolean = false) {
   const edges = [
@@ -24,7 +23,6 @@ export function nodeEdges(node: Node, noCenter: boolean = false) {
 
 export function NodesRulerLines() {
   const editor = useEditorStore()
-  const { transformState: { scale } } = useTransformContext()
   const pnts = function() {
     const arr: any[] = []
     editor.rulerPoints.forEach((point) => {

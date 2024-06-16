@@ -30,8 +30,8 @@ export default function WebsiteInfoDialog({ isOpen, onOpenChange }: { isOpen: bo
 
             <ModalBody >
               <div className="mb-2 flex flex-col gap-4 items-center">
-                <p>I'm too lazy to write anyting</p>
-                <p>here is my email if you want anything from me</p>
+                <p>I am too lazy to write anyting</p>
+                <p>Here is my email if you want anything</p>
                 <a href="mailto:hey@hadibaalbaki.com" target="_blank" className="text-primary underline">hey@hadibaalbaki.com</a>
                 <p></p>
                 <p></p>

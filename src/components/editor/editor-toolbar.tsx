@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { Button } from "@nextui-org/react";
 import { PointerAcitonStore } from './stores/pointer-actions-store';
 import { pointerActionsOptions } from './constants/actions';
+import { Cable } from 'lucide-react';
 
 export default function EditorToolbar() {
 
@@ -32,7 +33,7 @@ export default function EditorToolbar() {
         {pointerActionsOptions.map((action) => (
           <Button
             key={action.value}
-            variant={pointerAction.selectedMode === action.value ? "bordered" : "light"}
+            variant={pointerAction.selectedMode === action.value ? "faded" : "light"}
             color={pointerAction.selectedMode === action.value ? "primary" : "default"}
             isIconOnly
             size='sm'
@@ -41,6 +42,17 @@ export default function EditorToolbar() {
             {action.icon}
           </Button>
         ))}
+
+        <Button
+          variant={"light"}
+          color={"default"}
+          isIconOnly
+          size='sm'
+          className='opacity-25'
+          disabled
+        >
+          <Cable className='w-5 h-5' />
+        </Button>
 
       </div>
     </div >

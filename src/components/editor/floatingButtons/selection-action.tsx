@@ -50,7 +50,7 @@ export default function SelectionActionFloatButtons() {
       {selectionActionsOptions.map((action) => (
         <Button
           key={action.value}
-          variant={selectionAction.selectedMode === action.value ? "bordered" : "light"}
+          variant={selectionAction.selectedMode === action.value ? "faded" : "light"}
           color={selectionAction.selectedMode === action.value ? "primary" : "default"}
           isIconOnly
           size='sm'

@@ -1,3 +1,7 @@
+import EmailNotification from "../email-notification";
+
 export default function PCBGenerator() {
-  return (<div> </div>)
+  return (
+    <EmailNotification featureName="PCB_Generator" />
+  )
 }

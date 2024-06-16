@@ -1,7 +1,6 @@
 import { Button, Modal, ModalContent, ModalProps } from "@nextui-org/react"
 import ThreeDModelGenerator from "../genarators/3d-model-generator"
 import { X } from "lucide-react"
-import StlViewer from "@/components/stlViewer/stl-viewer"
 
 
 export default function ThreeDModelGeneratorDialog({ isOpen, onOpenChange }: { isOpen: boolean, onOpenChange: ModalProps["onOpenChange"] }) {

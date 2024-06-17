@@ -2,6 +2,7 @@
 import * as y from 'yup';
 import { createServerActionClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
+import { createClient } from '@/lib/supabase/server';
 
 const formSchema = y.object({
   email: y.string().email().required(),
@@ -29,9 +30,9 @@ export async function addToMailNotification(prevState: any, formData: FormData) 
 
   // send the data to the backend
   try {
-    const supabase = createServerActionClient({
-      cookies
-    })
+    const cookieStore = cookies()
+    const supabase = createClient(cookieStore)
+
     const { error } = await supabase.from("email_notification_list").insert({
       email: rawFormData.email,
       pending_feature: rawFormData.feature

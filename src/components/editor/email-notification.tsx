@@ -1,9 +1,9 @@
 import { addToMailNotification } from "@/actions/add-to-mail-notification";
 import { cn } from "@/lib/utils";
-import { Button, Input, useDisclosure } from "@nextui-org/react";
+import { Button, ButtonProps, Input, useDisclosure } from "@nextui-org/react";
 import { Construction, SendHorizonal } from "lucide-react";
 import { useEffect } from "react";
-import { useFormState } from "react-dom";
+import { useFormState, useFormStatus } from "react-dom";
 
 const initialState = {
   email: "",
@@ -52,16 +52,7 @@ export default function EmailNotification({ featureName }: { featureName: string
         </span>
 
         <div>
-          <Button
-            isDisabled={state.success}
-            type="submit"
-            fullWidth
-            color="primary"
-            endContent={<SendHorizonal />}
-            size="lg"
-          >
-            Email Me Updates
-          </Button>
+          <SubmitButton isDisabled={state.success} />
           <span className="text-xs">
             (no spam, no ads, no 💩 . just notification for this feature)
           </span>
@@ -69,5 +60,22 @@ export default function EmailNotification({ featureName }: { featureName: string
 
       </div>
     </form>
+  )
+}
+
+function SubmitButton(props: ButtonProps) {
+  const { pending } = useFormStatus()
+  return (
+    <Button
+      isDisabled={props.isDisabled}
+      isLoading={pending}
+      type="submit"
+      fullWidth
+      color="primary"
+      endContent={<SendHorizonal />}
+      size="lg"
+    >
+      Email Me Updates
+    </Button>
   )
 }

@@ -1,5 +1,7 @@
 'use server'
 import * as y from 'yup';
+import { createServerActionClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
 
 const formSchema = y.object({
   email: y.string().email().required(),
@@ -26,13 +28,28 @@ export async function addToMailNotification(prevState: any, formData: FormData) 
   }
 
   // send the data to the backend
-
+  try {
+    const supabase = createServerActionClient({
+      cookies
+    })
+    const { error } = await supabase.from("email_notification_list").insert({
+      email: rawFormData.email,
+      pending_feature: rawFormData.feature
+    })
+    if (error !== null) throw "";
+  } catch (e) {
+    return {
+      ...prevState,
+      success: false,
+      message: "unkown server error"
+    }
+  }
 
   // retrun if success
   return {
     ...prevState,
     success: true,
-    message: "email added"
+    message: "Email Submited  ✅"
   }
 
 }

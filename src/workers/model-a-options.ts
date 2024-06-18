@@ -35,7 +35,7 @@ export const modelADefaultOptionsValues: ModelAOptionsTypes = {
   wallRadius: "0",
 
   standoffThick: "3",
-  wallSwitchPadding: "4",
+  wallSwitchPadding: "2.5",
 }
 
 export const modelAOptionsList: {

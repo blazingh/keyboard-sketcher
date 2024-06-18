@@ -3,6 +3,7 @@ import hull from 'hull.js'
 import { primitives, booleans, hulls, extrusions, expansions, transforms, utils, geometries } from '@jscad/modeling'
 import polygonClipping from "polygon-clipping"
 
+
 type outlinePoints = number[][]
 
 function mirrorPointsHorizontally(points: number[][]): [number, number][] {
@@ -12,32 +13,40 @@ function mirrorPointsVertically(points: number[][]): [number, number][] {
   return points.map(point => [point[0], point[1] * -1]);
 }
 
-export function getNodesOutinePoints(nodes: Node[], padding: number = 0, offset: number = 0): outlinePoints {
+export function getNodesOutinePoints(
+  nodes: Node[],
+  options: {
+    wallWidth: number
+    wallSwitchPadding?: number
+    offset?: number
+  }
+): outlinePoints {
 
   const hullPadd = 140 * 4
 
   const initPoints: number[][] = []
 
   nodes.filter(node => node.type === "switch").forEach(node => {
-    const { pos: { x, y, r }, size: { w, h } } = node
-    const p = padding;
+    const { pos: { x, y, r }, size: { w, h, p } } = node;
+    const tp = p + (options?.wallSwitchPadding ?? 0); // total padding
     [
-      [x + p + w / 2, y + p + h / 2],
-      [x + p + w / 2, y - p - h / 2],
-      [x - p - w / 2, y + p + h / 2],
-      [x - p - w / 2, y - p - h / 2],
+      [x + tp + w / 2, y + tp + h / 2],
+      [x + tp + w / 2, y - tp - h / 2],
+      [x - tp - w / 2, y + tp + h / 2],
+      [x - tp - w / 2, y - tp - h / 2],
     ].forEach((pnt) => {
       initPoints.push(rotatePoint(pnt, [x, y], -r))
     })
   });
 
   nodes.filter(node => node.type === "mcu").forEach(node => {
-    const { pos: { x, y, r }, size: { w, h } } = node;
+    const { pos: { x, y, r }, size: { w, h, p } } = node;
+    const ww = options.wallWidth;
     [
-      [x + w / 2, y + h / 2],
-      [x + w / 2, y - h / 2],
-      [x - w / 2, y + h / 2],
-      [x - w / 2, y - h / 2],
+      [x + p + w / 2, y + p + h / 2 - ww],
+      [x + p + w / 2, y - p - h / 2 + ww],
+      [x - p - w / 2, y + p + h / 2 - ww],
+      [x - p - w / 2, y - p - h / 2 + ww],
     ].forEach((pnt) => {
       initPoints.push(rotatePoint(pnt, [x, y], -r))
     })
@@ -75,7 +84,7 @@ export function getNodesOutinePoints(nodes: Node[], padding: number = 0, offset:
   })
 
   const geom = geometries.geom2.create(sides as any)
-  const points = expansions.offset({ delta: offset }, geom).sides.map((pnts) => {
+  const points = expansions.offset({ delta: options?.offset ?? 0 }, geom).sides.map((pnts) => {
     return pnts[0]
   })
 

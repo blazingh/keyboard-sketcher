@@ -11,7 +11,7 @@ import { arcsGhostNodes } from '../nodes/arc-group-node';
 export type Pos = {
   x: number,
   y: number,
-  r: number,
+  r: number, // rotation
 }
 
 export type Node = {
@@ -19,7 +19,8 @@ export type Node = {
   pos: Pos
   size: {
     w: number,
-    h: number
+    h: number,
+    p: number, // padding
   }
   selectable: boolean
   type: "switch" | "mcu"
@@ -97,15 +98,15 @@ type Action = {
 }
 
 export const baseNodeState: Node = {
-  id: "1", size: { w: 140, h: 140 }, pos: { x: 0, y: 0, r: 0 }, selectable: true, type: "switch"
+  id: "1", size: { w: 140, h: 140, p: 25 }, pos: { x: 0, y: 0, r: 0 }, selectable: true, type: "switch"
 }
 
 const initialNodes: { [key: Node["id"]]: Node } = {
-  "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 750, y: 750, r: 0 }, selectable: true, type: "switch" },
-  "2": { id: "2", size: { w: 140, h: 140 }, pos: { x: 750, y: 850, r: 0 }, selectable: true, type: "switch" },
-  "4": { id: "4", size: { w: 140, h: 140 }, pos: { x: 850, y: 850, r: 0 }, selectable: true, type: "switch" },
-  "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: 850, y: 750, r: 0 }, selectable: true, type: "switch" },
-  "5": { id: "5", size: { w: 180, h: 360 }, pos: { x: 1000, y: 1000, r: 0 }, selectable: true, type: "mcu" }
+  "1": { id: "1", size: { w: 140, h: 140, p: 25 }, pos: { x: 750, y: 750, r: 0 }, selectable: true, type: "switch" },
+  "2": { id: "2", size: { w: 140, h: 140, p: 25 }, pos: { x: 750, y: 850, r: 0 }, selectable: true, type: "switch" },
+  "4": { id: "4", size: { w: 140, h: 140, p: 25 }, pos: { x: 850, y: 850, r: 0 }, selectable: true, type: "switch" },
+  "3": { id: "3", size: { w: 140, h: 140, p: 25 }, pos: { x: 850, y: 750, r: 0 }, selectable: true, type: "switch" },
+  "5": { id: "5", size: { w: 180, h: 360, p: 0 }, pos: { x: 1000, y: 1000, r: 0 }, selectable: true, type: "mcu" }
 }
 
 export const initialStoreState: State = {
@@ -319,7 +320,7 @@ export const useEditorStore = create<EditorStoreType>()(
     {
       name: 'sketcher-nodes',
       skipHydration: true,
-      version: 7,
+      version: 8,
       partialize: (state) => ({ nodes: state.nodes }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true)

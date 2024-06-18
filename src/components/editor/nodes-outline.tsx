@@ -13,8 +13,13 @@ export function NodesOutline({
 
   const points = useMemo(() => {
     if (nodes.length < 1) return { inner: [], outer: [] }
-    const basePoints = getNodesOutinePoints(nodes, parseFloat(model.params.wallSwitchPadding) * 10)
-    const offsetPoints = getNodesOutinePoints(nodes, parseFloat(model.params.wallSwitchPadding) * 10, parseFloat(model.params.wallThickness) * 10)
+    const outlineOptions = {
+      wallSwitchPadding: parseFloat(model.params.wallSwitchPadding) * 10,
+      wallWidth: parseFloat(model.params.wallThickness) * 10,
+      offset: parseFloat(model.params.wallThickness) * 10
+    }
+    const basePoints = getNodesOutinePoints(nodes, { ...outlineOptions, offset: 0 })
+    const offsetPoints = getNodesOutinePoints(nodes, outlineOptions)
     return {
       inner: basePoints,
       outer: offsetPoints

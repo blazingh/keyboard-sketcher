@@ -67,15 +67,19 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   // extract the nodes
   const nodes: SimpleNode[] = e.data.nodes.map((node: Node) => {
     return {
-      type: "switch",
+      type: node.type,
       position: { x: node.pos.x / 10, y: node.pos.y / 10, r: node.pos.r },
-      size: { w: node.size.w / 10, h: node.size.h / 10 }
+      size: { w: node.size.w / 10, h: node.size.h / 10, p: node.size.p }
     }
   })
 
   const switch_nodes = nodes.filter((node: any) => node.type === "switch")
+  const mcu_nodes = nodes.filter((node: any) => node.type === "mcu")
 
-  const borderPoints = getNodesOutinePoints(e.data.nodes as any, o.wallSwitchPadding * 10)
+  const borderPoints = getNodesOutinePoints(e.data.nodes as any, {
+    wallSwitchPadding: o.wallSwitchPadding * 10,
+    wallWidth: o.wallThickness * 10
+  })
   const sides: number[][][] = []
 
   borderPoints.map((point, index) => {

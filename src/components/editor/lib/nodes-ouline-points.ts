@@ -12,25 +12,38 @@ function mirrorPointsVertically(points: number[][]): [number, number][] {
   return points.map(point => [point[0], point[1] * -1]);
 }
 
-export function getNodesOutinePoints(nodes: Node[], p: number = 0): outlinePoints {
+export function getNodesOutinePoints(nodes: Node[], padding: number = 0, offset: number = 0): outlinePoints {
 
   const hullPadd = 140 * 4
 
   const initPoints: number[][] = []
 
-  nodes.forEach(node => {
-    const { pos: { x, y, r }, size: { w, h } } = node;
+  nodes.filter(node => node.type === "switch").forEach(node => {
+    const { pos: { x, y, r }, size: { w, h } } = node
+    const p = padding;
     [
-      [x + h / 2, y + h / 2],
-      [x + h / 2, y - h / 2],
-      [x - h / 2, y + h / 2],
-      [x - h / 2, y - h / 2],
+      [x + p + w / 2, y + p + h / 2],
+      [x + p + w / 2, y - p - h / 2],
+      [x - p - w / 2, y + p + h / 2],
+      [x - p - w / 2, y - p - h / 2],
     ].forEach((pnt) => {
-      initPoints.push(rotatePoint(pnt, [node.pos.x, node.pos.y], -node.pos.r))
+      initPoints.push(rotatePoint(pnt, [x, y], -r))
     })
   });
 
-  /* this code is for adding split keyboard support */
+  nodes.filter(node => node.type === "mcu").forEach(node => {
+    const { pos: { x, y, r }, size: { w, h } } = node;
+    [
+      [x + w / 2, y + h / 2],
+      [x + w / 2, y - h / 2],
+      [x - w / 2, y + h / 2],
+      [x - w / 2, y - h / 2],
+    ].forEach((pnt) => {
+      initPoints.push(rotatePoint(pnt, [x, y], -r))
+    })
+  });
+
+  /* this code is for when adding split keyboard support */
   /*
   const dbscan = new cluster.DBSCAN()
   let clusters = dbscan.run(points1, 250, 50);
@@ -62,7 +75,7 @@ export function getNodesOutinePoints(nodes: Node[], p: number = 0): outlinePoint
   })
 
   const geom = geometries.geom2.create(sides as any)
-  const points = expansions.offset({ delta: p }, geom).sides.map((pnts) => {
+  const points = expansions.offset({ delta: offset }, geom).sides.map((pnts) => {
     return pnts[0]
   })
 

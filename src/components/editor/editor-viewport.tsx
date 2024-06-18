@@ -11,13 +11,13 @@ import NodesAdditionOverlay from './nodes-addition-overlay';
 import NodesTranformationTools from './nodes-transformation-tools';
 import NodesDuplicationTools from './nodes-duplication-tools';
 import { normalizeAngle } from './lib/nodes-utils';
-import { ArcGroupNode } from './nodes/arc-group-node';
 import { PointerAcitonStore } from './stores/pointer-actions-store';
 import { TransformWrapper, TransformComponent, useTransformContext } from "react-zoom-pan-pinch";
 import { Skeleton } from '@nextui-org/react';
 import { cn } from '@/lib/utils';
 import { NodesRulerPoints, NodesRulerLines } from './nodes-ruler-points';
 import { EditorFloatButtons } from './floatingButtons';
+import { ArcGhostNodes } from './nodes/arc-group-node';
 
 
 const editorWidth = 7000
@@ -167,25 +167,6 @@ function EditorContent({
           />
         </g>
 
-        {/* arc ghost nodes */}
-        {(pointerAction.selectedMode === "arc" && store.activeNodes.length > 0) && (
-          <g>
-            {store.activeNodes.map((nodeId) => store.nodes[nodeId].type === "switch" && (
-              <ArcGroupNode
-                key={nodeId}
-                arc={{
-                  ...store.arcState,
-                  pos: {
-                    x: store.nodes[nodeId].pos.x + store.activeDisplacement.x,
-                    y: store.nodes[nodeId].pos.y + store.activeDisplacement.y,
-                    r: store.nodes[nodeId].pos.r + store.activeDisplacement.r,
-                  }
-                }}
-              />
-            ))}
-          </g>
-        )}
-
         {/* nodes */}
         <g
           className={cn(
@@ -222,6 +203,22 @@ function EditorContent({
           <use x="0" y="0" xlinkHref="#Nodes-Ouline-Inner" />
           <use x="0" y="0" xlinkHref="#Nodes-Ouline-Outer" />
         </g>
+
+        {/* arc ghost nodes */}
+        {(pointerAction.selectedMode === "arc" && store.activeNodes.length > 0) && (
+          <g>
+            {store.activeNodes.map((nodeId) => store.nodes[nodeId].type === "switch" && (
+              <ArcGhostNodes
+                key={nodeId}
+                pos={{
+                  x: store.nodes[nodeId].pos.x + store.activeDisplacement.x,
+                  y: store.nodes[nodeId].pos.y + store.activeDisplacement.y,
+                  r: store.nodes[nodeId].pos.r + store.activeDisplacement.r,
+                }}
+              />
+            ))}
+          </g>
+        )}
 
         {/* selection box perview */}
         {(boxSize[0] !== 0 || boxSize[1] !== 0) &&

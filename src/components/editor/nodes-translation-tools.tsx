@@ -1,5 +1,5 @@
 import { useEditorStore } from "./stores/editor-store"
-import { Checkbox } from "@nextui-org/react";
+import { Switch } from "@nextui-org/react";
 
 export default function NodesTranslationTools({
 }: {
@@ -11,17 +11,24 @@ export default function NodesTranslationTools({
       className='flex flex-col gap-4'
     >
 
-      <Checkbox
+
+      <Switch
         size="sm"
+        classNames={{
+          wrapper: "bg-secondary/70"
+        }}
       >
         Enable grid snaping
-      </Checkbox>
+      </Switch>
 
-      <Checkbox
+      <Switch
         size="sm"
+        classNames={{
+          wrapper: "bg-secondary/70"
+        }}
       >
         Relative translation
-      </Checkbox>
+      </Switch>
 
     </div>
   )

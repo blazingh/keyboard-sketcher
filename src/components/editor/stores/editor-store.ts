@@ -151,21 +151,6 @@ export const useEditorStore = create<EditorStoreType>()(
         }))
       },
       appendGhostNodes: () => {
-        const { activeNodes, addNodes, nodes, activeDisplacement } = get()
-        activeNodes.map((nodeId) => {
-          const arc = {
-            ...get().arcState,
-            pos: {
-              x: nodes[nodeId].pos.x + activeDisplacement.x,
-              y: nodes[nodeId].pos.y + activeDisplacement.y,
-              r: nodes[nodeId].pos.r + activeDisplacement.r,
-            }
-          }
-          const ghostNodesGroups = arcsGhostNodes(arc)
-          ghostNodesGroups.forEach((ghostNodesGroup) => {
-            addNodes(ghostNodesGroup.ghostNodes)
-          })
-        })
       },
       addNodes: (nodes) => {
         const ids: Node["id"][] = []

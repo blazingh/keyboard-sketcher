@@ -1,12 +1,15 @@
-import { ArcState, Node, Pos, baseNodeState } from "../stores/editor-store"
+import { Node, Pos, baseNodeState } from "../stores/editor-store"
 import { produce } from "immer"
 import { BasicNode } from "./basic-node";
 import { rotatePoint } from "../lib/Pos-utils";
+import { PointerAcitonStore, PointerActionStoreType } from "../stores/pointer-actions-store";
 
-export function ArcGroupNode({ arc }: { arc: ArcState }) {
+export function ArcGhostNodes({ pos }: { pos: Pos }) {
+
+  const { arcOptions: arc } = PointerAcitonStore()
 
   return (
-    arcsGhostNodes(arc).map((arc, index) => (
+    arcsGhostNodes(arc, pos).map((arc, index) => (
       <g
         key={index}
         className="opacity-30"
@@ -22,28 +25,28 @@ export function ArcGroupNode({ arc }: { arc: ArcState }) {
   )
 }
 
-export function arcsGhostNodes(arc: ArcState): { ghostNodes: Node[], arcPath: string }[] {
+export function arcsGhostNodes(arc: PointerActionStoreType["arcOptions"], pos: Pos): { ghostNodes: Node[], arcPath: string }[] {
 
   const {
-    switchGaps,
-    switchCounts,
-    radiuses,
-    pos,
+    sides,
+    switchGap,
+    switchCount,
+    radius,
   } = arc
 
   const arcs: any[] = []
   const tempPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  switchCounts.forEach((switchCount, side) => {
+  sides.forEach((side) => {
     if (switchCount === 0) return
     // calculate the arcLength
-    const arcLength = ((switchCount) * (140 + switchGaps[side]));
+    const arcLength = ((switchCount) * (140 + switchGap));
     // generate the arc svg path
-    const arcPath = generateArcPath(arcLength, radiuses[side], pos, side as any)
+    const arcPath = generateArcPath(arcLength, radius, pos, side === "left" ? 0 : 2)
     // generate the switches and place them on the arc
     const ghostNodes: Node[] = []
     for (let index = 1; index < switchCount + 1; index++) {
       ghostNodes.push(produce(baseNodeState, draft => {
-        const distance = index * (140 + switchGaps[side])
+        const distance = index * (140 + switchGap)
         tempPath.setAttribute("d", arcPath);
         const { x, y } = tempPath.getPointAtLength(distance)
         draft.id = String(Math.random())

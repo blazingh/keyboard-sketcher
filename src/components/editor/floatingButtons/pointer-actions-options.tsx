@@ -15,9 +15,29 @@ export default function PointerActionsOptions() {
         <TransformationActionOptions />
       }
 
+      {/* nodes selections box toolbar */}
+      {pointer.selectedMode === "selectionBox" &&
+        <></>
+      }
+
+      {/* nodes addition toolbar */}
+      {pointer.selectedMode === "addition" &&
+        <></>
+      }
+
       {/* nodes arc toolbar */}
       {pointer.selectedMode === "arc" &&
         <ArcActionOptions />
+      }
+
+      {/* nodes copy toolbar */}
+      {pointer.selectedMode === "copy" &&
+        <></>
+      }
+
+      {/* editor ruler toolbar */}
+      {pointer.selectedMode === "ruler" &&
+        <></>
       }
 
     </ScrollShadow>

@@ -58,7 +58,7 @@ export function NodesRulerLines() {
               dominantBaseline="middle"
               textAnchor="middle"
               className="stroke-black fill-white font-bold"
-              fontSize={12}
+              fontSize={14}
             >
               {distance}mm
             </text>
@@ -88,7 +88,7 @@ export function NodesRulerPoints() {
               key={node.id + pos.key}
               cx={x}
               cy={y}
-              r={4}
+              r={6}
               strokeWidth={1}
               onClick={() => {
                 if (selected)

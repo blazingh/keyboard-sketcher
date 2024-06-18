@@ -28,7 +28,7 @@ export function EditorFloatButtons() {
       </div>
 
       {/* view controls */}
-      <div className="absolute bottom-2 z-20">
+      <div className="absolute left-2 bottom-2 z-20">
         <ViewControls />
       </div>
 

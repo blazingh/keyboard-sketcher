@@ -43,9 +43,9 @@ export function getNodesOutinePoints(
     const { pos: { x, y, r }, size: { w, h, p } } = node;
     const ww = options.wallWidth;
     [
-      [x + p + w / 2, y + p + h / 2 - ww],
+      [x + p + w / 2, y + p + h / 2],
       [x + p + w / 2, y - p - h / 2 + ww],
-      [x - p - w / 2, y + p + h / 2 - ww],
+      [x - p - w / 2, y + p + h / 2],
       [x - p - w / 2, y - p - h / 2 + ww],
     ].forEach((pnt) => {
       initPoints.push(rotatePoint(pnt, [x, y], -r))

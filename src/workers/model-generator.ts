@@ -69,7 +69,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
     return {
       type: node.type,
       position: { x: node.pos.x / 10, y: node.pos.y / 10, r: node.pos.r },
-      size: { w: node.size.w / 10, h: node.size.h / 10, p: node.size.p }
+      size: { w: node.size.w / 10, h: node.size.h / 10, p: node.size.p / 10 }
     }
   })
 

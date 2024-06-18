@@ -22,6 +22,7 @@ export type Node = {
     h: number
   }
   selectable: boolean
+  type: "switch" | "mcu"
 }
 
 export type TransformMatrix = {
@@ -96,14 +97,15 @@ type Action = {
 }
 
 export const baseNodeState: Node = {
-  id: "1", size: { w: 140, h: 140 }, pos: { x: 0, y: 0, r: 0 }, selectable: true
+  id: "1", size: { w: 140, h: 140 }, pos: { x: 0, y: 0, r: 0 }, selectable: true, type: "switch"
 }
 
 const initialNodes: { [key: Node["id"]]: Node } = {
-  "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 750, y: 750, r: 0 }, selectable: true },
-  "2": { id: "2", size: { w: 140, h: 140 }, pos: { x: 750, y: 850, r: 0 }, selectable: true },
-  "4": { id: "4", size: { w: 140, h: 140 }, pos: { x: 850, y: 850, r: 0 }, selectable: true },
-  "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: 850, y: 750, r: 0 }, selectable: true }
+  "1": { id: "1", size: { w: 140, h: 140 }, pos: { x: 750, y: 750, r: 0 }, selectable: true, type: "switch" },
+  "2": { id: "2", size: { w: 140, h: 140 }, pos: { x: 750, y: 850, r: 0 }, selectable: true, type: "switch" },
+  "4": { id: "4", size: { w: 140, h: 140 }, pos: { x: 850, y: 850, r: 0 }, selectable: true, type: "switch" },
+  "3": { id: "3", size: { w: 140, h: 140 }, pos: { x: 850, y: 750, r: 0 }, selectable: true, type: "switch" },
+  "5": { id: "5", size: { w: 180, h: 360 }, pos: { x: 1000, y: 1000, r: 0 }, selectable: true, type: "mcu" }
 }
 
 export const initialStoreState: State = {

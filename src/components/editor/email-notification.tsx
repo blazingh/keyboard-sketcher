@@ -1,6 +1,6 @@
 import { addToMailNotification } from "@/actions/add-to-mail-notification";
 import { cn } from "@/lib/utils";
-import { Button, ButtonProps, Input, useDisclosure } from "@nextui-org/react";
+import { Button, ButtonProps, Input } from "@nextui-org/react";
 import { Construction, SendHorizonal } from "lucide-react";
 import { useEffect } from "react";
 import { useFormState, useFormStatus } from "react-dom";

@@ -15,7 +15,6 @@ export default function NodesArcTools({
   const [slider1Val, setSlider1Val] = useState<number>(0)
   const [slider2Val, setSlider2Val] = useState<number>(0)
 
-
   if (false
     || !store.activeNodes
     || !isDeepEqual(store.activeDxy, { x: 0, y: 0 })

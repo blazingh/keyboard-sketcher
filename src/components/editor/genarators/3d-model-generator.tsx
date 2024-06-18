@@ -1,15 +1,14 @@
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { ChevronDown, FileBox, HelpCircle, Loader2 } from "lucide-react";
+import { ChevronDown, FileBox, Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ModelWorkerResult, modelAOptionsList } from "@/workers/model-a-options";
 import { useThreeDModelGeneratorStore } from "../stores/3d-model-generator-store";
 import InputWithKeypad from "@/components/virtual-numpad-input";
 import { useEditorStore } from "../stores/editor-store";
-import { GeomsStlPreview } from "@/components/geoms-stl-preview";
 import { useEffect, useState } from "react";
 import StlViewer from "@/components/stlViewer/stl-viewer";
 import { CSG2Geom } from "@/lib/geometries";
-import { Button, DropdownMenu, Switch, DropdownItem, DropdownTrigger, Dropdown, Select, SelectSection, SelectItem } from "@nextui-org/react";
+import { Button, DropdownMenu, Switch, DropdownItem, DropdownTrigger, Dropdown, Select, SelectItem } from "@nextui-org/react";
 import { STLExporter } from "three-stdlib";
 import { Mesh } from "three";
 

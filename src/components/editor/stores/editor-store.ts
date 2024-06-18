@@ -136,7 +136,14 @@ export const useEditorStore = create<EditorStoreType>()(
         if (postReset) postReset()
       },
 
-      nodesArray: () => Object.values(get().nodes),
+      nodesArray: () => {
+        const sortOrder: Node["type"][] = ['mcu', 'switch'];
+        const orderMap: { [key: string]: number } = {};
+        sortOrder.forEach((type, index) => {
+          orderMap[type] = index;
+        });
+        return Object.values(get().nodes).toSorted((a, b) => orderMap[a.type] - orderMap[b.type])
+      },
       updateArcState: (arc) => {
         set(produce((state: State) => {
           state.arcState = arc

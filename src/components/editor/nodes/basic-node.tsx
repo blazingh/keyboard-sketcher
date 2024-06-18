@@ -99,7 +99,7 @@ export function BasicNode({
         className={cn(
           "stroke-2",
           nodeActive ? "stroke-primary" : "stroke-white/70",
-          node.type === "switch" && "fill-secondary",
+          node.type === "switch" && "fill-secondary/90",
           node.type === "mcu" && "fill-green-800",
         )}
         style={{

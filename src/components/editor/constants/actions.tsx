@@ -1,17 +1,50 @@
 import { ReactNode } from "react"
-import { EditorStoreType } from "../stores/editor-store"
 import { BoxSelect, Copy, DraftingCompass, FlipHorizontal, FlipVertical, Hand, MousePointer, Move, Plus, Ruler, Trash2 } from "lucide-react"
 import { SelectionActionStoreType } from "../stores/selection-actions-store"
 import { PointerActionStoreType } from "../stores/pointer-actions-store"
 
-type selectionAction = {
+type PointerAction = {
+  label: string
+  description: string
+  value: PointerActionStoreType["selectedMode"]
+  icon: ReactNode
+}
+
+export const pointerActionsOptions: PointerAction[] = [
+  {
+    label: "normal",
+    description: "pan viewport and select items",
+    value: "normal",
+    icon: <Hand className="w-5 h-5" />
+  },
+  {
+    label: "selection box",
+    description: "batch select items",
+    value: "selectionBox",
+    icon: <BoxSelect className="w-5 h-5" />
+  },
+  {
+    label: "measurement",
+    description: "measure distance between points",
+    value: "ruler",
+    icon: <Ruler className="w-5 h-5" />
+  },
+  {
+    label: "new item",
+    description: "add items to the editor",
+    value: "addition",
+    icon: <Plus className="w-5 h-5" />
+  },
+]
+
+type BaseAction = {
   label: string
   description: string
   value: SelectionActionStoreType["selectedMode"]
   icon: ReactNode
 }
 
-export const selectionActionsOptions: selectionAction[] = [
+export const baseActionsOptions: BaseAction[] = [
   {
     label: "move",
     description: "translate and rotate items",
@@ -50,36 +83,3 @@ export const selectionActionsOptions: selectionAction[] = [
   },
 ]
 
-type PointerAction = {
-  label: string
-  description: string
-  value: PointerActionStoreType["selectedMode"]
-  icon: ReactNode
-}
-
-export const pointerActionsOptions: PointerAction[] = [
-  {
-    label: "normal",
-    description: "pan viewport and select items",
-    value: "normal",
-    icon: <Hand className="w-5 h-5" />
-  },
-  {
-    label: "selection box",
-    description: "batch select items",
-    value: "selectionBox",
-    icon: <BoxSelect className="w-5 h-5" />
-  },
-  {
-    label: "measurement",
-    description: "measure distance between points",
-    value: "ruler",
-    icon: <Ruler className="w-5 h-5" />
-  },
-  {
-    label: "new item",
-    description: "add items to the editor",
-    value: "addition",
-    icon: <Plus className="w-5 h-5" />
-  },
-]

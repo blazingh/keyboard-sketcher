@@ -5,6 +5,7 @@ import { SelectionAcitonStore } from "../stores/selection-actions-store"
 import { useState } from "react"
 import { EditorStoreType, useEditorStore } from "../stores/editor-store"
 import { cn } from "@/lib/utils"
+import NodesTranslationTools from "../nodes-translation-tools"
 
 const selector = (state: EditorStoreType) => ({
   activeNodes: state.activeNodes,
@@ -38,7 +39,11 @@ export default function SelectionActionFloatButtons() {
           </div>
         </PopoverTrigger>
         <PopoverContent>
-          <ScrollShadow className="w-[220px] max-h-[380px] relative">
+          <ScrollShadow className="w-[220px] max-h-[380px] relative py-2">
+            {/* nodes translation toolbar */}
+            {selectionAction.selectedMode === "move" &&
+              <NodesTranslationTools />
+            }
             {/* nodes arc toolbar */}
             {selectionAction.selectedMode === "arc" &&
               <NodesArcTools />

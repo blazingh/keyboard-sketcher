@@ -197,7 +197,7 @@ function EditorContent({
         {/* arc ghost nodes */}
         {(selectionAction.selectedMode === "arc" && store.activeNodes.length > 0) && (
           <g>
-            {store.activeNodes.map((nodeId) => (
+            {store.activeNodes.map((nodeId) => store.nodes[nodeId].type === "switch" && (
               <ArcGroupNode
                 key={nodeId}
                 arc={{

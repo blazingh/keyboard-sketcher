@@ -97,8 +97,10 @@ export function BasicNode({
         width={node.size.w}
         height={node.size.h}
         className={cn(
-          "fill-secondary stroke-2",
+          "stroke-2",
           nodeActive ? "stroke-primary" : "stroke-white/70",
+          node.type === "switch" && "fill-secondary",
+          node.type === "mcu" && "fill-green-950",
         )}
         style={{
           transformBox: "fill-box",

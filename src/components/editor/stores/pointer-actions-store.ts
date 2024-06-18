@@ -2,11 +2,11 @@ import { create } from "zustand"
 
 
 type State = {
-  selectedMode: "normal" | "selectionBox" | "ruler" | "addition"
+  selectedMode: "normal" | "selectionBox" | "ruler" | "addition" | "copy" | "arc"
 }
+
 type Action = {
   setSelectedMode: (mode: State["selectedMode"]) => void
-
 }
 
 const initialState: State = {

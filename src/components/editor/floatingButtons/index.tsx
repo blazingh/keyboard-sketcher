@@ -1,13 +1,11 @@
 import GeneratorButtonGroup from "./generators";
-import { PointerAcitonStore } from "../stores/pointer-actions-store";
-import BaseActionOptions from "./base-actions-options";
 import EditorMenu from "./editor-menu";
 import { ViewControls } from "./view-controlls";
 import PointerActionsToolbar from "./pointer-actions-selection";
+import PointerActionsOptions from "./pointer-actions-options";
 
 
 export function EditorFloatButtons() {
-  const pointer = PointerAcitonStore()
 
   return (
     <>
@@ -34,9 +32,7 @@ export function EditorFloatButtons() {
 
       {/* selected action options buttons */}
       <div className="absolute top-1/2 left-2 -translate-y-1/2 z-20">
-        {pointer.selectedMode === "normal" && (
-          <BaseActionOptions />
-        )}
+        <PointerActionsOptions />
       </div>
 
 

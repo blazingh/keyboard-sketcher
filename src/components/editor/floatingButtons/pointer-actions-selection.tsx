@@ -1,14 +1,16 @@
 "use client"
 
 import { cn } from '@/lib/utils';
-import { Button } from "@nextui-org/react";
+import { Button, Divider } from "@nextui-org/react";
 import { Cable } from 'lucide-react';
 import { PointerAcitonStore } from '../stores/pointer-actions-store';
 import { pointerActionsOptions } from '../constants/actions';
+import { useEditorStore } from '../stores/editor-store';
 
 export default function PointerActionsToolbar() {
 
   const pointerAction = PointerAcitonStore()
+  const { activeNodes } = useEditorStore()
 
   return (
     <div className={cn(
@@ -28,30 +30,41 @@ export default function PointerActionsToolbar() {
         <Divider orientation='vertical' className='h-6 mx-2' />
         */}
 
-
-      {pointerActionsOptions.map((action) => (
-        <Button
-          key={action.value}
-          variant={pointerAction.selectedMode === action.value ? "flat" : "light"}
-          color={pointerAction.selectedMode === action.value ? "primary" : "default"}
-          isIconOnly
-          size='sm'
-          onPress={() => pointerAction.setSelectedMode(action.value)}
-        >
-          {action.icon}
-        </Button>
+      {[[0, 3], [3, 6]].map((indexes, index) => (
+        <>
+          {pointerActionsOptions.slice(indexes[0], indexes[1]).map((action) => (
+            (
+              <Button
+                key={action.value}
+                variant={pointerAction.selectedMode === action.value ? "flat" : "light"}
+                color={pointerAction.selectedMode === action.value ? "primary" : "default"}
+                isIconOnly
+                size='sm'
+                onPress={() => pointerAction.setSelectedMode(action.value)}
+              >
+                {action.icon}
+              </Button>
+            )
+          ))}
+          <Divider orientation='vertical' className='h-6 mx-2' />
+        </>
       ))}
 
-      <Button
-        variant={"light"}
-        color={"default"}
-        isIconOnly
-        size='sm'
-        className='opacity-25'
-        disabled
-      >
-        <Cable className='w-5 h-5' />
-      </Button>
+      {pointerActionsOptions.slice(6, 9).map((action) => (
+        (
+          <Button
+            key={action.value}
+            variant={"light"}
+            color={"default"}
+            isIconOnly
+            size='sm'
+            onPress={() => pointerAction.setSelectedMode(action.value)}
+            isDisabled={activeNodes.length === 0}
+          >
+            {action.icon}
+          </Button>
+        )
+      ))}
 
     </div>
   )

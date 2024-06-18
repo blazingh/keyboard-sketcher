@@ -12,7 +12,6 @@ import NodesTranformationTools from './nodes-transformation-tools';
 import NodesDuplicationTools from './nodes-duplication-tools';
 import { normalizeAngle } from './lib/nodes-utils';
 import { ArcGroupNode } from './nodes/arc-group-node';
-import { SelectionAcitonStore } from './stores/selection-actions-store';
 import { PointerAcitonStore } from './stores/pointer-actions-store';
 import { TransformWrapper, TransformComponent, useTransformContext } from "react-zoom-pan-pinch";
 import { Skeleton } from '@nextui-org/react';
@@ -89,7 +88,6 @@ function EditorContent({
   }) {
 
   const store = useEditorStore()
-  const selectionAction = SelectionAcitonStore()
   const pointerAction = PointerAcitonStore()
 
   const { transformState: { scale, positionX, positionY } } = useTransformContext()
@@ -138,11 +136,11 @@ function EditorContent({
     <div onContextMenu={(e) => e.preventDefault()} className='touch-none' >
 
       {/* nodes transformation toolbar */}
-      {selectionAction.selectedMode === "move" &&
+      {pointerAction.selectedMode === "normal" &&
         <NodesTranformationTools />
       }
       {/* nodes duplication toolbar */}
-      {selectionAction.selectedMode === "copy" &&
+      {pointerAction.selectedMode === "copy" &&
         <NodesDuplicationTools />
       }
 
@@ -170,7 +168,7 @@ function EditorContent({
         </g>
 
         {/* arc ghost nodes */}
-        {(selectionAction.selectedMode === "arc" && store.activeNodes.length > 0) && (
+        {(pointerAction.selectedMode === "arc" && store.activeNodes.length > 0) && (
           <g>
             {store.activeNodes.map((nodeId) => store.nodes[nodeId].type === "switch" && (
               <ArcGroupNode

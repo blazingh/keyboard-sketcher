@@ -12,11 +12,13 @@ export default function NodesTranslationTools({
     >
 
       <Checkbox
+        size="sm"
       >
         Enable grid snaping
       </Checkbox>
 
       <Checkbox
+        size="sm"
       >
         Relative translation
       </Checkbox>

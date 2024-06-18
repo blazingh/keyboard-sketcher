@@ -3,10 +3,6 @@ import { Button, Divider } from "@nextui-org/react";
 import { cn } from "@/lib/utils";
 import { EditorStoreType, useEditorStore } from "../stores/editor-store";
 import { useControls } from "react-zoom-pan-pinch";
-import GeneratorButtonGroup from "./generators";
-import { PointerAcitonStore } from "../stores/pointer-actions-store";
-import BaseActionOptions from "./base-actions-options";
-import EditorMenu from "./editor-menu";
 
 
 const selector = (state: EditorStoreType) => ({

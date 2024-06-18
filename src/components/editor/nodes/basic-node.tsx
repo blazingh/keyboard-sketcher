@@ -100,7 +100,7 @@ export function BasicNode({
           "stroke-2",
           nodeActive ? "stroke-primary" : "stroke-white/70",
           node.type === "switch" && "fill-secondary",
-          node.type === "mcu" && "fill-green-950",
+          node.type === "mcu" && "fill-green-800",
         )}
         style={{
           transformBox: "fill-box",
@@ -109,6 +109,17 @@ export function BasicNode({
         }}
       >
       </rect>
+      {node.type === "mcu" && (
+        <rect
+          x={x - 35}
+          y={y - node.size.h / 2 - 1}
+          width={70}
+          height={30}
+          rx={5}
+          className='fill-green-950'
+        >
+        </rect>
+      )}
       {(nodeActive && pointerAction.selectedMode === "normal") &&
         <text
           x={x}

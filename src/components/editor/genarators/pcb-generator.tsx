@@ -1,4 +1,4 @@
-import EmailNotification from "../email-notification";
+import EmailNotification from "@/components/email-notification";
 
 export default function PCBGenerator() {
   return (

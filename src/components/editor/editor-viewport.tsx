@@ -8,8 +8,6 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { Key } from 'ts-key-enum';
 import { NodesOutline } from './nodes-outline';
 import NodesAdditionOverlay from './nodes-addition-overlay';
-import EditorToolbar from './editor-toolbar';
-import { EditorFloatButtons } from './editor-float-buttons';
 import NodesTranformationTools from './nodes-transformation-tools';
 import NodesDuplicationTools from './nodes-duplication-tools';
 import { normalizeAngle } from './lib/nodes-utils';
@@ -20,6 +18,7 @@ import { TransformWrapper, TransformComponent, useTransformContext } from "react
 import { Skeleton } from '@nextui-org/react';
 import { cn } from '@/lib/utils';
 import { NodesRulerPoints, NodesRulerLines } from './nodes-ruler-points';
+import { EditorFloatButtons } from './floatingButtons';
 
 
 const editorWidth = 7000
@@ -59,7 +58,6 @@ export default function EditorViewPort() {
               ref.zoomToElement("nodes-outline")
             }}
           >
-            <EditorToolbar />
             <EditorFloatButtons />
 
             {/* nodes addtion message */}
@@ -171,29 +169,6 @@ function EditorContent({
           />
         </g>
 
-        {/* nodes outline */}
-        <g id="nodes-outline" className='pointer-events-none'>
-          <defs>
-            <NodesOutline nodes={function(nodes) {
-              return nodes.map(node => {
-                if (!store.activeNodes.includes(node.id))
-                  return node
-                return {
-                  ...node,
-                  pos: {
-                    x: node.pos.x + store.activeDisplacement.x,
-                    y: node.pos.y + store.activeDisplacement.y,
-                    r: normalizeAngle(node.pos.r + store.activeDisplacement.r)
-                  }
-                }
-              })
-            }(store.nodesArray())}
-            />
-          </defs>
-          <use x="0" y="0" xlinkHref="#Nodes-Ouline-Inner" />
-          <use x="0" y="0" xlinkHref="#Nodes-Ouline-Outer" />
-        </g>
-
         {/* arc ghost nodes */}
         {(selectionAction.selectedMode === "arc" && store.activeNodes.length > 0) && (
           <g>
@@ -225,6 +200,29 @@ function EditorContent({
               node={node}
             />
           ))}
+        </g>
+
+        {/* nodes outline */}
+        <g id="nodes-outline" className='pointer-events-none'>
+          <defs>
+            <NodesOutline nodes={function(nodes) {
+              return nodes.map(node => {
+                if (!store.activeNodes.includes(node.id))
+                  return node
+                return {
+                  ...node,
+                  pos: {
+                    x: node.pos.x + store.activeDisplacement.x,
+                    y: node.pos.y + store.activeDisplacement.y,
+                    r: normalizeAngle(node.pos.r + store.activeDisplacement.r)
+                  }
+                }
+              })
+            }(store.nodesArray())}
+            />
+          </defs>
+          <use x="0" y="0" xlinkHref="#Nodes-Ouline-Inner" />
+          <use x="0" y="0" xlinkHref="#Nodes-Ouline-Outer" />
         </g>
 
         {/* selection box perview */}

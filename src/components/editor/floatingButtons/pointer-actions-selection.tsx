@@ -10,7 +10,7 @@ import { useEditorStore } from '../stores/editor-store';
 export default function PointerActionsToolbar() {
 
   const pointerAction = PointerAcitonStore()
-  const { activeNodes } = useEditorStore()
+  const { activeNodes, deleteActiveNodes, flipActiveNodesVertically, flipActiveNodesHorizontally } = useEditorStore()
 
   return (
     <div className={cn(
@@ -30,7 +30,7 @@ export default function PointerActionsToolbar() {
         <Divider orientation='vertical' className='h-6 mx-2' />
         */}
 
-      {[[0, 3], [3, 6]].map((indexes, index) => (
+      {[[0, 3], [3, 6]].map((indexes) => (
         <>
           {pointerActionsOptions.slice(indexes[0], indexes[1]).map((action) => (
             (
@@ -58,7 +58,19 @@ export default function PointerActionsToolbar() {
             color={"default"}
             isIconOnly
             size='sm'
-            onPress={() => pointerAction.setSelectedMode(action.value)}
+            onPress={() => {
+              switch (action.value) {
+                case "flipH":
+                  flipActiveNodesHorizontally()
+                  break;
+                case "flipV":
+                  flipActiveNodesVertically()
+                  break;
+                case "delete":
+                  deleteActiveNodes()
+                  break;
+              }
+            }}
             isDisabled={activeNodes.length === 0}
           >
             {action.icon}

@@ -34,6 +34,11 @@ export default function TransformationActionOptions({
       >
         Relative translation
       </Switch>
+      <Switch
+        size="sm"
+      >
+        Display Positions
+      </Switch>
 
     </div>
   )

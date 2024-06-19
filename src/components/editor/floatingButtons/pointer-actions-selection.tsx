@@ -2,7 +2,6 @@
 
 import { cn } from '@/lib/utils';
 import { Button, Divider } from "@nextui-org/react";
-import { Cable } from 'lucide-react';
 import { PointerAcitonStore } from '../stores/pointer-actions-store';
 import { pointerActionsOptions } from '../constants/actions';
 import { useEditorStore } from '../stores/editor-store';

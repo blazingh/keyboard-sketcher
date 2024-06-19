@@ -4,7 +4,7 @@ import { create } from "zustand"
 
 type State = {
 
-  selectedMode: "normal" | "selectionBox" | "ruler" | "addition" | "copy" | "arc"
+  selectedMode: "normal" | "selectionBox" | "ruler" | "addition" | "copy" | "arc" | "flipH" | "flipV" | "delete"
 
   transformationOptions: {},
 

@@ -5,7 +5,7 @@ import { PointerActionStoreType } from "../stores/pointer-actions-store"
 type PointerAction = {
   label: string
   description: string
-  value: PointerActionStoreType["selectedMode"] | any
+  value: PointerActionStoreType["selectedMode"]
   icon: ReactNode
 }
 

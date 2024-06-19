@@ -1,8 +1,7 @@
 import { useEditorStore } from "@/components/editor/stores/editor-store"
-import InputWithKeypad from "@/components/virtual-numpad-input";
 import { Divider, Switch } from "@nextui-org/react";
 
-export default function CopyActionOptions({
+export default function SelectionBoxActionOptions({
 }: {
   }) {
   const editor = useEditorStore()
@@ -13,20 +12,21 @@ export default function CopyActionOptions({
     >
 
       <span className="w-full text-center">
-        Copy Options
+        Selection Options
       </span>
 
       <Divider />
 
-      <InputWithKeypad
+      <Switch
         size="sm"
-        label="Spacing"
-      />
+      >
+        Include Switches
+      </Switch>
 
       <Switch
         size="sm"
       >
-        Relative positioning
+        Include Controllers
       </Switch>
 
     </div>

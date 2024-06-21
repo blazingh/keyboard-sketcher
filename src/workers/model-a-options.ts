@@ -21,6 +21,8 @@ export type ModelAOptionsTypes = {
 
   standoffThick: string,
   wallSwitchPadding: string,
+
+  mcuHeigth: string
 }
 
 export const modelADefaultOptionsValues: ModelAOptionsTypes = {
@@ -36,6 +38,8 @@ export const modelADefaultOptionsValues: ModelAOptionsTypes = {
 
   standoffThick: "3",
   wallSwitchPadding: "2.5",
+
+  mcuHeigth: "1.5"
 }
 
 export const modelAOptionsList: {
@@ -92,6 +96,13 @@ export const modelAOptionsList: {
       key: "wallSwitchPadding",
       label: "wall switch distance",
       description: "distance between the switches and case walls (min: 3mm)",
+      type: "number"
+    },
+    {
+      id: 8,
+      key: "mcuHeigth",
+      label: "mcu elevation",
+      description: "distance from the bottom of the case base to the bottom of the mcu (min: 1.5mm)",
       type: "number"
     },
   ]

@@ -1,3 +1,4 @@
+import _ from "lodash"
 import { primitives, booleans, hulls, extrusions, expansions, transforms, utils, geometries } from '@jscad/modeling'
 import { Geom3 } from '@jscad/modeling/src/geometries/types';
 import { ModelWorkerResult } from './model-a-options';
@@ -18,6 +19,8 @@ const defaultOptions = {
 
   standoffThickness: 3,
   wallSwitchPadding: 4,
+
+  mcuHeight: 1.5
 }
 
 const tolerance = {
@@ -45,136 +48,121 @@ type SimpleNode = {
 
 self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
 
-  const o: typeof defaultOptions = e.data.options ? { ...defaultOptions, ...e.data.options } : defaultOptions
+  const initialOptions: typeof defaultOptions = _.merge({}, defaultOptions, e.data.options);
 
   // make sure all data are floats numbers
-  o.baseThickness = parseFloat(o.baseThickness as any)
-  o.plateThickness = parseFloat(o.plateThickness as any)
-  o.plateHeight = parseFloat(o.plateHeight as any)
-  o.wallThickness = parseFloat(o.wallThickness as any)
-  o.wallSwitchPadding = parseFloat(o.wallSwitchPadding as any)
-  o.wallHeight = parseFloat(o.wallHeight as any)
-  o.wallRadius = parseFloat(o.wallRadius as any)
+  const o = _.mapValues(initialOptions, (value) => typeof value === 'string' ? parseFloat(value) : value);
 
   // limit the options values
-  o.baseThickness = Math.max(o.baseThickness, 2)
-  o.plateThickness = Math.max(o.plateThickness, 1.5)
-  o.wallHeight = Math.max(o.baseThickness + o.plateHeight + o.plateThickness, o.wallHeight)
-  o.wallThickness = Math.max(o.wallThickness, 2)
-  o.wallRadius = Math.min(o.wallThickness / 2, o.wallRadius)
-  o.wallSwitchPadding = Math.max(o.wallSwitchPadding, 3)
+  o.baseThickness = Math.max(o.baseThickness, 2);
+  o.plateThickness = Math.max(o.plateThickness, 1.5);
+  o.wallHeight = Math.max(o.baseThickness + o.plateHeight + o.plateThickness, o.wallHeight);
+  o.wallThickness = Math.max(o.wallThickness, 2);
+  o.wallRadius = Math.min(o.wallThickness / 2, o.wallRadius);
+  o.wallSwitchPadding = Math.max(o.wallSwitchPadding, 3);
 
-  let switch_nodes: SimpleNode[] = []
-  let mcu_nodes: SimpleNode[] = []
+  let switch_nodes: SimpleNode[] = [];
+  let mcu_nodes: SimpleNode[] = [];
 
-  // extract the nodes
-  e.data.nodes.forEach((node: Node) => {
+  // extract and sipmlify the nodes
+  _.forEach(e.data.nodes, (node: Node) => {
     const simpleNode: SimpleNode = {
       type: node.type,
       position: { x: node.pos.x / 10, y: node.pos.y / 10, r: node.pos.r },
       size: { w: node.size.w / 10, h: node.size.h / 10, p: node.size.p / 10 }
-    }
-    if (node.type === "switch")
-      switch_nodes.push(simpleNode)
-    if (node.type === "mcu")
-      mcu_nodes.push(simpleNode)
-  })
+    };
+    if (node.type === 'switch') switch_nodes.push(simpleNode);
+    if (node.type === 'mcu') mcu_nodes.push(simpleNode);
+  });
 
-  const sides: number[][][] = []
+  const sides: number[][][] = [];
   const borderPoints = getNodesOutinePoints(e.data.nodes as any, {
     wallSwitchPadding: o.wallSwitchPadding * 10,
     wallWidth: o.wallThickness * 10
-  })
+  });
 
-  borderPoints.forEach((point, index) => {
-    if (index == borderPoints.length - 1)
-      sides.push([point, borderPoints[0]])
+  _.forEach(borderPoints, (point, index) => {
+    if (index === borderPoints.length - 1)
+      sides.push([point, borderPoints[0]]);
     else
-      sides.push([point, borderPoints[index + 1]])
-  })
+      sides.push([point, borderPoints[index + 1]]);
+  });
 
-  // 2d representation of the swithc plate
-  let base_plate = transforms.scale([0.1, 0.1, 1], geometries.geom2.create(sides as any))
+  // 2d representation of the switch plate
+  let base_plate = transforms.scale([0.1, 0.1, 1], geometries.geom2.create(sides as any));
 
   // extrude the plate to a 3d geometry
-  let base_plate_3d = extrusions.extrudeLinear({ height: o.plateThickness }, base_plate)
+  let base_plate_3d = extrusions.extrudeLinear({ height: o.plateThickness }, base_plate);
 
-  const case_corners: Geom3[] = []
+  // function will be used in wall creation
+  const createWallCylinder = (x: number, y: number) => primitives.roundedCylinder({
+    radius: o.wallThickness / 2,
+    height: o.wallHeight,
+    roundRadius: o.wallRadius,
+    center: [x, y, o.wallHeight / 2],
+    segments: 30
+  });
 
-  // generate the sides of the case from the sides of the plate
-  expansions.offset({ delta: tolerance.tight + o.wallThickness / 2 }, base_plate).sides.forEach((points) => {
-    case_corners.push(
-      booleans.union(
-        //wall
-        primitives.roundedCylinder({
-          radius: o.wallThickness / 2,
-          height: o.wallHeight,
-          roundRadius: o.wallRadius,
-          center: [points[0][0], points[0][1], o.wallHeight / 2],
-          segments: 30
-        }),
-        // wall bottom flat part part
-        primitives.roundedCylinder({
-          radius: o.wallThickness / 2,
-          height: o.wallRadius * 2,
-          roundRadius: 0,
-          center: [points[0][0], points[0][1], o.wallRadius],
-          segments: 30
-        }),
-      )
-    )
-  })
-  case_corners.push(case_corners[0])
+  // function will be used in wall creation
+  const createWallBottom = (x: number, y: number) => primitives.roundedCylinder({
+    radius: o.wallThickness / 2,
+    height: o.wallRadius * 2,
+    roundRadius: 0,
+    center: [x, y, o.wallRadius],
+    segments: 30
+  });
 
-  const case_standoffs: Geom3[] = []
-  expansions.offset({ delta: tolerance.tight - o.standoffThickness / 2 + o.wallThickness / 2 }, base_plate).sides.forEach((points) => {
-    case_standoffs.push(
-      primitives.cylinderElliptic({
-        height: o.standoffThickness,
-        startRadius: [0, 0],
-        endRadius: [o.standoffThickness * 0.75, o.standoffThickness * 0.75],
-        center: [points[0][0], points[0][1], o.standoffThickness / -2 + o.baseThickness + o.plateHeight],
-      })
-    )
-  })
-  case_standoffs.push(case_standoffs[0])
+  // generate the case walls
+  const wallsSides = expansions.offset({ delta: tolerance.tight + o.wallThickness / 2 }, base_plate).sides
+  const case_corners = wallsSides.map(points => booleans.union(
+    createWallCylinder(points[0][0], points[0][1]),
+    createWallBottom(points[0][0], points[0][1])
+  ));
+  case_corners.push(case_corners[0]);
+  const case_walls = hulls.hullChain(case_corners)
 
-  // generate the walls and floor of the case from it's edges
-  let base_case_3d = booleans.union(
-    // walls
-    hulls.hullChain(case_corners),
-    // plate standoff
-    hulls.hullChain(case_standoffs),
-    //base
-    extrusions.extrudeLinear(
-      { height: o.baseThickness },
-      expansions.offset({ delta: tolerance.tight + o.wallThickness / 2 },
-        base_plate
-      )
-    )
+  // generate plate standoff
+  const standoffSides = expansions.offset({ delta: tolerance.tight - o.standoffThickness / 2 + o.wallThickness / 2 }, base_plate).sides
+  const case_standoff_corners = standoffSides.map(points => primitives.cylinderElliptic({
+    height: o.standoffThickness,
+    startRadius: [0, 0],
+    endRadius: [o.standoffThickness * 0.75, o.standoffThickness * 0.75],
+    center: [points[0][0], points[0][1], o.standoffThickness / -2 + o.baseThickness + o.plateHeight]
+  }));
+  case_standoff_corners.push(case_standoff_corners[0]);
+  const case_standoffs = hulls.hullChain(case_standoff_corners);
+
+  // generate case botton base
+  const case_base = extrusions.extrudeLinear(
+    { height: o.baseThickness },
+    expansions.offset({ delta: tolerance.tight + o.wallThickness / 2 }, base_plate)
   )
 
+  // merge walls, standoffs and base to form the plate 
+  let base_case_3d = booleans.union(
+    case_walls,
+    case_standoffs,
+    case_base
+  );
+
   // cut the mcu from the case
-  /*
-  mcu_nodes.map((node) => {
+  _.forEach(mcu_nodes, (node) => {
     base_case_3d = booleans.subtract(
       base_case_3d,
       transforms.translate(
-        [node.position.x, node.position.y, 1],
+        [node.position.x, node.position.y, 3 + o.mcuHeight],
         transforms.rotateZ(
           utils.degToRad(node.position.r),
           primitives.cuboid({
-            size: [node.size.w + (tolerance.loose + tolerance.tight) * 2, node.size.h + (tolerance.loose + tolerance.tight) * 2, 5],
+            size: [node.size.w + tolerance.tight * 2, node.size.h + tolerance.tight * 2 + 1, 6],
             center: [0, 0, 0]
           })
         )
       )
-    )
-  })
-  */
+    );
+  });
 
-  // cut the switches holes and gruves from the plate
-  switch_nodes.forEach((node) => {
+  _.forEach(switch_nodes, (node) => {
     // cut switches from case
     base_case_3d = booleans.subtract(
       base_case_3d,
@@ -188,7 +176,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
           })
         )
       )
-    )
+    );
     // cut switches from plate
     base_plate_3d = booleans.subtract(
       base_plate_3d,
@@ -203,7 +191,7 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
           })
         )
       ),
-      // switch gruve cutout
+      // switch groove cutout
       transforms.translate(
         [node.position.x, node.position.y, (o.plateThickness - o.switchGruveThickness) / 2],
         transforms.rotateZ(
@@ -214,26 +202,24 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
           })
         )
       )
-    )
-  })
+    );
+  });
 
-  base_plate_3d = transforms.translateZ(
-    o.baseThickness + o.plateHeight,
-    base_plate_3d
-  )
+  // position the plate of the correct heigth
+  base_plate_3d = transforms.translateZ(o.baseThickness + o.plateHeight, base_plate_3d);
 
   const geoms: ModelWorkerResult["geometries"] = [
     {
       id: 1,
-      label: "Plate",
+      label: 'Plate',
       geom: transforms.mirrorY(base_plate_3d)
     },
     {
       id: 2,
-      label: "Case",
+      label: 'Case',
       geom: transforms.mirrorY(base_case_3d)
-    },
-  ]
+    }
+  ];
 
   // return the result
   self.postMessage({
@@ -242,5 +228,6 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
   });
 
 };
+
 
 export { };

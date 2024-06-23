@@ -4,6 +4,7 @@ import { Geom3 } from '@jscad/modeling/src/geometries/types';
 import { ModelWorkerResult } from './model-a-options';
 import { Node } from '@/components/editor/stores/editor-store';
 import { getNodesOutinePoints } from '@/components/editor/lib/nodes-ouline-points';
+import { Vec3 } from "@jscad/modeling/src/maths/vec3";
 
 
 const defaultOptions = {
@@ -145,21 +146,45 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
     case_base
   );
 
-  // cut the mcu from the case
   _.forEach(mcu_nodes, (node) => {
+    const [w, h] = [node.size.w + tolerance.tight * 2, node.size.h + tolerance.tight * 2 + 1]
+    // cut the mcu from the case
     base_case_3d = booleans.subtract(
       base_case_3d,
       transforms.translate(
         [node.position.x, node.position.y, 3 + o.mcuHeight],
         transforms.rotateZ(
           utils.degToRad(node.position.r),
-          primitives.cuboid({
-            size: [node.size.w + tolerance.tight * 2, node.size.h + tolerance.tight * 2 + 1, 6],
-            center: [0, 0, 0]
-          })
+          booleans.subtract(
+            primitives.cuboid({
+              size: [w, h, 6],
+              center: [0, 0, 0]
+            }),
+            transforms.translate(
+              [w / 2, h / -2 + o.wallThickness, 3],
+              transforms.rotate(
+                [0, utils.degToRad(45), 0],
+                primitives.cuboid({
+                  size: [3, o.wallThickness * 2, 3],
+                  center: [0, 0, 0]
+                })
+              )
+            ),
+            transforms.translate(
+              [w / -2, h / -2 + o.wallThickness, 3],
+              transforms.rotate(
+                [0, utils.degToRad(45), 0],
+                primitives.cuboid({
+                  size: [3, o.wallThickness * 2, 3],
+                  center: [0, 0, 0]
+                })
+              )
+            )
+          )
         )
       )
     );
+    //
   });
 
   _.forEach(switch_nodes, (node) => {

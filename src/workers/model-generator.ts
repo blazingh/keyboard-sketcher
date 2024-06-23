@@ -152,30 +152,61 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
     base_case_3d = booleans.subtract(
       base_case_3d,
       transforms.translate(
-        [node.position.x, node.position.y, 3 + o.mcuHeight],
+        [node.position.x, node.position.y, o.mcuHeight],
         transforms.rotateZ(
           utils.degToRad(node.position.r),
           booleans.subtract(
-            primitives.cuboid({
-              size: [w, h, 6],
-              center: [0, 0, 0]
-            }),
+            booleans.union(
+              transforms.translate(
+                [0, 0, 4],
+                primitives.cuboid({
+                  size: [w, h, 8],
+                  center: [0, 0, 0]
+                })
+              ),
+              hulls.hull(
+                transforms.translate(
+                  [2.65, h / -2 - o.wallThickness / 2, 2.5 + 1],
+                  transforms.rotate(
+                    [utils.degToRad(90), 0, 0],
+                    primitives.cylinder({
+                      radius: 2.5,
+                      height: o.wallThickness,
+                      center: [0, 0, 0],
+                      segments: 30
+                    }),
+                  )
+                ),
+                transforms.translate(
+                  [-2.65, h / -2 - o.wallThickness / 2, 2.5 + 1],
+                  transforms.rotate(
+                    [utils.degToRad(90), 0, 0],
+                    primitives.cylinder({
+                      radius: 2.5,
+                      height: o.wallThickness,
+                      center: [0, 0, 0],
+                      segments: 30
+                    }),
+                  )
+                )
+              )
+            ),
             transforms.translate(
-              [w / 2, h / -2 + o.wallThickness, 3],
+              [w / 2, h / -2 + o.wallThickness, 8],
               transforms.rotate(
                 [0, utils.degToRad(45), 0],
                 primitives.cuboid({
-                  size: [3, o.wallThickness * 2, 3],
+                  size: [4, o.wallThickness * 2, 4],
                   center: [0, 0, 0]
                 })
               )
             ),
             transforms.translate(
-              [w / -2, h / -2 + o.wallThickness, 3],
+              [w / -2, h / -2 + o.wallThickness, 8],
               transforms.rotate(
                 [0, utils.degToRad(45), 0],
                 primitives.cuboid({
-                  size: [3, o.wallThickness * 2, 3],
+                  size: [4, o.wallThickness * 2, 4],
                   center: [0, 0, 0]
                 })
               )
@@ -184,7 +215,6 @@ self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
         )
       )
     );
-    //
   });
 
   _.forEach(switch_nodes, (node) => {

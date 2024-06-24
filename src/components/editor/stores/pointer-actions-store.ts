@@ -13,13 +13,25 @@ type State = {
     displayPositions: boolean
   },
 
-  selectionBoxOptions: {},
+  selectionBoxOptions: {
+    includeSwitches: boolean,
+    includControllers: boolean,
+  },
 
   rulerOptions: {},
 
-  additionOptions: {},
+  additionOptions: {
+    nodeType: "switch"
+    switchType: string
+  } | {
+    nodeType: "mcu"
+    mcuType: string
+  },
 
-  copyOptions: {},
+  copyOptions: {
+    spacing: string
+    relativePosition: boolean
+  },
 
   arcOptions: {
     sides: ("left" | "right")[]
@@ -50,10 +62,23 @@ const initialState: State = {
     relativeTranslation: false
   },
 
-  selectionBoxOptions: {},
+  selectionBoxOptions: {
+    includeSwitches: true,
+    includControllers: true,
+  },
+
   rulerOptions: {},
-  additionOptions: {},
-  copyOptions: {},
+
+  additionOptions: {
+    nodeType: "switch",
+    switchType: "mx"
+  },
+
+  copyOptions: {
+    spacing: "5",
+    relativePosition: false,
+  },
+
   arcOptions: {
     sides: ["right"],
     switchCount: 5,

@@ -34,8 +34,7 @@ export default function PointerActionsOptions() {
             variant="faded"
             size="sm"
             className={cn(
-              "absolute top-1/2 -translate-y-1/2",
-              open ? " -right-4 " : "-right-8",
+              "absolute top-1/2 -translate-y-1/2 rounded-l-none",
             )}
             isIconOnly
             onPress={() => { setOpen(p => !p) }}

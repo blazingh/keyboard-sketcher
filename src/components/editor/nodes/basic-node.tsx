@@ -83,17 +83,16 @@ export function BasicNode({
     <g
       className={cn(
         "touch-none no-pan",
-        pointerAction.selectedMode !== "normal" && "pointer-events-none"
       )}
-      transform={`translate(${nodeActive ? dx : 0}, ${nodeActive ? dy : 0})`}
-      style={{
-      }}
+      width={node.size.w}
+      height={node.size.h}
+      transform={`translate(${(x) + (nodeActive ? dx : 0)}, ${(y) + (nodeActive ? dy : 0)}) rotate(${node.pos.r + (nodeActive ? dr : 0)})`}
       {...binds()}
     >
       <rect
-        x={x - node.size.w / 2}
-        y={y - node.size.h / 2}
         rx={5}
+        x={node.size.w / -2}
+        y={node.size.h / -2}
         width={node.size.w}
         height={node.size.h}
         className={cn(
@@ -102,17 +101,12 @@ export function BasicNode({
           node.type === "switch" && "fill-secondary/90",
           node.type === "mcu" && "fill-green-800",
         )}
-        style={{
-          transformBox: "fill-box",
-          transformOrigin: "center",
-          transform: `rotate(${node.pos.r + (nodeActive ? dr : 0)}deg)`
-        }}
       >
       </rect>
       {node.type === "mcu" && (
         <rect
-          x={x - 35}
-          y={y - node.size.h / 2 - 1}
+          x={-35}
+          y={node.size.h / -2}
           width={70}
           height={30}
           rx={5}
@@ -122,8 +116,6 @@ export function BasicNode({
       )}
       {(nodeActive && pointerAction.selectedMode === "normal") &&
         <text
-          x={x}
-          y={y}
           fontSize="10"
           fill="white"
           dominantBaseline="middle"

@@ -1,4 +1,3 @@
-import { useEditorStore } from "@/components/editor/stores/editor-store"
 import { Divider, Switch } from "@nextui-org/react";
 import { PointerAcitonStore } from "../stores/pointer-actions-store";
 import { produce } from "immer";
@@ -57,10 +56,10 @@ export default function TransformationActionOptions({
 
       <Switch
         size="sm"
-        isSelected={TO.relativeTranslation}
+        isSelected={TO.relativeTransformation}
         onValueChange={(v) => {
           updateTransformationOptions(produce(TO, draft => {
-            draft.relativeTranslation = v
+            draft.relativeTransformation = v
           }))
         }}
       >

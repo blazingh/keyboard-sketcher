@@ -9,7 +9,7 @@ type State = {
   transformationOptions: {
     gridSnapingActive: boolean
     rotationSnapingActive: boolean
-    relativeTranslation: boolean
+    relativeTransformation: boolean
     displayPositions: boolean
   },
 
@@ -57,7 +57,7 @@ const initialState: State = {
     gridSnapingActive: true,
     rotationSnapingActive: true,
     displayPositions: true,
-    relativeTranslation: false
+    relativeTransformation: false
   },
 
   selectionBoxOptions: {

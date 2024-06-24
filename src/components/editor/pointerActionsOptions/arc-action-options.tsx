@@ -140,25 +140,13 @@ export default function ArcActionOptions({
       </div>
 
 
-      <div className="w-full flex justify-between">
-
-        {/* cancel button */}
-        <Button
-          size="sm"
-          color="danger"
-          isIconOnly
-          onClick={() => {
-            store.clearActiveNodes()
-          }}
-        >
-          <X />
-        </Button>
+      <div className="w-full flex justify-between mt-2">
 
         {/* confirm button */}
         <Button
+          fullWidth
           size="sm"
           color="primary"
-          isIconOnly
           onClick={() => {
             store.activeNodes.map((nodeId) => {
               const { pos: { x, y, r } } = store.nodes[nodeId]
@@ -178,7 +166,7 @@ export default function ArcActionOptions({
             store.clearActiveNodes()
           }}
         >
-          <Check />
+          Add Nodes
         </Button>
       </div>
 

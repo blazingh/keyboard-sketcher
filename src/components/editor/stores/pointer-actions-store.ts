@@ -22,10 +22,8 @@ type State = {
 
   additionOptions: {
     nodeType: "switch"
-    switchType: string
   } | {
     nodeType: "mcu"
-    mcuType: string
   },
 
   copyOptions: {
@@ -71,7 +69,6 @@ const initialState: State = {
 
   additionOptions: {
     nodeType: "switch",
-    switchType: "mx"
   },
 
   copyOptions: {

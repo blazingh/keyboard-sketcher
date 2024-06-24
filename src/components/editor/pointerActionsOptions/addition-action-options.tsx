@@ -1,10 +1,11 @@
-import { useEditorStore } from "@/components/editor/stores/editor-store"
 import { Divider, Select, SelectItem } from "@nextui-org/react";
+import { PointerAcitonStore } from "../stores/pointer-actions-store";
+import { produce } from "immer";
 
 export default function AdditonActionOptions({
 }: {
   }) {
-  const editor = useEditorStore()
+  const { additionOptions: TO, updateAdditionOptions } = PointerAcitonStore()
 
   return (
     <div
@@ -20,8 +21,14 @@ export default function AdditonActionOptions({
       <Select
         label="Node type"
         size="sm"
-        selectionMode="multiple"
+        selectionMode="single"
+        selectedKeys={[TO.nodeType]}
         disallowEmptySelection
+        onSelectionChange={(v) => {
+          updateAdditionOptions(produce(TO, draft => {
+            draft.nodeType = Array.from(v)[0] as any
+          }))
+        }}
       >
         {["switch", "mcu"].map((side) => (
           <SelectItem key={side}>

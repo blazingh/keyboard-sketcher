@@ -1,11 +1,12 @@
-import { useEditorStore } from "@/components/editor/stores/editor-store"
 import InputWithKeypad from "@/components/virtual-numpad-input";
 import { Divider, Switch } from "@nextui-org/react";
+import { PointerAcitonStore } from "../stores/pointer-actions-store";
+import { produce } from "immer";
 
 export default function CopyActionOptions({
 }: {
   }) {
-  const editor = useEditorStore()
+  const { copyOptions: TO, updateCopyOptions } = PointerAcitonStore()
 
   return (
     <div
@@ -21,10 +22,22 @@ export default function CopyActionOptions({
       <InputWithKeypad
         size="sm"
         label="Spacing"
+        value={TO.spacing}
+        onValueChange={(v) => {
+          updateCopyOptions(produce(TO, draft => {
+            draft.spacing = v
+          }))
+        }}
       />
 
       <Switch
         size="sm"
+        isSelected={TO.relativePosition}
+        onValueChange={(v) => {
+          updateCopyOptions(produce(TO, draft => {
+            draft.relativePosition = v
+          }))
+        }}
       >
         Relative positioning
       </Switch>

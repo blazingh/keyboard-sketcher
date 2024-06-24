@@ -1,10 +1,12 @@
 import { useEditorStore } from "@/components/editor/stores/editor-store"
 import { Divider, Switch } from "@nextui-org/react";
+import { PointerAcitonStore } from "../stores/pointer-actions-store";
+import { produce } from "immer";
 
 export default function TransformationActionOptions({
 }: {
   }) {
-  const editor = useEditorStore()
+  const { transformationOptions: TO, updateTransformationOptions } = PointerAcitonStore()
 
   return (
     <div
@@ -19,26 +21,52 @@ export default function TransformationActionOptions({
 
       <Switch
         size="sm"
+        isSelected={TO.displayPositions}
+        onValueChange={(v) => {
+          updateTransformationOptions(produce(TO, draft => {
+            draft.displayPositions = v
+          }))
+        }}
+      >
+        Display Positions
+      </Switch>
+
+      <Switch
+        size="sm"
+        isSelected={TO.gridSnapingActive}
+        onValueChange={(v) => {
+          updateTransformationOptions(produce(TO, draft => {
+            draft.gridSnapingActive = v
+          }))
+        }}
       >
         Enable grid snaping
       </Switch>
 
       <Switch
         size="sm"
+        isSelected={TO.rotationSnapingActive}
+        onValueChange={(v) => {
+          updateTransformationOptions(produce(TO, draft => {
+            draft.rotationSnapingActive = v
+          }))
+        }}
       >
         Enable rotation snaping
       </Switch>
 
       <Switch
         size="sm"
+        isSelected={TO.relativeTranslation}
+        onValueChange={(v) => {
+          updateTransformationOptions(produce(TO, draft => {
+            draft.relativeTranslation = v
+          }))
+        }}
       >
         Relative translation
       </Switch>
-      <Switch
-        size="sm"
-      >
-        Display Positions
-      </Switch>
+
 
     </div>
   )

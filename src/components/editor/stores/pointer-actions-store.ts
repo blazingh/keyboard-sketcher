@@ -6,7 +6,12 @@ type State = {
 
   selectedMode: "normal" | "selectionBox" | "ruler" | "addition" | "copy" | "arc" | "flipH" | "flipV" | "delete"
 
-  transformationOptions: {},
+  transformationOptions: {
+    gridSnapingActive: boolean
+    rotationSnapingActive: boolean
+    relativeTranslation: boolean
+    displayPositions: boolean
+  },
 
   selectionBoxOptions: {},
 
@@ -37,7 +42,14 @@ type Action = {
 
 const initialState: State = {
   selectedMode: "normal",
-  transformationOptions: {},
+
+  transformationOptions: {
+    gridSnapingActive: true,
+    rotationSnapingActive: true,
+    displayPositions: true,
+    relativeTranslation: false
+  },
+
   selectionBoxOptions: {},
   rulerOptions: {},
   additionOptions: {},

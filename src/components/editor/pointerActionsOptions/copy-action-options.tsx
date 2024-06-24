@@ -6,6 +6,7 @@ import { produce } from "immer";
 export default function CopyActionOptions({
 }: {
   }) {
+
   const { copyOptions: TO, updateCopyOptions } = PointerAcitonStore()
 
   return (
@@ -22,7 +23,8 @@ export default function CopyActionOptions({
       <InputWithKeypad
         size="sm"
         label="Spacing"
-        value={TO.spacing}
+        defaultValue={TO.spacing}
+        endContent={<span className="text-xs italic">mm</span>}
         onValueChange={(v) => {
           updateCopyOptions(produce(TO, draft => {
             draft.spacing = v

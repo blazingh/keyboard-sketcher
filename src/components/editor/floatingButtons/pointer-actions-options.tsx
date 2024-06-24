@@ -6,7 +6,7 @@ import SelectionBoxActionOptions from "../pointerActionsOptions/selectionBox-act
 import AdditonActionOptions from "../pointerActionsOptions/addition-action-options"
 import CopyActionOptions from "../pointerActionsOptions/copy-action-options"
 import RulerActionOptions from "../pointerActionsOptions/ruler-action-options"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import { ArrowLeftToLine, ArrowRightFromLine } from "lucide-react"
 
@@ -14,6 +14,10 @@ export default function PointerActionsOptions() {
 
   const [open, setOpen] = useState(true)
   const pointer = PointerAcitonStore()
+
+  useEffect(() => {
+    setOpen(true)
+  }, [pointer.selectedMode])
 
   return (
     <div className="relative">

@@ -6,7 +6,7 @@ import { temporal } from 'zundo';
 import isDeepEqual from 'fast-deep-equal';
 import { v4 as v4uuid } from "uuid";
 import { normalizeAngle } from '../lib/nodes-utils';
-import { arcsGhostNodes } from '../nodes/arc-group-node';
+import _ from 'lodash';
 
 export type Pos = {
   x: number,
@@ -26,21 +26,10 @@ export type Node = {
   type: "switch" | "mcu"
 }
 
-export type TransformMatrix = {
-  x: number, // x translation
-  y: number, // y translation
-  s: number // scale 
-}
-
-export type ArcState = {
-  pos: Pos,
-  switchCounts: [number, number, number, number], // [left, top, rigth, bottom]
-  switchGaps: [number, number, number, number], // [left, top, rigth, bottom]
-  radiuses: [number, number, number, number], // [left, top, rigth, bottom]
-}
-
 type State = {
+  /** reactive state to check if the store has hydrated or not */
   _hasHydrated: boolean,
+
   /** nodes include switch, controllers or any newly added item to the viewport */
   nodes: { [key: Node["id"]]: Node },
 
@@ -50,17 +39,13 @@ type State = {
     position: "tl" | "tr" | "br" | "bl" | "c"
   }[]
 
-  /** arcState contain nodes spanned along the arc */
-  arcState: ArcState,
-
   /** selected Node */
   activeNodes: Node["id"][],
 
   /** snapLines position */
   snapLines?: GetSnapLinesResult,
 
-  /** current draged node x and y displacement, used to translate the selected nodes on pointer drag */
-  activeDxy: { x: number, y: number }
+  /** current draged node x, y and r displacement, used to translate the selected nodes on pointer drag */
   activeDisplacement: Pos
 }
 
@@ -68,14 +53,11 @@ type Action = {
   setHasHydrated: (state: boolean) => void
   nodesArray: () => Node[]
 
-  updateNodes: (newNodes: Node[]) => void
   addNodes: (nodes: Node[]) => Node["id"][]
-  deleteNode: (id: Node["id"]) => void
+  updateNodes: (newNodes: Node[]) => void
+  deleteNodes: (id: Node["id"][]) => void
 
   setActiveDisplacement: (displacement: Pos) => void
-
-  updateArcState: (arc: ArcState) => void,
-  appendGhostNodes: () => void,
 
   addActiveNode: (id: Node["id"]) => void
   removeActiveNode: (id: Node["id"]) => void
@@ -103,25 +85,18 @@ export const baseNodeState: Node = {
 
 const initialNodes: { [key: Node["id"]]: Node } = {
   "1": { id: "1", size: { w: 140, h: 140, p: 25 }, pos: { x: 750, y: 750, r: 0 }, selectable: true, type: "switch" },
-  "2": { id: "2", size: { w: 140, h: 140, p: 25 }, pos: { x: 750, y: 850, r: 0 }, selectable: true, type: "switch" },
-  "4": { id: "4", size: { w: 140, h: 140, p: 25 }, pos: { x: 850, y: 850, r: 0 }, selectable: true, type: "switch" },
-  "3": { id: "3", size: { w: 140, h: 140, p: 25 }, pos: { x: 850, y: 750, r: 0 }, selectable: true, type: "switch" },
-  "5": { id: "5", size: { w: 180, h: 360, p: 0 }, pos: { x: 1000, y: 1000, r: 0 }, selectable: true, type: "mcu" }
+  "2": { id: "2", size: { w: 140, h: 140, p: 25 }, pos: { x: 750, y: 940, r: 0 }, selectable: true, type: "switch" },
+  "4": { id: "4", size: { w: 140, h: 140, p: 25 }, pos: { x: 940, y: 940, r: 0 }, selectable: true, type: "switch" },
+  "3": { id: "3", size: { w: 140, h: 140, p: 25 }, pos: { x: 940, y: 750, r: 0 }, selectable: true, type: "switch" },
+  "5": { id: "5", size: { w: 180, h: 360, p: 0 }, pos: { x: 750, y: 790, r: 0 }, selectable: true, type: "mcu" }
 }
 
 export const initialStoreState: State = {
   _hasHydrated: false,
   nodes: initialNodes,
   rulerPoints: [],
-  arcState: {
-    pos: { x: 0, y: 0, r: 0 },
-    switchCounts: [3, 0, 3, 0],
-    switchGaps: [50, 0, 50, 0],
-    radiuses: [1000, 0, 1000, 0]
-  },
   activeNodes: [],
   snapLines: { ...defaultSnapLinesResult },
-  activeDxy: { x: 0, y: 0 },
   activeDisplacement: { x: 0, y: 0, r: 0 },
 }
 
@@ -130,6 +105,12 @@ export const useEditorStore = create<EditorStoreType>()(
   persist(
     temporal((set, get) => ({
       ...initialStoreState,
+
+      setHasHydrated: (state) => {
+        set({
+          _hasHydrated: state
+        });
+      },
 
       resetState: async (postReset) => {
         set({ ...initialStoreState, _hasHydrated: true })
@@ -145,13 +126,7 @@ export const useEditorStore = create<EditorStoreType>()(
         });
         return Object.values(get().nodes).toSorted((a, b) => orderMap[a.type] - orderMap[b.type])
       },
-      updateArcState: (arc) => {
-        set(produce((state: State) => {
-          state.arcState = arc
-        }))
-      },
-      appendGhostNodes: () => {
-      },
+
       addNodes: (nodes) => {
         const ids: Node["id"][] = []
         set(produce((state: State) => {
@@ -163,26 +138,32 @@ export const useEditorStore = create<EditorStoreType>()(
         }))
         return ids
       },
-      deleteNode: (id) => {
-        get().removeRulerPoint(id)
+
+      updateNodes: (newNodes) => {
         set(produce((state: State) => {
-          const index = state.activeNodes.findIndex((a: string) => a === id)
-          if (index !== -1) state.activeNodes.splice(index, 1)
-          delete state.nodes[id]
+          _.forEach(newNodes, newNode => {
+            state.nodes[newNode.id] = newNode
+          })
         }))
       },
+
+      deleteNodes: (ids) => {
+        _.forEach(ids, id => {
+          get().removeRulerPoint(id)
+          set(produce((state: State) => {
+            const index = state.activeNodes.findIndex((a: string) => a === id)
+            if (index !== -1) state.activeNodes.splice(index, 1)
+            delete state.nodes[id]
+          }))
+        })
+      },
+
       setActiveDisplacement: (displacement) => {
         set(produce((state) => {
           state.activeDisplacement = displacement
         }))
       },
-      updateNodes: (newNodes) => {
-        set(produce((state: State) => {
-          newNodes.forEach(newNode => {
-            state.nodes[newNode.id] = newNode
-          })
-        }))
-      },
+
       addRulerPoint: (point) => {
         const exists = get().rulerPoints.some(item => item.nodeId === point.nodeId);
         if (!exists)
@@ -197,23 +178,27 @@ export const useEditorStore = create<EditorStoreType>()(
             state.rulerPoints[index].position = point.position
           }))
       },
+
       removeRulerPoint: (nodeId) => {
         set(produce((state: State) => {
           state.rulerPoints = state.rulerPoints.filter(point => point.nodeId !== nodeId)
         }))
       },
+
       addActiveNode: (id) => {
         set(produce((state: State) => {
           const index = state.activeNodes.findIndex((a: string) => a === id)
           if (index === -1) state.activeNodes.push(id)
         }))
       },
+
       removeActiveNode: (id) => {
         set(produce((state: State) => {
           const index = state.activeNodes.findIndex((a: string) => a === id)
           if (index !== -1) state.activeNodes.splice(index, 1)
         }))
       },
+
       toggleActiveNode: (id) => {
         set(produce((state: State) => {
           const index = state.activeNodes.findIndex((a: string) => a === id)
@@ -221,15 +206,19 @@ export const useEditorStore = create<EditorStoreType>()(
           else state.activeNodes.push(id)
         }))
       },
+
       clearActiveNodes: () => {
         set({ activeNodes: [] })
       },
+
       updateSnapLines: (target) => {
         set({ snapLines: getSnapLines(target, get().nodesArray()) })
       },
+
       resetSnapLines: () => {
         set({ snapLines: undefined })
       },
+
       moveActiveNodes: (displacement) => {
         const { x, y, r } = displacement
         set(produce((state: State) => {
@@ -240,6 +229,7 @@ export const useEditorStore = create<EditorStoreType>()(
           })
         }))
       },
+
       deleteActiveNodes: () => {
         set(produce((state: State) => {
           get().activeNodes.forEach(id => {
@@ -248,6 +238,7 @@ export const useEditorStore = create<EditorStoreType>()(
           state.activeNodes = []
         }))
       },
+
       copyActivedNodes: (xy) => {
         const nodes: Node[] = []
         get().activeNodes.forEach(node => {
@@ -259,6 +250,7 @@ export const useEditorStore = create<EditorStoreType>()(
         const newIds = get().addNodes(nodes)
         set({ activeNodes: newIds })
       },
+
       flipActiveNodesHorizontally: () => {
         const nodes: Node[] = get().activeNodes.map(nodeId => get().nodes[nodeId])
         let minX = Infinity, maxX = -Infinity;
@@ -274,6 +266,7 @@ export const useEditorStore = create<EditorStoreType>()(
           }
         }))
       },
+
       flipActiveNodesVertically: () => {
         const nodes: Node[] = get().activeNodes.map(nodeId => get().nodes[nodeId])
         let minY = Infinity, maxY = -Infinity;
@@ -289,11 +282,6 @@ export const useEditorStore = create<EditorStoreType>()(
           }
         }))
       },
-      setHasHydrated: (state) => {
-        set({
-          _hasHydrated: state
-        });
-      }
 
     }),
       {
@@ -305,7 +293,7 @@ export const useEditorStore = create<EditorStoreType>()(
     {
       name: 'sketcher-nodes',
       skipHydration: true,
-      version: 8,
+      version: 9,
       partialize: (state) => ({ nodes: state.nodes }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true)

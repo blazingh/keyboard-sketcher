@@ -14,8 +14,7 @@ export default function NodesDuplicationTools({
   const { x: dx, y: dy, r: dr } = store.activeDisplacement
 
   if (false
-    || !store.activeNodes
-    || !isDeepEqual(store.activeDxy, { x: 0, y: 0 })
+    || store.activeNodes.length === 0
   ) return null
 
   const nodes: Node[] = store.activeNodes.map((nodeId) => {

@@ -1,8 +1,6 @@
 import { useEditorStore } from "@/components/editor/stores/editor-store"
 import { produce } from "immer"
-import isDeepEqual from 'fast-deep-equal';
 import SimpleNumberInput from "@/components/simple-number-input"
-import { Check, X } from "lucide-react";
 import InputWithKeypad from "@/components/virtual-numpad-input";
 import { useState } from "react";
 import { Button, Slider, Select, SelectItem, Divider } from "@nextui-org/react";
@@ -12,17 +10,13 @@ import { arcsGhostNodes } from "../nodes/arc-group-node";
 export default function ArcActionOptions({
 }: {
   }) {
+
   const store = useEditorStore()
 
   const pointerAction = PointerAcitonStore()
 
   const [slider1Val, setSlider1Val] = useState<number>(0)
   const [slider2Val, setSlider2Val] = useState<number>(0)
-
-  if (false
-    || !store.activeNodes
-    || !isDeepEqual(store.activeDxy, { x: 0, y: 0 })
-  ) return null
 
   const arc = pointerAction.arcOptions
 
@@ -162,7 +156,6 @@ export default function ArcActionOptions({
                 store.addNodes(ghostNodesGroup.ghostNodes)
               })
             })
-            store.appendGhostNodes()
             store.clearActiveNodes()
           }}
         >

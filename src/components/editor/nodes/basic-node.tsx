@@ -121,7 +121,7 @@ export function BasicNode({
           dominantBaseline="middle"
           textAnchor="middle"
         >
-          {normalizeAngle(node.pos.r + dr)}°
+          {normalizeAngle(node.pos.r + dr).toFixed(1)}°
         </text>
       }
       {false && (<>
